@@ -18,13 +18,17 @@
  */
 package jch.education.aws.l4loadbalancing.server;
 
-public class Program {
+public class Statistics {
     
-    public static void main(String[] args) {
-        // TODO:
-        // - two command line arguments:
-        //   + IP address to bind the listening socket to
-        //   + TCP port to open
-        System.out.println("Hello world!!! My name is Server.");
+    private long connectionsAccepted = 0;
+    
+    private long requestsHandled = 0;
+    
+    public synchronized void connectionAccepted() {
+        this.connectionsAccepted++;
+    }
+    
+    public synchronized void requestHandled() {
+        this.requestsHandled++;
     }
 }

@@ -16,15 +16,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jch.education.aws.l4loadbalancing.server;
+package jch.education.aws.l4loadbalancing.commons;
 
-public class Program {
-    
-    public static void main(String[] args) {
-        // TODO:
-        // - two command line arguments:
-        //   + IP address to bind the listening socket to
-        //   + TCP port to open
-        System.out.println("Hello world!!! My name is Server.");
-    }
+import java.util.Date;
+
+public class ProcessInfo {
+
+    private String hostname;
+
+    private String username;
+
+    private Date startTime;
 }

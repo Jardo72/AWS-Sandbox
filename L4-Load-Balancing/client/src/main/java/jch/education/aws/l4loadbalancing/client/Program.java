@@ -21,6 +21,12 @@ package jch.education.aws.l4loadbalancing.client;
 public class Program {
     
     public static void main(String[] args) {
+        // TODO:
+        // - four command line arguments:
+        //   + server IP address or hostname
+        //   + server TCP port
+        //   + number of requests
+        //   + duration of pause between requests
         System.out.println("Hello world!!! My name is Client.");
     }
 }

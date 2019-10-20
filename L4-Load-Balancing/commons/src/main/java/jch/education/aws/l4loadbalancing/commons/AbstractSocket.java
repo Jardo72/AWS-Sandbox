@@ -16,15 +16,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jch.education.aws.l4loadbalancing.server;
+package jch.education.aws.l4loadbalancing.commons;
 
-public class Program {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+
+public class AbstractSocket {
+
+    private final Socket socket;
+
+    private final InputStream input;
     
-    public static void main(String[] args) {
-        // TODO:
-        // - two command line arguments:
-        //   + IP address to bind the listening socket to
-        //   + TCP port to open
-        System.out.println("Hello world!!! My name is Server.");
+    private final OutputStream output;
+
+    protected AbstractSocket(Socket socket) throws IOException {
+        this.socket = socket;
+        this.input = socket.getInputStream();
+        this.output = socket.getOutputStream();
     }
 }
