@@ -18,9 +18,27 @@
  */
 package jch.education.aws.l4loadbalancing.commons;
 
-public class Statistics {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+public class StatisticsInfo {
+
+    @JsonProperty(value = "connectionsAccepted", required = true)
     private long connectionsAccepted;
 
+    @JsonProperty(value = "requestsHandled", required = true)
     private long requestsHandled;
+
+
+    public StatisticsInfo(long connectionsAccepted, long requestsHandled) {
+        this.connectionsAccepted = connectionsAccepted;
+        this.requestsHandled = requestsHandled;
+    }
+
+    public long getConnectionsAccepted() {
+        return this.connectionsAccepted;
+    }
+
+    public long getRequestsHandled() {
+        return this.requestsHandled;
+    }
 }

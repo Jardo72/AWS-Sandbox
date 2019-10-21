@@ -22,12 +22,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <version.number>1.0</version.number>
-  </properties>
-
   <modelVersion>4.0.0</modelVersion>
   <groupId>jch.education.awssandbox</groupId>
   <artifactId>aws-sandbox-network-load-balancing</artifactId>
@@ -41,20 +35,24 @@
     <module>server</module>
   </modules>
 
-  <dependencies>
-    <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
-        <version>20190722</version>
-    </dependency>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <version.number>1.0</version.number>
+    <jackson.version>2.10.0</jackson.version>
+  </properties>
 
-<!-- TODO: do we really need this?
+  <dependencies>
+	<dependency>
+	    <groupId>com.fasterxml.jackson.core</groupId>
+	    <artifactId>jackson-core</artifactId>
+	    <version>${jackson.version}</version>
+	</dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.7</version>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-xml</artifactId>
+        <version>${jackson.version}</version>
     </dependency>
-    -->
   </dependencies>
 </project>
 

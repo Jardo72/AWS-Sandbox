@@ -20,11 +20,29 @@ package jch.education.aws.l4loadbalancing.commons;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ProcessInfo {
 
+    @JsonProperty(value = "hostname", required = true)
     private String hostname;
 
+    @JsonProperty(value = "username", required = true)
     private String username;
 
+    @JsonProperty(value = "startTime", required = true)
     private Date startTime;
+
+
+    public String getHostname() {
+        return this.hostname;
+    }
+
+    public String getUsername() {
+        return this.username;
+    }
+
+    public Date getStartTime() {
+        return this.startTime;
+    }
 }

@@ -18,9 +18,26 @@
  */
 package jch.education.aws.l4loadbalancing.commons;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ServerInfo {
 
+    @JsonProperty(value = "processInfo", required = true)
     private ProcessInfo processInfo;
 
-    private Statistics statistics;
+    @JsonProperty(value = "statisticsInfo", required = true)
+    private StatisticsInfo statisticsInfo;
+
+    public ServerInfo(ProcessInfo processInfo, StatisticsInfo statisticsInfo) {
+        this.processInfo = processInfo;
+        this.statisticsInfo = statisticsInfo;
+    }
+
+    public ProcessInfo getProcessInfo() {
+        return this.processInfo;
+    }
+
+    public StatisticsInfo getStatisticsInfo() {
+        return this.statisticsInfo;
+    }
 }

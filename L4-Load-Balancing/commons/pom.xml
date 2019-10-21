@@ -33,12 +33,16 @@
   <artifactId>aws-sandbox-network-load-balancing-commons</artifactId>
   <name>AWS Sandbox Network Load-Balancing - Commons</name>
 
-
-  <!-- TODO: do we need this???
   <dependencies>
     <dependency>
-        <groupId>org.json</groupId>
-        <artifactId>json</artifactId>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
     </dependency>
-  </dependencies> -->
+	<dependency>
+	    <groupId>com.fasterxml.jackson.dataformat</groupId>
+	    <artifactId>jackson-dataformat-xml</artifactId>
+	    <version>${jackson.version}</version>
+	</dependency>
+  </dependencies>
 </project>
