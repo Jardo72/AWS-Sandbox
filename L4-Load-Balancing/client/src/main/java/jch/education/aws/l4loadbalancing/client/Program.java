@@ -18,9 +18,14 @@
  */
 package jch.education.aws.l4loadbalancing.client;
 
+import java.io.IOException;
+
+import jch.education.aws.l4loadbalancing.commons.CommandLineArguments;
+import jch.education.aws.l4loadbalancing.commons.ServerInfo;
+
 public class Program {
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // TODO:
         // - four command line arguments:
         //   + server IP address or hostname
@@ -28,5 +33,16 @@ public class Program {
         //   + number of requests
         //   + duration of pause between requests
         System.out.println("Hello world!!! My name is Client.");
+        
+        final String ipAddress = CommandLineArguments.extractStringValue(args, "");
+        final int port = CommandLineArguments.extractIntValue(args, "", 1234);
+        final int requestCount = CommandLineArguments.extractIntValue(args, "", 1);
+        final int breakBetweenRequestsSec = CommandLineArguments.extractIntValue(args, "", 0);
+        
+        ClientSocket clientSocket = new ClientSocket(ipAddress, port, 5);
+        for (int i = 0; i < requestCount; i++) {
+            ServerInfo serverInfo = clientSocket.requestServerInfo();
+        }
     }
 }
+

@@ -25,11 +25,11 @@ import java.net.Socket;
 
 public class AbstractSocket {
 
-    private final Socket socket;
+    protected final Socket socket;
 
-    private final InputStream input;
+    protected final InputStream input;
     
-    private final OutputStream output;
+    protected final OutputStream output;
 
     protected AbstractSocket(Socket socket) throws IOException {
         this.socket = socket;
