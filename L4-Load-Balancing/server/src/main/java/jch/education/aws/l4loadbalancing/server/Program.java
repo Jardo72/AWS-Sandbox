@@ -18,13 +18,28 @@
  */
 package jch.education.aws.l4loadbalancing.server;
 
+import java.io.IOException;
+
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+
+import jch.education.aws.l4loadbalancing.commons.CommandLineArguments;
+
 public class Program {
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // TODO:
         // - two command line arguments:
         //   + IP address to bind the listening socket to
         //   + TCP port to open
         System.out.println("Hello world!!! My name is Server.");
+        final String ipAddress = CommandLineArguments.extractStringValue(args, "");
+        final int port = CommandLineArguments.extractIntValue(args, "", 1234);
+
+        ServerSocket serverSocket = new ServerSocket();
+        serverSocket.bind(new InetSocketAddress(ipAddress, port));
+        while (true) {
+            serverSocket.accept();
+        }
     }
 }

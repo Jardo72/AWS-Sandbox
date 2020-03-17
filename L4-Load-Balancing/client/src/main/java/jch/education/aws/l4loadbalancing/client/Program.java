@@ -19,9 +19,11 @@
 package jch.education.aws.l4loadbalancing.client;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import jch.education.aws.l4loadbalancing.commons.CommandLineArguments;
 import jch.education.aws.l4loadbalancing.commons.ServerInfo;
+import jch.education.aws.l4loadbalancing.commons.Timing;
 
 public class Program {
     
@@ -42,6 +44,7 @@ public class Program {
         ClientSocket clientSocket = new ClientSocket(ipAddress, port, 5);
         for (int i = 0; i < requestCount; i++) {
             ServerInfo serverInfo = clientSocket.requestServerInfo();
+            Timing.sleep(breakBetweenRequestsSec, TimeUnit.SECONDS);
         }
     }
 }

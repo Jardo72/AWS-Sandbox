@@ -39,7 +39,7 @@ public class ClientSocket extends AbstractSocket {
         return socket;
     }
 
-    public ServerInfo requestServerInfo() {
+    public ServerInfo requestServerInfo() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(this.input, ServerInfo.class);
     }
