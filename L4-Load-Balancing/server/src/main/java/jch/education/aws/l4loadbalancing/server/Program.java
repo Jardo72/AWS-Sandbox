@@ -39,7 +39,7 @@ public class Program {
         ServerSocket serverSocket = new ServerSocket();
         serverSocket.bind(new InetSocketAddress(ipAddress, port));
         while (true) {
-            serverSocket.accept();
+            ServiceSocket serviceSocket = new ServiceSocket(serverSocket.accept());
         }
     }
 }

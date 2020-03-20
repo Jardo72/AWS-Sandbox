@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import jch.education.aws.l4loadbalancing.commons.CommandLineArguments;
+import jch.education.aws.l4loadbalancing.commons.ProcessInfo;
 import jch.education.aws.l4loadbalancing.commons.ServerInfo;
+import jch.education.aws.l4loadbalancing.commons.StatisticsInfo;
 import jch.education.aws.l4loadbalancing.commons.Timing;
 
 public class Program {
@@ -44,8 +46,22 @@ public class Program {
         ClientSocket clientSocket = new ClientSocket(ipAddress, port, 5);
         for (int i = 0; i < requestCount; i++) {
             ServerInfo serverInfo = clientSocket.requestServerInfo();
+            print(serverInfo);
             Timing.sleep(breakBetweenRequestsSec, TimeUnit.SECONDS);
         }
     }
-}
 
+    private static void print(ServerInfo serverInfo) {
+        System.out.println("Server process information");
+        ProcessInfo processInfo = serverInfo.getProcessInfo();
+        System.out.printf("Hostname:   %s%n", processInfo.getHostname());
+        System.out.printf("User:       %s%n", processInfo.getUsername());
+        /*
+        System.out.printf("Start time: %s%n", processInfo.get()); */
+
+        System.out.println("Server statistics");
+        StatisticsInfo statisticsInfo = serverInfo.getStatisticsInfo();
+        System.out.printf("Connections accepted: %d%n", statisticsInfo.getConnectionsAccepted());
+        System.out.printf("Requests handled:     %d%n", statisticsInfo.getRequestsHandled());
+    }
+}

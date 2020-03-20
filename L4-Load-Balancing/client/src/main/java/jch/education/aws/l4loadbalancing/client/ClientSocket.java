@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import jch.education.aws.l4loadbalancing.commons.AbstractSocket;
 import jch.education.aws.l4loadbalancing.commons.ServerInfo;
 
@@ -40,7 +38,9 @@ public class ClientSocket extends AbstractSocket {
     }
 
     public ServerInfo requestServerInfo() throws IOException {
+        return readObject(ServerInfo.class);
+        /* TODO: remove
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(this.input, ServerInfo.class);
+        return objectMapper.readValue(this.input, ServerInfo.class); */
     }
 }

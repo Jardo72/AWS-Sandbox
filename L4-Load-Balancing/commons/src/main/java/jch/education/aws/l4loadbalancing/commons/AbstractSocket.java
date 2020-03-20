@@ -23,7 +23,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class AbstractSocket {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     protected final Socket socket;
 
@@ -35,5 +39,13 @@ public class AbstractSocket {
         this.socket = socket;
         this.input = socket.getInputStream();
         this.output = socket.getOutputStream();
+    }
+
+    protected <T> T readObject(Class<T> clazz) throws IOException {
+        return this.objectMapper.readValue(this.input, clazz);
+    }
+
+    public void writeObject(Object object) throws IOException {
+        this.objectMapper.writeValue(this.output, object);
     }
 }
