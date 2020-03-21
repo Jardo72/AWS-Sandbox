@@ -18,6 +18,8 @@
  */
 package jch.education.aws.l4loadbalancing.server;
 
+import jch.education.aws.l4loadbalancing.commons.StatisticsInfo;
+
 public class Statistics {
     
     private long connectionsAccepted = 0;
@@ -30,5 +32,9 @@ public class Statistics {
     
     public synchronized void requestHandled() {
         this.requestsHandled++;
+    }
+
+    public synchronized StatisticsInfo getSnapshot() {
+        return new StatisticsInfo(this.connectionsAccepted, this.requestsHandled);
     }
 }

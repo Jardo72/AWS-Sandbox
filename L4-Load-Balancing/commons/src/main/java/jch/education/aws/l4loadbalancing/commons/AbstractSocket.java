@@ -29,11 +29,11 @@ public class AbstractSocket {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    protected final Socket socket;
+    private final Socket socket;
 
-    protected final InputStream input;
+    private final InputStream input;
     
-    protected final OutputStream output;
+    private final OutputStream output;
 
     protected AbstractSocket(Socket socket) throws IOException {
         this.socket = socket;

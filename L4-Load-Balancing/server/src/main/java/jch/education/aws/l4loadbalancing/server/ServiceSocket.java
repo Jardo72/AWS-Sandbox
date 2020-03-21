@@ -22,10 +22,20 @@ import java.io.IOException;
 import java.net.Socket;
 
 import jch.education.aws.l4loadbalancing.commons.AbstractSocket;
+import jch.education.aws.l4loadbalancing.commons.ClientInfo;
+import jch.education.aws.l4loadbalancing.commons.ServerInfo;
 
 public class ServiceSocket extends AbstractSocket {
     
     public ServiceSocket(Socket socket) throws IOException {
         super(socket);
+    }
+
+    public ClientInfo readClientInfo() throws IOException {
+        return readObject(ClientInfo.class);
+    }
+
+    public void writeServerInfo(ServerInfo serveInfo) throws IOException {
+        writeObject(serveInfo);
     }
 }

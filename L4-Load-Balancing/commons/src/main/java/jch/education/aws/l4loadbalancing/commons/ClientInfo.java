@@ -28,11 +28,30 @@ public class ClientInfo {
     @JsonProperty(value = "requestNumber", required = true)
     private long requestNumber;
 
+    @JsonProperty(value = "requestCount", required = true)
+    private long requestCount;
+
+    public ClientInfo() {}
+
+    public ClientInfo(String clientId, long requestNumber, long requestCount) {
+        this.clientId = clientId;
+        this.requestNumber = requestNumber;
+        this.requestCount = requestCount;
+    }
+
     public String getClientId() {
         return this.clientId;
     }
 
     public long getRequestNumber() {
         return this.requestNumber;
+    }
+
+    public long getRequestCount() {
+        return this.requestCount;
+    }
+
+    public boolean isNotLastRequest() {
+        return this.requestNumber < this.requestCount;
     }
 }

@@ -28,6 +28,8 @@ public class ServerInfo {
     @JsonProperty(value = "statisticsInfo", required = true)
     private StatisticsInfo statisticsInfo;
 
+    public ServerInfo() {}
+
     public ServerInfo(ProcessInfo processInfo, StatisticsInfo statisticsInfo) {
         this.processInfo = processInfo;
         this.statisticsInfo = statisticsInfo;

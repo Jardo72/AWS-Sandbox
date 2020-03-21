@@ -18,6 +18,8 @@
  */
 package jch.education.aws.l4loadbalancing.server;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.io.IOException;
 
 import java.net.InetSocketAddress;
@@ -33,13 +35,18 @@ public class Program {
         //   + IP address to bind the listening socket to
         //   + TCP port to open
         System.out.println("Hello world!!! My name is Server.");
-        final String ipAddress = CommandLineArguments.extractStringValue(args, "");
-        final int port = CommandLineArguments.extractIntValue(args, "", 1234);
+        final String ipAddress = CommandLineArguments.extractStringValue(args, "IP-address");
+        final int port = CommandLineArguments.extractIntValue(args, "port", 1234);
 
-        ServerSocket serverSocket = new ServerSocket();
+        final ExecutorService threadPool = Executors.newFixedThreadPool(20);
+        final Statistics statistics = new Statistics();
+
+        final ServerSocket serverSocket = new ServerSocket();
         serverSocket.bind(new InetSocketAddress(ipAddress, port));
         while (true) {
             ServiceSocket serviceSocket = new ServiceSocket(serverSocket.accept());
+            statistics.connectionAccepted();
+            threadPool.submit(new ClientHandler(serviceSocket, statistics));
         }
     }
 }

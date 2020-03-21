@@ -23,6 +23,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import jch.education.aws.l4loadbalancing.commons.AbstractSocket;
+import jch.education.aws.l4loadbalancing.commons.ClientInfo;
 import jch.education.aws.l4loadbalancing.commons.ServerInfo;
 
 public class ClientSocket extends AbstractSocket {
@@ -37,10 +38,11 @@ public class ClientSocket extends AbstractSocket {
         return socket;
     }
 
-    public ServerInfo requestServerInfo() throws IOException {
+    public void writeClientInfo(ClientInfo clientInfo) throws IOException {
+        writeObject(clientInfo);
+    }
+
+    public ServerInfo readServerInfo() throws IOException {
         return readObject(ServerInfo.class);
-        /* TODO: remove
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(this.input, ServerInfo.class); */
     }
 }
