@@ -33,6 +33,13 @@ public class ProcessInfo {
     @JsonProperty(value = "startTime", required = true)
     private Date startTime;
 
+    public ProcessInfo() {}
+
+    public ProcessInfo(String hostname, String username, Date startTime) {
+        this.hostname = hostname;
+        this.username = username;
+        this.startTime = startTime;
+    }
 
     public String getHostname() {
         return this.hostname;

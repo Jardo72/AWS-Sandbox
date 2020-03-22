@@ -18,7 +18,6 @@
  */
 package jch.education.aws.l4loadbalancing.client;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -29,18 +28,21 @@ import jch.education.aws.l4loadbalancing.commons.CommandLineArguments;
 import jch.education.aws.l4loadbalancing.commons.ProcessInfo;
 import jch.education.aws.l4loadbalancing.commons.ServerInfo;
 import jch.education.aws.l4loadbalancing.commons.StatisticsInfo;
+import jch.education.aws.l4loadbalancing.commons.Stdout;
 import jch.education.aws.l4loadbalancing.commons.Timing;
 
 public class Program {
     
-    public static void main(String[] args) throws IOException {
-        System.out.println("Hello world!!! My name is Client.");
-        
+    public static void main(String[] args) throws Exception {
         final String ipAddress = CommandLineArguments.extractStringValue(args, "IP-address");
         final int port = CommandLineArguments.extractIntValue(args, "port", 1234);
         final int requestCount = CommandLineArguments.extractIntValue(args, "request-count", 1);
-        final int breakBetweenRequestsSec = CommandLineArguments.extractIntValue(args, "", 0);
-        
+        final int breakBetweenRequestsSec = CommandLineArguments.extractIntValue(args, "break-between-requests-sec", 5);
+        Stdout.println("IP address:                   %s", ipAddress);
+        Stdout.println("TCP port:                     %d", port);
+        Stdout.println("Request count:                %d", requestCount);
+        Stdout.println("Break between requests [sec]: %d", breakBetweenRequestsSec);
+
         final String clientId = UUID.randomUUID().toString();
         final ClientSocket clientSocket = new ClientSocket(ipAddress, port, 5);
         for (int i = 1; i <= requestCount; i++) {

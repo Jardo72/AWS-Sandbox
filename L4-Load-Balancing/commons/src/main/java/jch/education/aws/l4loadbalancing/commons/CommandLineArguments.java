@@ -22,18 +22,22 @@ public class CommandLineArguments {
 
     private CommandLineArguments() {}
 
-    public static String extractStringValue(String[] commandLineArgs, String name) {
+    public static String extractStringValue(String[] commandLineArgs, String name) throws InvalidCommandLineArgumentsException {
         String result = extractValue(commandLineArgs, name);
         if ((result == null) || (result.length() == 0)) {
-            // TODO: throw an exception
+            String message = "Missing command line argument %s.";
+            message = String.format(message, name);
+            throw new InvalidCommandLineArgumentsException(message);
         }
         return result;
     }
 
-    public static int extractIntValue(String[] commandLineArgs, String name) {
+    public static int extractIntValue(String[] commandLineArgs, String name) throws InvalidCommandLineArgumentsException {
         String result = extractValue(commandLineArgs, name);
         if ((result == null) || (result.length() == 0)) {
-            // TODO: throw an exception
+            String message = "Missing command line argument %s.";
+            message = String.format(message, name);
+            throw new InvalidCommandLineArgumentsException(message);
         }
         return Integer.parseInt(result);
     }

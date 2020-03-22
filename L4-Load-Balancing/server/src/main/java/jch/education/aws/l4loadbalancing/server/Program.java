@@ -18,35 +18,46 @@
  */
 package jch.education.aws.l4loadbalancing.server;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.io.IOException;
-
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import jch.education.aws.l4loadbalancing.commons.CommandLineArguments;
+import jch.education.aws.l4loadbalancing.commons.ProcessInfo;
+import jch.education.aws.l4loadbalancing.commons.Stdout;
 
 public class Program {
     
-    public static void main(String[] args) throws IOException {
-        // TODO:
-        // - two command line arguments:
-        //   + IP address to bind the listening socket to
-        //   + TCP port to open
-        System.out.println("Hello world!!! My name is Server.");
+    public static void main(String[] args) throws Exception {
         final String ipAddress = CommandLineArguments.extractStringValue(args, "IP-address");
         final int port = CommandLineArguments.extractIntValue(args, "port", 1234);
+        Stdout.println("IP address: %s", ipAddress);
+        Stdout.println("TCP port:   %d", port);
 
         final ExecutorService threadPool = Executors.newFixedThreadPool(20);
+        final ProcessInfo processInfo = createProcessInfo();
         final Statistics statistics = new Statistics();
 
         final ServerSocket serverSocket = new ServerSocket();
         serverSocket.bind(new InetSocketAddress(ipAddress, port));
+        Stdout.println("Server socket listening on %s...", serverSocket.getLocalSocketAddress());
         while (true) {
-            ServiceSocket serviceSocket = new ServiceSocket(serverSocket.accept());
+            Socket socket = serverSocket.accept();
+            Stdout.println("New socket accepted from %s...", socket.getRemoteSocketAddress());
+            ServiceSocket serviceSocket = new ServiceSocket(socket);
             statistics.connectionAccepted();
-            threadPool.submit(new ClientHandler(serviceSocket, statistics));
+            threadPool.submit(new ClientHandler(serviceSocket, statistics, processInfo));
         }
+    }
+
+    private static ProcessInfo createProcessInfo() throws UnknownHostException {
+        final String hostname = InetAddress.getLocalHost().getHostName();
+        final String username = System.getProperty("user.name");
+        return new ProcessInfo(hostname, username, new Date());
     }
 }

@@ -22,8 +22,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jch.education.aws.l4loadbalancing.commons.ClientInfo;
+import jch.education.aws.l4loadbalancing.commons.ProcessInfo;
 import jch.education.aws.l4loadbalancing.commons.ServerInfo;
 import jch.education.aws.l4loadbalancing.commons.StatisticsInfo;
+import jch.education.aws.l4loadbalancing.commons.Stdout;
 
 public class ClientHandler implements Callable<Boolean> {
 
@@ -35,23 +37,35 @@ public class ClientHandler implements Callable<Boolean> {
 
     private final Statistics statistics;
 
-    public ClientHandler(ServiceSocket socket, Statistics statistics) {
+    private final ProcessInfo processInfo;
+
+    public ClientHandler(ServiceSocket socket, Statistics statistics, ProcessInfo processInfo) {
         this.socket = socket;
         this.statistics = statistics;
+        this.processInfo = processInfo;
     }
 
     @Override
     public Boolean call() throws Exception {
+        Stdout.println("New client handler started...");
         ClientInfo clientInfo = null;
-        do {
-            clientInfo = this.socket.readClientInfo();
-            this.statistics.requestHandled();
 
-            StatisticsInfo statisticsInfo = this.statistics.getSnapshot();
-            ServerInfo serverInfo = new ServerInfo(null, statisticsInfo);
-            this.socket.writeServerInfo(serverInfo);
-        } while (clientInfo.isNotLastRequest());
+        try {
+            do {
+                clientInfo = this.socket.readClientInfo();
+                this.statistics.requestHandled();
+                Stdout.println("Request #:     %d", clientInfo.getRequestNumber());
+                Stdout.println("Request count: %d", clientInfo.getRequestCount());
 
-        return true;
+                StatisticsInfo statisticsInfo = this.statistics.getSnapshot();
+                ServerInfo serverInfo = new ServerInfo(this.processInfo, statisticsInfo);
+                this.socket.writeServerInfo(serverInfo);
+            } while (clientInfo.isNotLastRequest());
+
+            return true;
+        } catch (Exception e) {
+            Stdout.printException(e);
+            return false;
+        }
     }
 }

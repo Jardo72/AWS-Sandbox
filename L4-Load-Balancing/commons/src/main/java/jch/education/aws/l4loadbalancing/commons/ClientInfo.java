@@ -18,8 +18,10 @@
  */
 package jch.education.aws.l4loadbalancing.commons;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientInfo {
     
     @JsonProperty(value = "clientId", required = true)
