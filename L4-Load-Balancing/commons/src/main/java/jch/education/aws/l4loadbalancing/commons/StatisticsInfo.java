@@ -28,6 +28,7 @@ public class StatisticsInfo {
     @JsonProperty(value = "requestsHandled", required = true)
     private long requestsHandled;
 
+    public StatisticsInfo() {}
 
     public StatisticsInfo(long connectionsAccepted, long requestsHandled) {
         this.connectionsAccepted = connectionsAccepted;

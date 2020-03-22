@@ -18,16 +18,19 @@
  */
 package jch.education.aws.l4loadbalancing.commons;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AbstractSocket {
+public class AbstractSocket implements Closeable {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = createObjectMapper();
 
     private final Socket socket;
 
@@ -41,11 +44,26 @@ public class AbstractSocket {
         this.output = socket.getOutputStream();
     }
 
+    private static ObjectMapper createObjectMapper() {
+        return new ObjectMapper()
+            .configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
+            .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
+    }
+
     protected <T> T readObject(Class<T> clazz) throws IOException {
         return this.objectMapper.readValue(this.input, clazz);
     }
 
     public void writeObject(Object object) throws IOException {
+        // TODO: remove the comments
+        // http://inventwithpython.com/makinggames.pdf
         this.objectMapper.writeValue(this.output, object);
+    }
+
+    @Override
+    public void close() {
+        ResourceCleanupToolkit.close(this.output);
+        ResourceCleanupToolkit.close(this.input);
+        ResourceCleanupToolkit.close(this.socket);
     }
 }

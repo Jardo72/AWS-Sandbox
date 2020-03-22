@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jch.education.aws.l4loadbalancing.commons.ClientInfo;
 import jch.education.aws.l4loadbalancing.commons.ProcessInfo;
+import jch.education.aws.l4loadbalancing.commons.ResourceCleanupToolkit;
 import jch.education.aws.l4loadbalancing.commons.ServerInfo;
 import jch.education.aws.l4loadbalancing.commons.StatisticsInfo;
 import jch.education.aws.l4loadbalancing.commons.Stdout;
@@ -66,6 +67,8 @@ public class ClientHandler implements Callable<Boolean> {
         } catch (Exception e) {
             Stdout.printException(e);
             return false;
+        } finally {
+            ResourceCleanupToolkit.close(this.socket);
         }
     }
 }
