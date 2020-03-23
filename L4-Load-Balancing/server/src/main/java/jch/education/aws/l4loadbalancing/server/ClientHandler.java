@@ -55,8 +55,9 @@ public class ClientHandler implements Callable<Boolean> {
             do {
                 clientInfo = this.socket.readClientInfo();
                 this.statistics.requestHandled();
-                Stdout.println("Request #:     %d", clientInfo.getRequestNumber());
-                Stdout.println("Request count: %d", clientInfo.getRequestCount());
+                Stdout.println("Request %d of %d from client %s received...",
+                        clientInfo.getRequestNumber(), clientInfo.getRequestCount(),
+                        clientInfo.getClientId());
 
                 StatisticsInfo statisticsInfo = this.statistics.getSnapshot();
                 ServerInfo serverInfo = new ServerInfo(this.processInfo, statisticsInfo);

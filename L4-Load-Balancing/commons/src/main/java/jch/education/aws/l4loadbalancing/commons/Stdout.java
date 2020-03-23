@@ -28,6 +28,10 @@ public class Stdout {
 
     private Stdout() {}
 
+    public static void println() {
+        System.out.println();
+    }
+
     public static void println(String message, Object... args) {
         preprocessArgs(args);
         if (message == null) {

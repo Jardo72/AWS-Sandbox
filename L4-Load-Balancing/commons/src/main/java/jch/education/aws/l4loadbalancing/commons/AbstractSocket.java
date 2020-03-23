@@ -46,8 +46,8 @@ public class AbstractSocket implements Closeable {
 
     private static ObjectMapper createObjectMapper() {
         return new ObjectMapper()
-            .configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
-            .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
+                .configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false)
+                .configure(JsonParser.Feature.AUTO_CLOSE_SOURCE, false);
     }
 
     protected <T> T readObject(Class<T> clazz) throws IOException {
