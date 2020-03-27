@@ -29,20 +29,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jch.education.aws.l7loadbalancing.dto.ConnectionEndpoint;
 import jch.education.aws.l7loadbalancing.dto.ConnectionInformation;
+import jch.education.aws.l7loadbalancing.dto.StatisticInformation;
 import jch.education.aws.l7loadbalancing.dto.SystemInformation;
 
 @RestController
 public class SystemInformationController {
 
+    private static final Statistics statistics = new Statistics();
+
     @RequestMapping(value = "/api/system-info", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SystemInformation> systemInformation(HttpServletRequest request) throws Exception {
+        statistics.requestHandled();
+
         ConnectionEndpoint clientEndpoint = new ConnectionEndpoint(request.getRemoteAddr(), request.getRemotePort());
         ConnectionEndpoint serverEndpoint = new ConnectionEndpoint(request.getLocalAddr(), request.getLocalPort());
         String scheme = request.getScheme();
         boolean isSecure = request.isSecure();
 
         ConnectionInformation connectionInfo = new ConnectionInformation(scheme, isSecure, clientEndpoint, serverEndpoint);
-        SystemInformation sysInfo = new SystemInformation(connectionInfo);
+        StatisticInformation statisticInfo = statistics.getSnapshot();
+        SystemInformation sysInfo = new SystemInformation(connectionInfo, statisticInfo);
         return new ResponseEntity<SystemInformation>(sysInfo, HttpStatus.OK);
     }
 }

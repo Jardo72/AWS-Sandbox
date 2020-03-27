@@ -30,9 +30,12 @@ public class SystemInformation {
 
     private final ConnectionInformation connectionInformation;
 
-    public SystemInformation(ConnectionInformation connectionInformation) throws Exception {
+    private final StatisticInformation statisticInformation;
+
+    public SystemInformation(ConnectionInformation connectionInformation, StatisticInformation statisticInformation) throws Exception {
         this.serverInformation = new ServerInformation();
         this.connectionInformation = connectionInformation;
+        this.statisticInformation = statisticInformation;
     }
 
     public long getRequestSequenceNumber() {
@@ -45,5 +48,9 @@ public class SystemInformation {
 
     public ConnectionInformation getConnectionInformation() {
         return this.connectionInformation;
+    }
+
+    public StatisticInformation getStatisticInformation() {
+        return this.statisticInformation;
     }
 }
