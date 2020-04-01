@@ -1,0 +1,11 @@
+# compiled class file
+**/*.class
+**/target/**
+
+# log files
+**/*.log
+
+# other files
+**/.project
+**/.settings
+**/.vscode
