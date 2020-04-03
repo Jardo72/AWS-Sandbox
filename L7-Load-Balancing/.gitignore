@@ -6,6 +6,7 @@
 **/*.log
 
 # other files
+**/.classpath
 **/.project
 **/.settings
 **/.vscode

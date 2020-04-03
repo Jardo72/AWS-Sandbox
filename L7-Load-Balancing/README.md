@@ -18,16 +18,22 @@ mvn clean package
 
 
 ## How to Start the Service
-
+- application.properties
+- bind to 0.0.0.0
 ```
 java -jar .\target\aws-sandbox-network-load-balancing-1.0.jar
 ```
 
 
 ## How to Send Requests to the Service
+- GET method
+- URL: http://localhost:8001/api/system-info
+- Postman screenshot might make sense
 
 ## How to Deploy the Service to AWS
 
 ### EC2
+- via AWS Console
+- via AWS CLI
 
 ### ECS
