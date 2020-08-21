@@ -35,5 +35,16 @@ java -jar .\target\aws-sandbox-network-load-balancing-1.0.jar
 ### EC2
 - via AWS Console
 - via AWS CLI
+- CloudFormation
+
+```
+# install Java on the EC2 instance
+sudo yum install java-1.8.0-openjdk
+```
+
+```
+# copy the service to the EC2 instance
+scp -i <private-key-file> ./target/aws-sandbox-network-load-balancing-1.0.jar ec2-user@<instance-ip-address>:/home/ec2-user
+```
 
 ### ECS
