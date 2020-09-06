@@ -84,7 +84,7 @@ public class Program {
     }
 
     private static String format(Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss Z");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss Z");
         return dateFormat.format(date);
     }
 }

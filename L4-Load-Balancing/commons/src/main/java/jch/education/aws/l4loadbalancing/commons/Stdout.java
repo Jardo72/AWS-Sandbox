@@ -24,7 +24,7 @@ import java.util.Date;
 
 public class Stdout {
 
-    private static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss,SS";
+    private static final String DATE_FORMAT = "dd-MMM-yyyy HH:mm:ss,SS";
 
     private Stdout() {}
 
