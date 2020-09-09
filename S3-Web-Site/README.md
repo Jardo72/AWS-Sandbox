@@ -44,6 +44,9 @@ aws s3 ls s3://<bucket-name>
 
 # display the configuration of the website (index and error page settings)
 aws s3api get-bucket-website --bucket <bucket-name>
+
+# display the bucket policy
+aws s3api get-bucket-policy --bucket <bucket-name>
 ```
 
 If the above listed AWS CLI commands succeeded, you should be able to access the website via one of the following URLs:
