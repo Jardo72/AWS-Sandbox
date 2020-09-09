@@ -4,7 +4,22 @@
 This project is just a small set of files that can be used to demonstrate the static website hosting provided by AWS S3.
 
 ## How to Setup the Static Website Hosted by AWS S3
-The following sequence of AWS CLI commands can be used to setup a static website comprised of the HTML file provided by this project. Obviously, you have to choose a uniqe name for your S3 bucket, and replace the `<bucket-name>` placeholder in the commands below with the chosen bucket name.
+Before starting with the actual setup, you have to choose a unique name for the S3 bucket. Create a file `bucket-policy.json` with the following content, and replace the `<bucket-name>` placeholder with the actual bucket name.
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::<bucket-name>/*"
+        }
+    ]
+}
+```
+
+The following sequence of AWS CLI commands can be used to setup a static website comprised of the HTML file provided by this project. Do not forget to replace the `<bucket-name>` placeholder in the commands below with the chosen bucket name. The commands assume that the root directory of this project is the current directory, and that the `bucket-policy.json` created above is also present in the current directory.
 ```
 # create a new S3 bucket
 aws s3 mb s3://<bucket-name>
@@ -16,6 +31,9 @@ aws s3 cp error.html s3://<bucket-name>/error.html
 
 # enable public anonymous read-only access to all files stored in the S3 bucket created above
 aws s3api put-bucket-acl --bucket <bucket-name> --acl public-read
+aws s3api put-bucket-policy --bucket <bucket-name> --policy file://./bucket-policy.json
+
+# configure the website (index and error page)
 aws s3 website s3://<bucket-name> --index-document index.html --error-document error.html
 ```
 
