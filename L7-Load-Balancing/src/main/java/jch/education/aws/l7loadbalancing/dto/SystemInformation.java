@@ -24,8 +24,6 @@ public class SystemInformation {
 
     private static final AtomicLong sequence = new AtomicLong(0);
 
-    private final long requestSequenceNumber = sequence.incrementAndGet();
-
     private final ServerInformation serverInformation;
 
     private final ConnectionInformation connectionInformation;
@@ -36,10 +34,6 @@ public class SystemInformation {
         this.serverInformation = new ServerInformation();
         this.connectionInformation = connectionInformation;
         this.statisticInformation = statisticInformation;
-    }
-
-    public long getRequestSequenceNumber() {
-        return this.requestSequenceNumber;
     }
 
     public ServerInformation getServerInformation() {

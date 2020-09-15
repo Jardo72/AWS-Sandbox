@@ -21,20 +21,14 @@ package jch.education.aws.l7loadbalancing.controllers;
 import jch.education.aws.l7loadbalancing.dto.StatisticInformation;
 
 public class Statistics {
-    
-    private long connectionsAccepted = 0;
-    
+
     private long requestsHandled = 0;
-    
-    public synchronized void connectionAccepted() {
-        this.connectionsAccepted++;
-    }
-    
+
     public synchronized void requestHandled() {
         this.requestsHandled++;
     }
 
     public synchronized StatisticInformation getSnapshot() {
-        return new StatisticInformation(this.connectionsAccepted, this.requestsHandled);
+        return new StatisticInformation(this.requestsHandled);
     }
 }

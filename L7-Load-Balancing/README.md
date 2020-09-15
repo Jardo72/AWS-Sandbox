@@ -19,9 +19,9 @@ mvn clean package
 
 ## How to Start the Service
 - application.properties
-- bind to 0.0.0.0
+- bind to 0.0.0.0 (i.e. all network interfaces), TCP port 80
 ```
-java -jar .\target\aws-sandbox-network-load-balancing-1.0.jar
+java -jar .\target\aws-sandbox-application-load-balancing-server-1.0.jar
 ```
 
 
@@ -39,7 +39,7 @@ java -jar .\target\aws-sandbox-network-load-balancing-1.0.jar
 
 ```
 # install Java on the EC2 instance
-sudo yum install java-1.8.0-openjdk
+yum install java-1.8.0-openjdk -y
 ```
 
 ```

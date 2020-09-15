@@ -20,19 +20,12 @@ package jch.education.aws.l7loadbalancing.dto;
 
 public class StatisticInformation {
 
-    private long connectionsAccepted;
-
     private long requestsHandled;
 
     public StatisticInformation() {}
 
-    public StatisticInformation(long connectionsAccepted, long requestsHandled) {
-        this.connectionsAccepted = connectionsAccepted;
+    public StatisticInformation(long requestsHandled) {
         this.requestsHandled = requestsHandled;
-    }
-
-    public long getConnectionsAccepted() {
-        return this.connectionsAccepted;
     }
 
     public long getRequestsHandled() {
