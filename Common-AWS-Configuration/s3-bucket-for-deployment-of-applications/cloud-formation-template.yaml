@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Setup of an S3 bucket serving as a deployment artifactory, including an IAM role permitted to
+  download files from the S3 bucket
+
+Parameters:
+  BucketNameParam:
+    Description: The name of the S3 bucket which will serve as the artifactory 
+    Type: String
+
+Resources:
+  DeploymentArtifactoryBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref BucketNameParam
+      AccessControl: Private
+
+  DeploymentArtifactoryReadAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: DeploymentArtifactoryReadAccess
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - 's3:GetObject'
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref BucketNameParam, '/*']]
+
+  DeploymentArtifactoryReader:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: DeploymentArtifactoryReader
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - !Ref DeploymentArtifactoryReadAccess
+
