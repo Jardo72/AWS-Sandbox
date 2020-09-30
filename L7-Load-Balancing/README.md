@@ -1,7 +1,7 @@
 # L7 Load-Balancing Demo
 
 ## Introduction
-L7 Load-Balancing Demo is an experimantal/education application meant as illustration of L7 (aka application) load balancing in combination with AWS, Docker, Kubernetes etc. It is a Java application based on the SpringBoot framework which exposes a single REST API endpoint providing access to:
+L7 Load-Balancing Demo is an experimantal/educational application meant as illustration of L7 (aka application) load balancing in combination with AWS, Docker, Kubernetes etc. It is a Java application based on the SpringBoot framework which exposes a single REST API endpoint providing access to:
 - the number of REST requests handled so far by the application (there is a counter which is incremented whenever a REST request is handled)
 - information about the server process and the host where it is running (hostname, username, number of processors available)
 - information about the connection used to deliver the current request (e.g. IP address/TCP port for both client and server)
@@ -19,7 +19,7 @@ mvn clean package
 The command above builds a fat runnable JAR file with all dependencies (including Spring and embedded HTTP server) which can be immediately used to start the application. The name of the JAR file is `aws-sandbox-application-load-balancing-server-1.0.jar`, and it resides in the `target` directory.
 
 ## How to Start the Service
-The fat runnable JAR file mentioned in the previous section also involves `application.properties` file allowing to configure the application. The default configuration binds the embedded HTTP server to all network interfaces (i.e. 0.0.0.0), so in the vast majority of cases, there is no need to change this. The default configuration binds the embedded HTTP server to the TCP port 80, which should also be OK for most use cases. The following command illustrates how to start the application with the default settings.
+The fat runnable JAR file mentioned in the previous section also involves `application.properties` file allowing to configure the application. The default configuration binds the embedded HTTP server to all available network interfaces (i.e. 0.0.0.0), so in the vast majority of cases, there is no need to change this. The default configuration binds the embedded HTTP server to the TCP port 80, which should also be OK for most use cases. The following command illustrates how to start the application with the default settings.
 
 ```
 java -jar ./target/aws-sandbox-application-load-balancing-server-1.0.jar
@@ -44,3 +44,7 @@ TODO
 - parametrized CloudFormation template that will create everything from VPC up to ASG + ELB
 
 ### ECS
+TODO
+
+### EKS
+TODO

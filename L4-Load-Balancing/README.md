@@ -1,7 +1,7 @@
 # L4 Load-Balancing Demo
 
 ## Introduction
-L4 Load-Balancing Demo is an experimantal/education project meant as illustration of L4 (aka network) load balancing in combination with AWS, Docker, Kubernetes etc. The project actually involves two applications:
+L4 Load-Balancing Demo is an experimantal/educational project meant as illustration of L4 (aka network) load balancing in combination with AWS, Docker, Kubernetes etc. The project actually involves two applications:
 - simple server which opens a TCP socket in listening mode, accepts incoming connections from clients and handles requests from clients
 - simple client which connects to the server, sends the specified number of requests to the server and writes the responses from the server to stdout
 
@@ -11,21 +11,20 @@ The server involves two counters - one collecting the number of accepted connect
 - the current values of both above mentioned counters
 - information about the server process (the hostname of the host where it is running, the user under which it is running, TODO)
 
-TODO
-- client connects and repeatedly retrieves the info from the server
+Single client opens a single connection to the server, sends the specified number of requests with the given periodicity, prints the responses from the server to stdout, and terminates. Each client generates a random UUID which serves as its unique client ID. This information is sent to the server as part of each request.
 
 ## Source Code Organization and Building
-The project is organized as multi-module Maven project consisting of 3 modules
-- `commons` is a simple Java library providing functionalities common to both the server and the client. The other two modules has a dependency on this module.
+The project is organized as multi-module Maven project consisting of 3 modules:
+- `commons` is a simple Java library providing functionalities common to both the server and the client. The other two modules have a dependency on this module.
 - `server` is an application serving as the above described server.
-- `client` is a Java application serving as the above described client.
+- `client` is an application serving as the above described client.
 
 In order to build both applications, just navigate to the root directory of the project and execute the following command (assumed Maven is installed and properly configured):
 ```
 mvn clean package
 ```
 
-The command above will automatically build all three modules comprising the project. After a successful build, there will be two JAR files for the client, and two JAR files for the server. Two of the four JAR files, one for the client and one for the server, are runnable JAR files which can be used to start the server and the client. In concrete terms, the runnable JAR files are:
+The command above will automatically build all three modules comprising the project. After a successful build, there will be two JAR files for the client, and two JAR files for the server. Two of the four JAR files, one for the client and one for the server, are runnable JAR files which can be immediately used to start the server and the client. In concrete terms, the runnable JAR files are:
 - `./server/target/aws-sandbox-network-load-balancing-server-1.0-jar-with-dependencies.jar` for the server
 - `./client/target/aws-sandbox-network-load-balancing-client-1.0-jar-with-dependencies.jar` for the client
 
@@ -50,3 +49,6 @@ TODO
 - CloudFormation template that will create the entire stack (incl. ASG, ELB)
 
 ### ECS
+TODO
+
+### EKS
