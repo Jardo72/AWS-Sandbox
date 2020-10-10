@@ -18,7 +18,9 @@
  */
 package jch.education.aws.l7loadbalancing.dto;
 
-public class ConnectionInformation {
+import java.util.List;
+
+public class RequestInformation {
 
     private final String scheme;
 
@@ -28,11 +30,14 @@ public class ConnectionInformation {
 
     private final ConnectionEndpoint serverEndpoint;
 
-    public ConnectionInformation(String scheme, boolean isSecure, ConnectionEndpoint clientEndpoint, ConnectionEndpoint serverEndpoint) throws Exception {
+    private final List<HttpHeader> httpHeaders;
+
+    public RequestInformation(String scheme, boolean isSecure, ConnectionEndpoint clientEndpoint, ConnectionEndpoint serverEndpoint, List<HttpHeader> httpHeaders) throws Exception {
         this.scheme = scheme;
         this.isSecure = isSecure;
         this.clientEndpoint = clientEndpoint;
         this.serverEndpoint = serverEndpoint;
+        this.httpHeaders = httpHeaders;
     }
 
     public String getScheme() {
@@ -49,5 +54,9 @@ public class ConnectionInformation {
 
     public ConnectionEndpoint getServerEndpoint() {
         return this.serverEndpoint;
+    }
+
+    public List<HttpHeader> getHttpHeaders() {
+        return this.httpHeaders;
     }
 }

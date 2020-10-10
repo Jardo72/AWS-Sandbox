@@ -26,13 +26,13 @@ public class SystemInformation {
 
     private final ServerInformation serverInformation;
 
-    private final ConnectionInformation connectionInformation;
+    private final RequestInformation requestInformation;
 
     private final StatisticInformation statisticInformation;
 
-    public SystemInformation(ConnectionInformation connectionInformation, StatisticInformation statisticInformation) throws Exception {
+    public SystemInformation(RequestInformation requestInformation, StatisticInformation statisticInformation) throws Exception {
         this.serverInformation = new ServerInformation();
-        this.connectionInformation = connectionInformation;
+        this.requestInformation = requestInformation;
         this.statisticInformation = statisticInformation;
     }
 
@@ -40,8 +40,8 @@ public class SystemInformation {
         return this.serverInformation;
     }
 
-    public ConnectionInformation getConnectionInformation() {
-        return this.connectionInformation;
+    public RequestInformation getRequestInformation() {
+        return this.requestInformation;
     }
 
     public StatisticInformation getStatisticInformation() {

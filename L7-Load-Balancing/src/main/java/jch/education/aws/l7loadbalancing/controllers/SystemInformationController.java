@@ -18,17 +18,21 @@
  */
 package jch.education.aws.l7loadbalancing.controllers;
 
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jch.education.aws.l7loadbalancing.dto.ConnectionEndpoint;
-import jch.education.aws.l7loadbalancing.dto.ConnectionInformation;
+import jch.education.aws.l7loadbalancing.dto.HttpHeader;
+import jch.education.aws.l7loadbalancing.dto.RequestInformation;
 import jch.education.aws.l7loadbalancing.dto.StatisticInformation;
 import jch.education.aws.l7loadbalancing.dto.SystemInformation;
 
@@ -37,18 +41,30 @@ public class SystemInformationController {
 
     private static final Statistics statistics = new Statistics();
 
-    @RequestMapping(value = "/api/system-info", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/system-info", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SystemInformation> systemInformation(HttpServletRequest request) throws Exception {
         statistics.requestHandled();
 
         ConnectionEndpoint clientEndpoint = new ConnectionEndpoint(request.getRemoteAddr(), request.getRemotePort());
         ConnectionEndpoint serverEndpoint = new ConnectionEndpoint(request.getLocalAddr(), request.getLocalPort());
+        List<HttpHeader> httpHeaders = extractHeadersFrom(request);
         String scheme = request.getScheme();
         boolean isSecure = request.isSecure();
 
-        ConnectionInformation connectionInfo = new ConnectionInformation(scheme, isSecure, clientEndpoint, serverEndpoint);
+        RequestInformation requestInfo = new RequestInformation(scheme, isSecure, clientEndpoint, serverEndpoint, httpHeaders);
         StatisticInformation statisticInfo = statistics.getSnapshot();
-        SystemInformation sysInfo = new SystemInformation(connectionInfo, statisticInfo);
+        SystemInformation sysInfo = new SystemInformation(requestInfo, statisticInfo);
         return new ResponseEntity<SystemInformation>(sysInfo, HttpStatus.OK);
+    }
+
+    private static List<HttpHeader> extractHeadersFrom(HttpServletRequest request) {
+        List<HttpHeader> result = new LinkedList<HttpHeader>();
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String name = headerNames.nextElement();
+            Enumeration<String> values = request.getHeaders(name);
+            result.add(new HttpHeader(name, values));
+        }
+        return result;
     }
 }
