@@ -18,11 +18,7 @@
  */
 package jch.education.aws.l7loadbalancing.dto;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 public class SystemInformation {
-
-    private static final AtomicLong sequence = new AtomicLong(0);
 
     private final ServerInformation serverInformation;
 

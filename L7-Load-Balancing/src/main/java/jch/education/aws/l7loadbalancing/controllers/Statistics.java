@@ -19,16 +19,27 @@
 package jch.education.aws.l7loadbalancing.controllers;
 
 import jch.education.aws.l7loadbalancing.dto.StatisticInformation;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class Statistics {
 
-    private long requestsHandled = 0;
+    private long systemInfoRequestCount = 0;
 
-    public synchronized void requestHandled() {
-        this.requestsHandled++;
+    private long healthCheckCount = 0;
+
+    public synchronized void systemInfoProvided() {
+        this.systemInfoRequestCount++;
+    }
+
+    public synchronized void healthCheckExecuted() {
+        this.healthCheckCount++;
     }
 
     public synchronized StatisticInformation getSnapshot() {
-        return new StatisticInformation(this.requestsHandled);
+        return new StatisticInformation(this.systemInfoRequestCount, this.healthCheckCount);
     }
 }

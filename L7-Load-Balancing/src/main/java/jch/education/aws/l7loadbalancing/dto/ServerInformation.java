@@ -22,13 +22,14 @@ import java.net.InetAddress;
 
 public class ServerInformation {
 
-    private final String username = System.getProperty("user.name");
+    private final String username;
 
     private final String hostname;
 
     private final int availableProcessors;
 
     public ServerInformation() throws Exception {
+        this.username = System.getProperty("user.name");
         this.hostname = InetAddress.getLocalHost().getHostName();
         this.availableProcessors = Runtime.getRuntime().availableProcessors();
     }

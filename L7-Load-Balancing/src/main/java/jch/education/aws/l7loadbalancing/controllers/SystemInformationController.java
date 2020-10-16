@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,11 +40,12 @@ import jch.education.aws.l7loadbalancing.dto.SystemInformation;
 @RestController
 public class SystemInformationController {
 
-    private static final Statistics statistics = new Statistics();
+    @Autowired
+    private Statistics statistics;
 
     @GetMapping(value = "/api/system-info", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SystemInformation> systemInformation(HttpServletRequest request) throws Exception {
-        statistics.requestHandled();
+        this.statistics.systemInfoProvided();
 
         ConnectionEndpoint clientEndpoint = new ConnectionEndpoint(request.getRemoteAddr(), request.getRemotePort());
         ConnectionEndpoint serverEndpoint = new ConnectionEndpoint(request.getLocalAddr(), request.getLocalPort());
@@ -54,7 +56,7 @@ public class SystemInformationController {
         RequestInformation requestInfo = new RequestInformation(scheme, isSecure, clientEndpoint, serverEndpoint, httpHeaders);
         StatisticInformation statisticInfo = statistics.getSnapshot();
         SystemInformation sysInfo = new SystemInformation(requestInfo, statisticInfo);
-        return new ResponseEntity<SystemInformation>(sysInfo, HttpStatus.OK);
+        return new ResponseEntity<>(sysInfo, HttpStatus.OK);
     }
 
     private static List<HttpHeader> extractHeadersFrom(HttpServletRequest request) {

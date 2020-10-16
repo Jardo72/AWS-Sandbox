@@ -20,15 +20,20 @@ package jch.education.aws.l7loadbalancing.dto;
 
 public class StatisticInformation {
 
-    private long requestsHandled;
+    private final long systemInfoRequestCount;
 
-    public StatisticInformation() {}
+    private final long healthCheckCount;
 
-    public StatisticInformation(long requestsHandled) {
-        this.requestsHandled = requestsHandled;
+    public StatisticInformation(long systemInfoRequestCount, long healthCheckCount) {
+        this.systemInfoRequestCount = systemInfoRequestCount;
+        this.healthCheckCount = healthCheckCount;
     }
 
-    public long getRequestsHandled() {
-        return this.requestsHandled;
+    public long getSystemInfoRequestCount() {
+        return this.systemInfoRequestCount;
+    }
+
+    public long getHealthCheckCount() {
+        return this.healthCheckCount;
     }
 }

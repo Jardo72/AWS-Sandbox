@@ -20,6 +20,7 @@ package jch.education.aws.l7loadbalancing.controllers;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +35,12 @@ public class HealthCheckController {
 
     private final AtomicReference<HealthStatus> currentStatus = new AtomicReference<HealthStatus>(HealthStatus.OK);
 
+    @Autowired
+    private Statistics statistics;
+
     @GetMapping(value = "/api/health-check")
     public ResponseEntity doHealthCheck() {
+        this.statistics.healthCheckExecuted();
         HealthStatus currentStatus = this.currentStatus.get();
         if (currentStatus == HealthStatus.OK) {
             return ResponseEntity.ok().build();
