@@ -56,7 +56,7 @@ def generate_requests(host, port, request_count):
         response = connection.getresponse()
         response_body = response.read().decode()
         json_data = loads(response_body)
-        server = json_data['connectionInformation']['serverEndpoint']['address']
+        server = json_data['requestInformation']['serverEndpoint']['address']
         http_status_stats.update({ response.status: 1 })
         server_stats.update({ server: 1 })
         if i % 250 == 0:
