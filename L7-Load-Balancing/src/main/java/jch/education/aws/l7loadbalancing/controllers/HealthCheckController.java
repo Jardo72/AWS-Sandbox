@@ -20,26 +20,29 @@ package jch.education.aws.l7loadbalancing.controllers;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HealthCheckController {
 
-    private final AtomicReference<HealthStatus> currentStatus = new AtomicReference<HealthStatus>(HealthStatus.OK);
+    private static final Logger log = LoggerFactory.getLogger(HealthCheckController.class);
+
+    private final AtomicReference<HealthStatus> currentStatus = new AtomicReference<>(HealthStatus.OK);
 
     @Autowired
     private Statistics statistics;
 
     @GetMapping(value = "/api/health-check")
-    public ResponseEntity doHealthCheck() {
+    public ResponseEntity<Void> doHealthCheck() {
         this.statistics.healthCheckExecuted();
         HealthStatus currentStatus = this.currentStatus.get();
         if (currentStatus == HealthStatus.OK) {
@@ -62,13 +65,15 @@ public class HealthCheckController {
     }
 
     @GetMapping(value = "/api/health-status", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity getHealthStatus() {
+    public ResponseEntity<String> getHealthStatus() {
         HealthStatus currentStatus = this.currentStatus.get();
+        log.info("Going to return current health status ({})", currentStatus);
         return ResponseEntity.ok().body(currentStatus.toString());
     }
 
     @PutMapping(value = "/api/health-status")
-    public ResponseEntity setHealthStatus(@RequestParam(name = "status") String status) {
+    public ResponseEntity<Void> setHealthStatus(@RequestParam(name = "status") String status) {
+        log.info("Going to set health-status to {}", status);
         if ("OK".equalsIgnoreCase(status)) {
             this.currentStatus.set(HealthStatus.OK);
             return ResponseEntity.ok().build();
@@ -84,7 +89,7 @@ public class HealthCheckController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    private static enum HealthStatus {
+    private enum HealthStatus {
         OK, ERROR, HANG
     }
 }
