@@ -24,9 +24,13 @@ public class StatisticInformation {
 
     private final long healthCheckCount;
 
-    public StatisticInformation(long systemInfoRequestCount, long healthCheckCount) {
+    private final long primeNumbersCalculationCount;
+
+    public StatisticInformation(long systemInfoRequestCount, long healthCheckCount,
+                                long primeNumbersCalculationCount) {
         this.systemInfoRequestCount = systemInfoRequestCount;
         this.healthCheckCount = healthCheckCount;
+        this.primeNumbersCalculationCount = primeNumbersCalculationCount;
     }
 
     public long getSystemInfoRequestCount() {
@@ -35,5 +39,9 @@ public class StatisticInformation {
 
     public long getHealthCheckCount() {
         return this.healthCheckCount;
+    }
+
+    public long getPrimeNumbersCalculationCount() {
+        return this.primeNumbersCalculationCount;
     }
 }

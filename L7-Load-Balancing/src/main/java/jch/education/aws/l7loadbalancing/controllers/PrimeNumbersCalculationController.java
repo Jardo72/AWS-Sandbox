@@ -28,14 +28,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ResourceConsumptionController {
+public class PrimeNumbersCalculationController {
 
     @Autowired
     private PrimeNumbersCalculationService primeNumbersCalculationService;
 
+    @Autowired
+    private Statistics statistics;
     @PostMapping(value = "/api/calculate-prime-numbers", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> startPrimeNumberCalculation(@RequestBody PrimeNumberCalculationRequest request) {
         this.primeNumbersCalculationService.startCalculation(request.getStart(), request.getEnd());
+        this.statistics.primeNumbersCalculationStarted();
         return ResponseEntity.ok().build();
     }
 }
