@@ -1,11 +1,35 @@
 # L7 Load-Balancing Demo
 
 ## Introduction
-L7 Load-Balancing Demo is an experimantal/educational application meant as illustration of L7 (aka application) load balancing in combination with AWS, Docker, Kubernetes etc. It is a Java application based on the SpringBoot framework which exposes a single REST API endpoint providing access to:
+L7 Load-Balancing Demo is an experimantal/educational application meant as illustration of L7 (aka application) load balancing in combination with AWS, Docker, Kubernetes etc. It is a Java application based on the SpringBoot framework which exposes 3 groups of REST API endpoints:
+- Load-Balancing Demonstration API
+- Health Check API
+- CPU Load API
+
+### Load-Balancing Demonstration API
+Load-balancing demonstration API involves single API endpoint (`GET /api/system-info`) that can be used to illustrate various aspects of load balancing
+TODO
 - the number of REST requests handled so far by the application (there is a counter which is incremented whenever a REST request is handled)
 - information about the server process and the host where it is running (hostname, username, number of processors available)
 - information about the connection used to deliver the current request (e.g. IP address/TCP port for both client and server)
 
+### Health Check API
+Health check API involves an API endpoint (`GET /api/health-check`) that is supposed to be used as load balancer health check. In addition, there are two additional endpoints that can be used to control the behavior of the above mentioned health check endpoint:
+- `PUT /api/health-status?status=<STATUS>` allows to specify the outcome of subsequent invocations of the health check endpoint. The query string parameter `status` can have one of the following three values: the value `OK` (default) specifies that subsequent health checks will succeed with HTTP status 200; the value `ERROR` means that health checks will fail with HTTP status 500; and the value `HANG` will cause that subsequent health checks will block the thread handling the health check request forever (i.e. the load balancer health check will most likely fail with timeout).
+- `GET /api/health-status` returns the current status (i.e. the value specified by the last 
+
+### CPU Load API
+CPU load API involves just a single endpoint (`POST /api/calculate-prime-numbers`) that can be used to trigger calculation of prime numbers and thus high CPU load. If this application is deployed to an AWS auto scaling group, this API endpoint can be used to demonstrate the auto scaling. The POST request is supposed to carry the following JSON body specifying the desired range for the calculation:
+
+```json
+{
+    "start": 1,
+    "end":   900000000
+}
+```
+
+
+## Security
 As the application does not deal with any sensitive data, there is no need for security. In addition, I wanted to make the application as simple and cheap as possible. Therefore, the REST API exposed by the application is accessible via plain HTTP (i.e. not via HTTPS).
 
 
