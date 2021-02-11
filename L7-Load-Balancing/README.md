@@ -6,7 +6,7 @@ L7 Load-Balancing Demo is an experimantal/educational application meant as illus
 - Health Check API
 - CPU Load API
 
-Details for each of the three API endpoint groups are described below. In order to submit REST requests to the application, use a tool like Postman or curl. Unless you override the default configuration, the application is listening on port 80, so you do not need to specify the port in the URLs. As the application does not deal with any sensitive data, there is no need for security. In addition, I wanted to make the application as simple and cheap as possible. Therefore, the REST API exposed by the application is accessible via plain HTTP (i.e. not via HTTPS).
+Details for each of the three API endpoint groups are described below. In order to submit REST requests to the application, use a tool like [Postman](https://www.postman.com) or [curl](https://curl.se). Unless you override the default configuration, the application is listening on port 80, so you do not need to specify the port in the URLs. As the application does not deal with any sensitive data, there is no need for security. In addition, I wanted to make the application as simple and cheap as possible. Therefore, the REST API exposed by the application is accessible via plain HTTP (i.e. not via HTTPS).
 
 
 #### Load-Balancing Demonstration API
