@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -58,6 +59,25 @@ public class AbstractSocket implements Closeable {
         // TODO: remove the comments
         // http://inventwithpython.com/makinggames.pdf
         this.objectMapper.writeValue(this.output, object);
+    }
+
+    public String getLocalAddress() {
+        return formatAddress(this.socket.getLocalSocketAddress());
+    }
+
+    public String getRemoteAddress() {
+        return formatAddress(this.socket.getRemoteSocketAddress());
+    }
+
+    private static String formatAddress(SocketAddress address) {
+        if (address == null) {
+            return "<N/A>";
+        }
+        String result = address.toString();
+        if (result.startsWith("/")) {
+            result = result.substring(1);
+        }
+        return result;
     }
 
     @Override

@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jch.education.aws.l4loadbalancing.commons.ClientInfo;
+import jch.education.aws.l4loadbalancing.commons.ConnectionInfo;
 import jch.education.aws.l4loadbalancing.commons.ProcessInfo;
 import jch.education.aws.l4loadbalancing.commons.ResourceCleanupToolkit;
 import jch.education.aws.l4loadbalancing.commons.ServerInfo;
@@ -59,8 +60,10 @@ public class ClientHandler implements Callable<Boolean> {
                         clientInfo.getRequestNumber(), clientInfo.getRequestCount(),
                         clientInfo.getClientId());
 
+                ConnectionInfo connectionInfo = new ConnectionInfo(this.socket.getLocalAddress(),
+                        this.socket.getRemoteAddress());
                 StatisticsInfo statisticsInfo = this.statistics.getSnapshot();
-                ServerInfo serverInfo = new ServerInfo(this.processInfo, statisticsInfo);
+                ServerInfo serverInfo = new ServerInfo(this.processInfo, connectionInfo, statisticsInfo);
                 this.socket.writeServerInfo(serverInfo);
             } while (clientInfo.isNotLastRequest());
 

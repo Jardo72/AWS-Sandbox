@@ -24,6 +24,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import jch.education.aws.l4loadbalancing.commons.ClientInfo;
+import jch.education.aws.l4loadbalancing.commons.ConnectionInfo;
 import jch.education.aws.l4loadbalancing.commons.CommandLineArguments;
 import jch.education.aws.l4loadbalancing.commons.ProcessInfo;
 import jch.education.aws.l4loadbalancing.commons.ResourceCleanupToolkit;
@@ -72,6 +73,7 @@ public class Program {
 
     private static void print(ServerInfo serverInfo) {
         final StatisticsInfo statisticsInfo = serverInfo.getStatisticsInfo();
+        final ConnectionInfo connectionInfo = serverInfo.getConnectionInfo();
         final ProcessInfo processInfo = serverInfo.getProcessInfo();
 
         Stdout.println();
@@ -79,6 +81,8 @@ public class Program {
         Stdout.println("Hostname:             %s", processInfo.getHostname());
         Stdout.println("User:                 %s", processInfo.getUsername());
         Stdout.println("Start time:           %s", format(processInfo.getStartTime()));
+        Stdout.println("Server address:       %s", connectionInfo.getServerAddress());
+        Stdout.println("Client address:       %s", connectionInfo.getClientAddress());
         Stdout.println("Connections accepted: %d", statisticsInfo.getConnectionsAccepted());
         Stdout.println("Requests handled:     %d", statisticsInfo.getRequestsHandled());
     }

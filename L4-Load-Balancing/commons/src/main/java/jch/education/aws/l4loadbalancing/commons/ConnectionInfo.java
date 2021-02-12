@@ -20,34 +20,26 @@ package jch.education.aws.l4loadbalancing.commons;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ServerInfo {
+public class ConnectionInfo {
 
-    @JsonProperty(value = "processInfo", required = true)
-    private ProcessInfo processInfo;
+    @JsonProperty(value = "serverAddress", required = true)
+    private String serverAddress;
 
-    @JsonProperty(value = "connectionInfo", required = true)
-    private ConnectionInfo connectionInfo;
+    @JsonProperty(value = "clientAddress", required = true)
+    private String clientAddress;
 
-    @JsonProperty(value = "statisticsInfo", required = true)
-    private StatisticsInfo statisticsInfo;
+    public ConnectionInfo() {}
 
-    public ServerInfo() {}
-
-    public ServerInfo(ProcessInfo processInfo, ConnectionInfo connectionInfo, StatisticsInfo statisticsInfo) {
-        this.processInfo = processInfo;
-        this.connectionInfo = connectionInfo;
-        this.statisticsInfo = statisticsInfo;
+    public ConnectionInfo(String serverAddress, String clientAddress) {
+        this.serverAddress = serverAddress;
+        this.clientAddress = clientAddress;
     }
 
-    public ProcessInfo getProcessInfo() {
-        return this.processInfo;
+    public String getServerAddress() {
+        return this.serverAddress;
     }
 
-    public ConnectionInfo getConnectionInfo() {
-        return this.connectionInfo;
-    }
-
-    public StatisticsInfo getStatisticsInfo() {
-        return this.statisticsInfo;
+    public String getClientAddress() {
+        return this.clientAddress;
     }
 }
