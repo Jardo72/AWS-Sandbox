@@ -43,7 +43,7 @@ Resources:
       BucketName: !Ref BucketNameParam
       AccessControl: Private
 
-  DeploymentArtifactoryReadAccess:
+  DeploymentArtifactoryReadAccessPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
       ManagedPolicyName: !Ref PolicyNameParam
@@ -55,7 +55,7 @@ Resources:
           - 's3:GetObject'
           Resource: !Join ['', ['arn:aws:s3:::', !Ref BucketNameParam, '/*']]
 
-  DeploymentArtifactoryReader:
+  DeploymentArtifactoryReaderRole:
     Type: 'AWS::IAM::Role'
     Properties:
       RoleName: !Ref RoleNameParam
@@ -69,7 +69,13 @@ Resources:
           Action:
           - 'sts:AssumeRole'
       ManagedPolicyArns:
-      - !Ref DeploymentArtifactoryReadAccess
+      - !Ref DeploymentArtifactoryReadAccessPolicy
+
+  DeploymentArtifactoryReaderInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+      - !Ref DeploymentArtifactoryReaderRole
 
 Outputs:
   DeploymentArtifactoryBucket:
@@ -79,7 +85,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-Bucket"
 
   IAMInstanceRole:
-    Description: Cross-stack reference to the created IAM role
-    Value: !Ref DeploymentArtifactoryReader
+    Description: Cross-stack reference to the created IAM instance profile
+    Value: !Ref DeploymentArtifactoryReaderInstanceProfile
     Export:
-      Name: !Sub "${AWS::StackName}-Role"
+      Name: !Sub "${AWS::StackName}-InstanceProfile"
