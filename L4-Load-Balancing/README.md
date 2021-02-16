@@ -9,7 +9,8 @@ Both server and client are simple Java console applications based on Java SE, wi
 
 The server involves two counters - one collecting the number of accepted connections, and the other collecting the number of handled requests. The first counter is incremented whenever a new connection from a client is accepted. The second counter is accepted whenever a request from a client is handled. When a request from a client is handled by a server, the server sends the following information to the client:
 - the current values of both above mentioned counters
-- information about the server process (the hostname of the host where it is running, the user under which it is running, TODO)
+- information about the server process (the hostname of the host where it is running, the user under which it is running, the start time of the server process)
+- information about both endpoints of the TCP connection (server IP address + TCP port, client IP address + TCP port)
 
 Single client opens a single connection to the server, sends the specified number of requests with the given periodicity, prints the responses from the server to stdout, and terminates. Each client generates a random UUID which serves as its unique client ID. This information is sent to the server as part of each request.
 
@@ -44,11 +45,6 @@ java -jar ./client/target/aws-sandbox-network-load-balancing-client-1.0-jar-with
 
 ## How to Deploy the Server to AWS
 
-### EC2
+### Network Load Balancer + EC2 Auto Scaling Group
 TODO
 - CloudFormation template that will create the entire stack (incl. ASG, ELB)
-
-### ECS
-TODO
-
-### EKS
