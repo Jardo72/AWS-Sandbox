@@ -1,0 +1,127 @@
+#
+# Copyright 2020 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Set of illustrational Lambda functions and other resources (e.g. SSM parameter, Secrets Manager secret)
+  the functions will access using the AWS SDK. This template also creates IAM policies & roles granting the
+  functions access to the resources.
+
+Parameters:
+  SSMParameterNameParam:
+    Description: The name of the parameter stored in the SSM Parameter Store & read by one of the Lambda functions
+    Type: String
+
+  SSMParameterValueParam:
+    Description: The value of the parameter stored in the SSM Parameter Store & read by one of the Lambda functions
+    Type: String
+
+  SecretNameParam:
+    Description: The name of the secret stored in the Secrets Manager & read by one of the Lambda functions
+    Type: String
+
+  SecretValueParam:
+    Description: The value of the secret stored in the Secrets Manager & read by one of the Lambda functions
+    Type: String
+
+  EnvironmentVariableOneValueParam:
+    Description: The value of a sample env. variable (SAMPLE_VAR_ONE) used for one of the Lambda functions
+    Type: String
+
+  EnvironmentVariableTwoValueParam:
+    Description: The value of a sample env. variable (SAMPLE_VAR_ONE) used for one of the Lambda functions
+    Type: String
+
+Resources:
+  SSMParameter:
+    Type: AWS::SSM::Parameter
+    Properties: 
+      Description: Parameter stored in the SSM Parameter Store & read by one of the Lambda functions
+      Name: !Ref SSMParameterNameParam
+      Value: !Ref SSMParameterValueParam
+      Type: String
+      Tier: Standard
+
+  Secret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Secret stored in the Secrets Manager & read by one of the Lambda functions
+      Name: !Ref SecretNameParam
+      SecretString: !Ref SecretValueParam
+
+  InvocationDumpFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda function that dumps various invocation details (event, context, env. variables etc.)
+      FunctionName: DumpInvocation
+      Handler: dump-invocation.main
+      Runtime: python3.8
+      Code: 
+      Environment:
+        Variables:
+          SAMPLE_VAR_ONE: !Ref EnvironmentVariableOneValueParam
+          SAMPLE_VAR_TWO: !Ref EnvironmentVariableTwoValueParam
+
+  # ReadSSMParameterFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Description: Lambda function that reads the specified parameter from the SSM Parameter Store using the SDK
+  #     FunctionName: ReadSSMParameter
+  #     Handler: read-ssm-parameter.main
+  #     Runtime: python3.8
+  #     Role: !Ref TODO
+  #     Code: 
+
+  SecretsReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyName: !Sub "${AWS::StackName}-SecretsReadAccess-Policy"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - secretsmanager:GetSecretValue
+          Resource: !Ref Secret
+
+  SecretsReadAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-SecretsReader-Role"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - !Ref SecretsReadAccessPolicy
+
+  # ReadSecretFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Description: Lambda function that reads the specified secret from the Secrets Manager using the SDK
+  #     FunctionName: ReadSecret
+  #     Handler: read-secret-string.main
+  #     Runtime: python3.8
+  #     Role: !Ref SecretsReadAccessRole
+  #     Code: 

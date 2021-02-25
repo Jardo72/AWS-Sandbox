@@ -18,9 +18,22 @@
 #
 
 from os import environ
+from uuid import uuid4
+
+
+instance_id = str(uuid4())
+incovation_counter = 0
+
 
 def main(event, context):
+    global incovation_counter
+    incovation_counter += 1
+
     return {
+        'functionInstance': {
+            'instanceId': instance_id,
+            'numberOfInvocations': incovation_counter
+        },
         'event': event,
         'context': {
             'functionName': context.function_name,
