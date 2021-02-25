@@ -78,6 +78,36 @@ Resources:
           SAMPLE_VAR_ONE: !Ref EnvironmentVariableOneValueParam
           SAMPLE_VAR_TWO: !Ref EnvironmentVariableTwoValueParam
 
+  SSMParameterReadAccessPolicy:
+    Type: ASW::IAM::ManagedPolicy
+    Properties:
+      PolicyName: !Sub "${AWS::StackName}-SSMParameterReadAccess-Policy"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - ssm:GetParametersByPath
+          - ssm:GetParameters
+          - ssm:GetParameter
+          Resource: !Ref SSMParameter
+
+  SSMParameterReadRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-SSMParameterReader-Role"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - !Ref SSMParameterReadAccessPolicy
+
   # ReadSSMParameterFunction:
   #   Type: AWS::Lambda::Function
   #   Properties:
@@ -85,7 +115,7 @@ Resources:
   #     FunctionName: ReadSSMParameter
   #     Handler: read-ssm-parameter.main
   #     Runtime: python3.8
-  #     Role: !Ref TODO
+  #     Role: !Ref SSMParameterReadRole
   #     Code: 
 
   SecretsReadAccessPolicy:
@@ -100,7 +130,7 @@ Resources:
           - secretsmanager:GetSecretValue
           Resource: !Ref Secret
 
-  SecretsReadAccessRole:
+  SecretsReaderRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub "${AWS::StackName}-SecretsReader-Role"
@@ -123,5 +153,5 @@ Resources:
   #     FunctionName: ReadSecret
   #     Handler: read-secret-string.main
   #     Runtime: python3.8
-  #     Role: !Ref SecretsReadAccessRole
+  #     Role: !Ref SecretsReaderRole
   #     Code: 
