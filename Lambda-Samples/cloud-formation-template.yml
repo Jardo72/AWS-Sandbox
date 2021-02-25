@@ -65,23 +65,23 @@ Resources:
       Name: !Ref SecretNameParam
       SecretString: !Ref SecretValueParam
 
-  InvocationDumpFunction:
-    Type: AWS::Lambda::Function
-    Properties:
-      Description: Lambda function that dumps various invocation details (event, context, env. variables etc.)
-      FunctionName: DumpInvocation
-      Handler: dump-invocation.main
-      Runtime: python3.8
-      Code: 
-      Environment:
-        Variables:
-          SAMPLE_VAR_ONE: !Ref EnvironmentVariableOneValueParam
-          SAMPLE_VAR_TWO: !Ref EnvironmentVariableTwoValueParam
+  # InvocationDumpFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Description: Lambda function that dumps various invocation details (event, context, env. variables etc.)
+  #     FunctionName: DumpInvocation
+  #     Handler: dump-invocation.main
+  #     Runtime: python3.8
+  #     Code: 
+  #     Environment:
+  #       Variables:
+  #         SAMPLE_VAR_ONE: !Ref EnvironmentVariableOneValueParam
+  #         SAMPLE_VAR_TWO: !Ref EnvironmentVariableTwoValueParam
 
   SSMParameterReadAccessPolicy:
-    Type: ASW::IAM::ManagedPolicy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
-      PolicyName: !Sub "${AWS::StackName}-SSMParameterReadAccess-Policy"
+      ManagedPolicyName: !Sub "${AWS::StackName}-SSMParameterReadAccess-Policy"
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -90,7 +90,7 @@ Resources:
           - ssm:GetParametersByPath
           - ssm:GetParameters
           - ssm:GetParameter
-          Resource: !Ref SSMParameter
+          Resource: "*"
 
   SSMParameterReadRole:
     Type: AWS::IAM::Role
@@ -121,14 +121,14 @@ Resources:
   SecretsReadAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      PolicyName: !Sub "${AWS::StackName}-SecretsReadAccess-Policy"
+      ManagedPolicyName: !Sub "${AWS::StackName}-SecretsReadAccess-Policy"
       PolicyDocument:
         Version: 2012-10-17
         Statement:
         - Effect: Allow
           Action:
           - secretsmanager:GetSecretValue
-          Resource: !Ref Secret
+          Resource: "*"
 
   SecretsReaderRole:
     Type: AWS::IAM::Role
