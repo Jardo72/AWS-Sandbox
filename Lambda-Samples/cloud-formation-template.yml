@@ -81,20 +81,40 @@ Resources:
       Name: !Ref SecretNameParam
       SecretString: !Ref SecretValueParam
 
-  # InvocationDumpFunction:
-  #   Type: AWS::Lambda::Function
-  #   Properties:
-  #     Description: Lambda function that dumps various invocation details (event, context, env. variables etc.)
-  #     FunctionName: DumpInvocation
-  #     Handler: dump-invocation.main
-  #     Runtime: python3.8
-  #     Code:
-  #       S3Bucket: !Ref FunctionCodeS3BucketParam
-  #       S3Key: !Ref InvocationDumpFunctionS3KeyParam
-  #     Environment:
-  #       Variables:
-  #         SAMPLE_VAR_ONE: !Ref EnvironmentVariableOneValueParam
-  #         SAMPLE_VAR_TWO: !Ref EnvironmentVariableTwoValueParam
+  # the InvocationDumpFunction in fact does not need any special permissions, but the Role
+  # property is mandatory; so the easiest/cheapest way to solve the problem is to create
+  # a role and use an existing AWS managed policy
+  InvocationDumpRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-InvocationDump-Role"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/AWSLambdaExecute"
+
+  InvocationDumpFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda function that dumps various invocation details (event, context, env. variables etc.)
+      FunctionName: DumpInvocation
+      Handler: dump-invocation.main
+      Runtime: python3.8
+      Role: !GetAtt ["InvocationDumpRole", "Arn"]
+      Code:
+        S3Bucket: !Ref FunctionCodeS3BucketParam
+        S3Key: !Ref InvocationDumpFunctionS3KeyParam
+      Environment:
+        Variables:
+          SAMPLE_VAR_ONE: !Ref EnvironmentVariableOneValueParam
+          SAMPLE_VAR_TWO: !Ref EnvironmentVariableTwoValueParam
 
   SSMParameterReadAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -133,10 +153,7 @@ Resources:
       FunctionName: ReadSSMParameter
       Handler: read-ssm-parameter.main
       Runtime: python3.8
-      Role:
-        Fn::GetAtt: 
-        - "SSMParameterReadRole"
-        - "Arn"
+      Role: !GetAtt ["SSMParameterReadRole", "Arn"]
       Code: 
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref ReadSSMParameterFunctionS3KeyParam
@@ -176,10 +193,7 @@ Resources:
       FunctionName: ReadSecret
       Handler: read-secret-string.main
       Runtime: python3.8
-      Role:
-        Fn::GetAtt: 
-        - "SecretsReaderRole"
-        - "Arn"
+      Role: !GetAtt ["SecretsReaderRole", "Arn"]
       Code: 
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref ReadSecretFunctionS3KeyParam

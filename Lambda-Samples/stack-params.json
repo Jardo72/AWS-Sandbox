@@ -1,0 +1,42 @@
+[
+    {
+        "ParameterKey": "SSMParameterNameParam",
+        "ParameterValue": "/lambda-samples/sample-param"
+    },
+    {
+        "ParameterKey": "SSMParameterValueParam",
+        "ParameterValue": "Sample value SSM"
+    },
+    {
+        "ParameterKey": "SecretNameParam",
+        "ParameterValue": "lambda-secret"
+    },
+    {
+        "ParameterKey": "SecretValueParam",
+        "ParameterValue": "Secret value"
+    },
+    {
+        "ParameterKey": "EnvironmentVariableOneValueParam",
+        "ParameterValue": "Sample value #1"
+    },
+    {
+        "ParameterKey": "EnvironmentVariableTwoValueParam",
+        "ParameterValue": "Sample value #2"
+    },
+    {
+        "ParameterKey": "FunctionCodeS3BucketParam",
+        "ParameterValue": "jardo72-ec2-installation-repo"
+    },
+    {
+        "ParameterKey": "InvocationDumpFunctionS3KeyParam",
+        "ParameterValue": "LAMBDA-SAMPLES/dump-invocation.zip"
+    },
+    {
+        "ParameterKey": "ReadSSMParameterFunctionS3KeyParam",
+        "ParameterValue": "LAMBDA-SAMPLES/read-ssm-parameter.zip"
+    },
+    {
+        "ParameterKey": "ReadSecretFunctionS3KeyParam",
+        "ParameterValue": "LAMBDA-SAMPLES/read-secret-string.zip"
+    }
+]

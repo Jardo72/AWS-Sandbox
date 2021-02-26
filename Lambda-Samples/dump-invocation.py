@@ -39,7 +39,7 @@ def main(event, context):
             'functionName': context.function_name,
             'functionVersion': context.function_version,
             'memoryLimitMB': context.memory_limit_in_mb,
-            'remainintTimeMillis': context.get_remaining_time_in_millis()
+            'remainingTimeMillis': context.get_remaining_time_in_millis()
         },
         'environmentVariables': {name: value for name, value in environ.items()}
     }
