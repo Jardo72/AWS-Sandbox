@@ -2,9 +2,9 @@
 
 ## Introduction
 Lambda Samples is an experimantal/educational project meant as illustration of Lamdba functions. The project actually involves three Lambda functions:
-- [dump-invocation](./dump-invocation.py)
-- [read-secret-string](./read-secret-string.py)
-- [read-ssm-parameter](./read-ssm-parameter.py)
+- [dump-invocation](./dump-invocation.py) provides various details of the function invocation. The function returns a structure carrying the input parameter (event) of the function, various properties extracted from the context passed to the function by Lambda, environment variables, plus an instance ID generated in the initialization code outside of the function. The initialization code also involves an invocation counter which is incremented by every invocation of this function instance. The value of the counter is also involved in the returned structure.
+- [read-secret-string](./read-secret-string.py) reads the specified secret string from Secrets Manager. The value of the secret (together with several properties of the secret) is returned.
+- [read-ssm-parameter](./read-ssm-parameter.py) reads the specified parameter from SSM Parameter Store. The value of the parameter (together with several properties of the secret) is returned.
 
 Besides the above listed Lambda functions, the project also involves a CloudFormation template that can be used to create the above listed functions in AWS, together with other related AWS resources used by the functions.
 
