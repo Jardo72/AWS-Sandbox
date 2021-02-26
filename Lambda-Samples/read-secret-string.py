@@ -18,13 +18,11 @@
 #
 
 import boto3
-import json
 
 def main(event, context):
     client = boto3.client('secretsmanager', region_name=event['region'])
-    secret = client.get_secret_value(event['secret'])
-    print(secret)
+    secret = client.get_secret_value(SecretId=event['secret'])
     return {
         'name': secret['Name'],
-        'secret': json.loads(secret['SecretString'])
+        'secret': secret['SecretString']
     }
