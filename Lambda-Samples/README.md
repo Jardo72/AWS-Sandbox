@@ -27,9 +27,18 @@ The [stack-params.json](./stack-params.json) file contains parameter values used
 ## Invocation of the Functions
 
 ### Dump Invocation
-The following command illustrates how to invoke the [dump-invocation](./dump-invocation.py) function via the AWS CLI (the `--function-name` argument assumes you have deployed the functions via the above described CloudFormation template). As the function does not expect any input, the `--payload` argument is omitted). The return value of the function will be written to the `dump-invocation-response.json` file.
+The following command illustrates how to invoke the [dump-invocation](./dump-invocation.py) function via the AWS CLI (the `--function-name` argument assumes you have deployed the functions via the above described CloudFormation template). The value of the `--payload` argument should be a Base64-encoded JSON structure carrying the input for the function. The return value of the function will be written to the `dump-invocation-response.json` file.
 ```
-aws lambda invoke --function-name DumpInvocation dump-invocation-response.json
+aws lambda invoke --function-name DumpInvocation --payload <base64-encoded-json> dump-invocation-response.json
+```
+
+The value of the `--payload` argument must be a Base64-encoded JSON structure. The function does not rely on any particular input, it simply dumps the input (together with other information) to the return value. Any JSON structure (even an empty one) can be used. The following snippet illustrates a structure used during my experiments.
+```json
+{
+    "string": "Hello from Lambda",
+    "number": 123,
+    "boolean": true
+}
 ```
 
 ### Read Secret String
