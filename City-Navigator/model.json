@@ -1,0 +1,420 @@
+{
+    "version": "1.0",
+    "lines": [
+        {
+            "identifier": "U1",
+            "meansOfTransport": "U-Bahn",
+            "itinerary": [
+                {
+                    "station": "Oberlaa",
+                    "pointInTime": 0
+                }, {
+                    "station": "Neulaa",
+                    "pointInTime": 2
+                }, {
+                    "station": "Alaudagasse",
+                    "pointInTime": 4
+                }, {
+                    "station": "Altes Landgut",
+                    "pointInTime": 6
+                }, {
+                    "station": "Troststrasse",
+                    "pointInTime": 7
+                }, {
+                    "station": "Reumannplatz",
+                    "pointInTime": 8
+                }, {
+                    "station": "Keplerplatz",
+                    "pointInTime": 9
+                }, {
+                    "station": "Suedtiroler Pl. - Hbf.",
+                    "pointInTime": 11
+                }, {
+                    "station": "Taubstummengasse",
+                    "pointInTime": 12
+                }, {
+                    "station": "Karlsplatz",
+                    "pointInTime": 14
+                }, {
+                    "station": "Stephansplatz",
+                    "pointInTime": 16
+                }, {
+                    "station": "Schwedenplatz",
+                    "pointInTime": 17
+                }, {
+                    "station": "Nestroyplatz",
+                    "pointInTime": 18
+                }, {
+                    "station": "Praterstern",
+                    "pointInTime": 19
+                }, {
+                    "station": "Vorgartenstrasse",
+                    "pointInTime": 20
+                }, {
+                    "station": "Donauinsel",
+                    "pointInTime": 22
+                }, {
+                    "station": "Kaisermuehlen-VIC",
+                    "pointInTime": 23
+                }, {
+                    "station": "Alte Donau",
+                    "pointInTime": 25
+                }, {
+                    "station": "Kagran",
+                    "pointInTime": 26
+                }, {
+                    "station": "Kagraner Platz",
+                    "pointInTime": 28
+                }, {
+                    "station": "Rennbahnweg",
+                    "pointInTime": 30
+                }, {
+                    "station": "Aderklaaer Strasse",
+                    "pointInTime": 31
+                }, {
+                    "station": "Grossfeldsiedlung",
+                    "pointInTime": 32
+                }, {
+                    "station": "Leopoldau",
+                    "pointInTime": 34
+                }
+            ]
+        }, {
+            "identifier": "U2",
+            "meansOfTransport": "U-Bahn",
+            "itinerary": [
+                {
+                    "station": "Seestadt",
+                    "pointInTime": 0
+                }, {
+                    "station": "Aspern Nord",
+                    "pointInTime": 2
+                }, {
+                    "station": "Hausfeldstrasse",
+                    "pointInTime": 4
+                }, {
+                    "station": "Aspernstrasse",
+                    "pointInTime": 6
+                }, {
+                    "station": "Donauspital",
+                    "pointInTime": 7
+                }, {
+                    "station": "Hardeggasse",
+                    "pointInTime": 9
+                }, {
+                    "station": "Stadlau",
+                    "pointInTime": 10
+                }, {
+                    "station": "Donaustadtbruecke",
+                    "pointInTime": 12
+                }, {
+                    "station": "Donaumarina",
+                    "pointInTime": 13
+                }, {
+                    "station": "Stadion",
+                    "pointInTime": 15
+                }, {
+                    "station": "Krieau",
+                    "pointInTime": 16
+                }, {
+                    "station": "Messe-Prater",
+                    "pointInTime": 17
+                }, {
+                    "station": "Praterstern",
+                    "pointInTime": 19
+                }, {
+                    "station": "Taborstrasse",
+                    "pointInTime": 21
+                }, {
+                    "station": "Schottenring",
+                    "pointInTime": 22
+                }, {
+                    "station": "Schottentor",
+                    "pointInTime": 23
+                }, {
+                    "station": "Rathaus",
+                    "pointInTime": 25
+                }, {
+                    "station": "Volkstheater",
+                    "pointInTime": 27
+                }, {
+                    "station": "Museumsquartier",
+                    "pointInTime": 28
+                }, {
+                    "station": "Karlsplatz",
+                    "pointInTime": 30
+                }
+            ]
+        }, {
+            "identifier": "U3",
+            "meansOfTransport": "U-Bahn",
+            "itinerary": [
+                {
+                    "station": "Ottakring",
+                    "pointInTime": 0
+                }, {
+                    "station": "Kendlerstrasse",
+                    "pointInTime": 1
+                }, {
+                    "station": "Huetteldorfer Strasse",
+                    "pointInTime": 2
+                }, {
+                    "station": "Johnstrasse",
+                    "pointInTime": 3
+                }, {
+                    "station": "Schweglerstrasse",
+                    "pointInTime": 5
+                }, {
+                    "station": "Westbahnhof",
+                    "pointInTime": 7
+                }, {
+                    "station": "Zieglergasse",
+                    "pointInTime": 8
+                }, {
+                    "station": "Neubaugasse",
+                    "pointInTime": 9
+                }, {
+                    "station": "Volkstheater",
+                    "pointInTime": 11
+                }, {
+                    "station": "Herrengasse",
+                    "pointInTime": 12
+                }, {
+                    "station": "Stephansplatz",
+                    "pointInTime": 14
+                }, {
+                    "station": "Stubentor",
+                    "pointInTime": 15
+                }, {
+                    "station": "Landstrasse",
+                    "pointInTime": 16
+                }, {
+                    "station": "Rochusgasse",
+                    "pointInTime": 18
+                }, {
+                    "station": "Kardinal-Nagl-Platz",
+                    "pointInTime": 19
+                }, {
+                    "station": "Schlachthausgasse",
+                    "pointInTime": 20
+                }, {
+                    "station": "Erdberg",
+                    "pointInTime": 21
+                }, {
+                    "station": "Gasometer",
+                    "pointInTime": 23
+                }, {
+                    "station": "Zippererstrasse",
+                    "pointInTime": 24
+                }, {
+                    "station": "Enkplatz",
+                    "pointInTime": 25
+                }, {
+                    "station": "Simmering",
+                    "pointInTime": 26
+                }
+            ]
+        }, {
+            "identifier": "U4",
+            "meansOfTransport": "U-Bahn",
+            "itinerary": [
+                {
+                    "station": "Heiligenstadt",
+                    "pointInTime": 0
+                }, {
+                    "station": "Spittelau",
+                    "pointInTime": 2
+                }, {
+                    "station": "Friedensbruecke",
+                    "pointInTime": 3
+                }, {
+                    "station": "Rossauer Laende",
+                    "pointInTime": 4
+                }, {
+                    "station": "Schottenring",
+                    "pointInTime": 6
+                }, {
+                    "station": "Schwedenplatz",
+                    "pointInTime": 7
+                }, {
+                    "station": "Landstrasse",
+                    "pointInTime": 9
+                }, {
+                    "station": "Stadtpark",
+                    "pointInTime": 10
+                }, {
+                    "station": "Karlsplatz",
+                    "pointInTime": 12
+                }, {
+                    "station": "Kettenbrueckengasse",
+                    "pointInTime": 14
+                }, {
+                    "station": "Pilgramgasse",
+                    "pointInTime": 15
+                }, {
+                    "station": "Margaretenguertel",
+                    "pointInTime": 17
+                }, {
+                    "station": "Laengenfeldgasse",
+                    "pointInTime": 19
+                }, {
+                    "station": "Meidling Hauptstrasse",
+                    "pointInTime": 20
+                }, {
+                    "station": "Schoenbrunn",
+                    "pointInTime": 21
+                }, {
+                    "station": "Hietzing",
+                    "pointInTime": 23
+                }, {
+                    "station": "Braunschweiggasse",
+                    "pointInTime": 24
+                }, {
+                    "station": "Unter St. Veit",
+                    "pointInTime": 26
+                }, {
+                    "station": "Ober St. Veit",
+                    "pointInTime": 27
+                }, {
+                    "station": "Huetteldorf",
+                    "pointInTime": 29
+                }
+            ]
+        }, {
+            "identifier": "U6",
+            "meansOfTransport": "U-Bahn",
+            "itinerary": [
+                {
+                    "station": "Siebenhirten",
+                    "pointInTime": 0
+                }, {
+                    "station": "Perfektastrasse",
+                    "pointInTime": 1
+                }, {
+                    "station": "Erlaaer Strasse",
+                    "pointInTime": 2
+                }, {
+                    "station": "Alterlaa",
+                    "pointInTime": 4
+                }, {
+                    "station": "Am Schoepfwerk",
+                    "pointInTime": 6
+                }, {
+                    "station": "Tscherttegasse",
+                    "pointInTime": 7
+                }, {
+                    "station": "Meidling",
+                    "pointInTime": 9
+                }, {
+                    "station": "Niederhofstrasse",
+                    "pointInTime": 11
+                }, {
+                    "station": "Laengenfeldgasse",
+                    "pointInTime": 12
+                }, {
+                    "station": "Gumpendorfer Strasse",
+                    "pointInTime": 14
+                }, {
+                    "station": "Westbahnhof",
+                    "pointInTime": 15
+                }, {
+                    "station": "Burggasse-Stadthalle",
+                    "pointInTime": 17
+                }, {
+                    "station": "Thaliastrasse",
+                    "pointInTime": 18
+                }, {
+                    "station": "Josefstaedter Strasse",
+                    "pointInTime": 19
+                }, {
+                    "station": "Alser Strasse",
+                    "pointInTime": 21
+                }, {
+                    "station": "Michelbeuern-AKH",
+                    "pointInTime": 22
+                }, {
+                    "station": "Waehringer Strasse-Volksoper",
+                    "pointInTime": 24
+                }, {
+                    "station": "Nussdorfer Strasse",
+                    "pointInTime": 25
+                }, {
+                    "station": "Spittelau",
+                    "pointInTime": 27
+                }, {
+                    "station": "Jaegerstrasse",
+                    "pointInTime": 28
+                }, {
+                    "station": "Dresdner Strasse",
+                    "pointInTime": 30
+                }, {
+                    "station": "Handelskai",
+                    "pointInTime": 31
+                }, {
+                    "station": "Neue Donau",
+                    "pointInTime": 32
+                }, {
+                    "station": "Floridsdorf",
+                    "pointInTime": 34
+                }
+            ]
+        }, {
+            "identifier": "S1",
+            "meansOfTransport": "S-Bahn",
+            "itinerary": [
+                {
+                    "station": "Meidling",
+                    "pointInTime": 0
+                },
+                {
+                    "station": "Matzleinsdorfer Platz",
+                    "pointInTime": 3
+                },
+                {
+                    "station": "Hauptbahnhof",
+                    "pointInTime": 6
+                },
+                {
+                    "station": "Quartier Belvedere",
+                    "pointInTime": 7
+                },
+                {
+                    "station": "Rennweg",
+                    "pointInTime": 10
+                },
+                {
+                    "station": "Landstrasse",
+                    "pointInTime": 13
+                },
+                {
+                    "station": "Praterstern",
+                    "pointInTime": 17
+                },
+                {
+                    "station": "Traisengasse",
+                    "pointInTime": 20
+                },
+                {
+                    "station": "Handelskai",
+                    "pointInTime": 22
+                },
+                {
+                    "station": "Floridsdorf",
+                    "pointInTime": 25
+                },
+                {
+                    "station": "Siemensstrasse",
+                    "pointInTime": 28
+                },
+                {
+                    "station": "Leopoldau",
+                    "pointInTime": 32
+                },
+                {
+                    "station": "Suessenbrunn",
+                    "pointInTime": 36
+                }
+            ]
+        }
+    ]
+}
