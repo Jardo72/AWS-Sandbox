@@ -37,10 +37,17 @@ class Sample:
 
 @dataclass(frozen=True)
 class Summary:
-    number_of_samples: int
+    number_of_values: int
     min_value: int
     max_value: int
     avg_value: float
+
+
+def print_parameters(number_of_samples: int, period_sec: int, instance_id: str) -> None:
+    print()
+    print(f'InstanceId = {instance_id}')
+    print(f'{number_of_samples} samples to be generated, period = {period_sec} sec')
+    print()
 
 
 def publish_single_sample(cloud_watch, instance_id: str) -> Sample:
@@ -64,35 +71,42 @@ def publish_single_sample(cloud_watch, instance_id: str) -> Sample:
 def publish_samples(number_of_samples: int, period_sec: int, instance_id: str) -> Tuple[Sample, ...]:
     cloud_watch = client('cloudwatch')
     samples = []
-    for _ in range(0, number_of_samples):
+    for i in range(0, number_of_samples):
         sample = publish_single_sample(cloud_watch, instance_id)
+        print(f'{i + 1}/{number_of_samples} (status code = {sample.status_code})')
         samples.append(sample)
-        sleep(period_sec)
+        if i < number_of_samples - 1:
+            sleep(period_sec)
     return tuple(samples)
 
 
 def calculate_summary(samples: Sequence[Sample]) -> Summary:
-    number_of_samples = len(samples)
-    values = map(lambda i: i.value, samples)
-    avg_value = sum(values) / number_of_samples
+    relevant_samples = filter(lambda s: s.status_code == 200, samples)
+    values = list(map(lambda s: s.value, relevant_samples))
+    number_of_values = len(values)
+    avg_value = sum(values) / number_of_values
     min_value = min(values)
     max_value = max(values)
-    return Summary(number_of_samples, min_value, max_value, avg_value)
+    return Summary(number_of_values, min_value, max_value, avg_value)
 
 
-def main():
+def print_summary(summary: Summary) -> None:
+    print()
+    print(f'Number of relevant values (status code 200): {summary.number_of_values}')
+    print(f'Min value: {summary.min_value}')
+    print(f'Max value: {summary.max_value}')
+    print(f'Avg value: {summary.avg_value}')
+
+
+def main() -> None:
     period_sec = int(argv[1])
     number_of_samples = int(argv[2])
     instance_id = str(uuid4())
 
-    print()
-    print(f'InstanceId = {instance_id}')
-    print(f'{number_of_samples} samples to be generated, period = {period_sec} sec')
-    print()
-
+    print_parameters(number_of_samples, period_sec, instance_id)
     samples = publish_samples(number_of_samples, period_sec, instance_id)
     summary = calculate_summary(samples)
-    print(summary)
+    print_summary(summary)
 
 
 # https://stackify.com/custom-metrics-aws-lambda/
