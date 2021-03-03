@@ -28,6 +28,9 @@ from uuid import uuid4
 from boto3 import client
 
 
+pattern = '%Y-%m-%dT%H:%M:%SZ'
+
+
 @dataclass(frozen=True)
 class Sample:
     timestamp: datetime
@@ -41,6 +44,8 @@ class Summary:
     min_value: int
     max_value: int
     avg_value: float
+    min_timestamp: datetime
+    max_timestamp: datetime
 
 
 def print_parameters(number_of_samples: int, period_sec: int, instance_id: str) -> None:
@@ -73,7 +78,8 @@ def publish_samples(number_of_samples: int, period_sec: int, instance_id: str) -
     samples = []
     for i in range(0, number_of_samples):
         sample = publish_single_sample(cloud_watch, instance_id)
-        print(f'{i + 1}/{number_of_samples} (status code = {sample.status_code})')
+        timestamp = sample.timestamp.strftime(pattern)
+        print(f'{i + 1}/{number_of_samples} (value = {sample.value}, status code = {sample.status_code}, timestamp = {timestamp})')
         samples.append(sample)
         if i < number_of_samples - 1:
             sleep(period_sec)
@@ -82,20 +88,28 @@ def publish_samples(number_of_samples: int, period_sec: int, instance_id: str) -
 
 def calculate_summary(samples: Sequence[Sample]) -> Summary:
     relevant_samples = filter(lambda s: s.status_code == 200, samples)
+    relevant_samples = list(relevant_samples)
     values = list(map(lambda s: s.value, relevant_samples))
     number_of_values = len(values)
     avg_value = sum(values) / number_of_values
     min_value = min(values)
     max_value = max(values)
-    return Summary(number_of_values, min_value, max_value, avg_value)
+    start_time = relevant_samples[0].timestamp
+    end_time = relevant_samples[-1].timestamp
+    return Summary(number_of_values, min_value, max_value, avg_value, start_time, end_time)
 
 
-def print_summary(summary: Summary) -> None:
+def print_summary(instance_id: str, summary: Summary) -> None:
+    min_timestamp = summary.min_timestamp.strftime(pattern)
+    max_timestamp = summary.max_timestamp.strftime(pattern)
     print()
-    print(f'Number of relevant values (status code 200): {summary.number_of_values}')
-    print(f'Min value: {summary.min_value}')
-    print(f'Max value: {summary.max_value}')
-    print(f'Avg value: {summary.avg_value}')
+    print(f'Relevant values (status code 200): {summary.number_of_values}')
+    print(f'Instance ID:    {instance_id}')
+    print(f'Min value:      {summary.min_value}')
+    print(f'Max value:      {summary.max_value}')
+    print(f'Avg value:      {summary.avg_value}')
+    print(f'Min timestamp:  {min_timestamp}')
+    print(f'Max timestamp:  {max_timestamp}')
 
 
 def main() -> None:
@@ -106,7 +120,7 @@ def main() -> None:
     print_parameters(number_of_samples, period_sec, instance_id)
     samples = publish_samples(number_of_samples, period_sec, instance_id)
     summary = calculate_summary(samples)
-    print_summary(summary)
+    print_summary(instance_id, summary)
 
 
 # https://stackify.com/custom-metrics-aws-lambda/
