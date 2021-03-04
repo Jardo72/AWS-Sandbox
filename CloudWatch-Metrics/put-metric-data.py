@@ -17,10 +17,10 @@
 # limitations under the License.
 #
 
+from argparse import ArgumentParser, RawTextHelpFormatter
 from dataclasses import dataclass
 from datetime import datetime
 from random import randint
-from sys import argv
 from time import sleep
 from typing import Sequence, Tuple
 from uuid import uuid4
@@ -46,6 +46,24 @@ class Summary:
     avg_value: float
     min_timestamp: datetime
     max_timestamp: datetime
+
+
+def create_command_line_arguments_parser() -> ArgumentParser:
+    parser = ArgumentParser(description = "CloudWatch Metrics Generator", formatter_class = RawTextHelpFormatter)
+
+    parser.add_argument('period_sec',
+        help='period (i.e. break between two consecutive samples) in seconds',
+        type=int)
+    parser.add_argument('number_of_samples',
+        help='number of samples (i.e. values) to be generated',
+        type=int)
+
+    return parser
+
+
+def parse_command_line_arguments():
+    parser = create_command_line_arguments_parser()
+    return parser.parse_args()
 
 
 def print_parameters(number_of_samples: int, period_sec: int, instance_id: str) -> None:
@@ -113,16 +131,14 @@ def print_summary(instance_id: str, summary: Summary) -> None:
 
 
 def main() -> None:
-    period_sec = int(argv[1])
-    number_of_samples = int(argv[2])
+    params = parse_command_line_arguments()
     instance_id = str(uuid4())
 
-    print_parameters(number_of_samples, period_sec, instance_id)
-    samples = publish_samples(number_of_samples, period_sec, instance_id)
+    print_parameters(params.number_of_samples, params.period_sec, instance_id)
+    samples = publish_samples(params.number_of_samples, params.period_sec, instance_id)
     summary = calculate_summary(samples)
     print_summary(instance_id, summary)
 
 
-# https://stackify.com/custom-metrics-aws-lambda/
 if __name__ == "__main__":
     main()
