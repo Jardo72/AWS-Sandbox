@@ -135,7 +135,7 @@ def print_summaries(summaries: Sequence[Summary], instance_id: str) -> None:
     for index, single_summary in enumerate(summaries):
         print()
         print(f'Batch {index + 1}/{len(summaries)}')
-        print_summary(single_summary, instance_id)
+        print_summary(instance_id, single_summary)
 
 
 def main() -> None:
