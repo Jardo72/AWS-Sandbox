@@ -22,6 +22,8 @@ from typing import Any, Dict
 
 from boto3 import resource
 
+from commons import Constants
+
 
 def create_command_line_arguments_parser() -> ArgumentParser:
     parser = ArgumentParser(description = "CloudWatch Metrics Generator", formatter_class = RawTextHelpFormatter)
@@ -46,7 +48,7 @@ def parse_command_line_arguments():
 
 def retrieve_statistics(params) -> Dict[str, Any]:
     cloud_watch = resource('cloudwatch')
-    metric = cloud_watch.Metric('JCH', 'RandomValue')
+    metric = cloud_watch.Metric(Constants.namespace(), Constants.metric())
     dimensions = [{'Name': 'InstanceId', 'Value': params.instance_id}]
     statistics = metric.get_statistics(
         Dimensions=dimensions,
