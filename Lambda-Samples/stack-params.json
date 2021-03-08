@@ -38,5 +38,9 @@
     {
         "ParameterKey": "ReadSecretFunctionS3KeyParam",
         "ParameterValue": "LAMBDA-SAMPLES/read-secret-string.zip"
+    },
+    {
+        "ParameterKey": "SQSRecipientFunctionS3KeyParam",
+        "ParameterValue": "LAMBDA-SAMPLES/sqs-recipient.zip"
     }
 ]
