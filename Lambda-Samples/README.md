@@ -71,4 +71,4 @@ The following snippet illustrates the JSON structure which in Base64-encoded for
 ```
 
 ### Receive SQS Messages
-The [sqs-recipient](./sqs-recipient.py) function is automatically triggered by an SQS queue (assumed you have deployed the functions via the above described CloudFormation template). It does not make any sense to invoke this function manually.
+The [sqs-recipient](./sqs-recipient.py) function is automatically triggered by an SQS queue (assumed you have deployed the functions via the above described CloudFormation template). Therefore, it does not make any sense to invoke this function manually. Instead, send message(s) to the SQS queue configured as the trigger for the function.
