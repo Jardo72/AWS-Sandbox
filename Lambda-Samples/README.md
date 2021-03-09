@@ -5,12 +5,13 @@ Lambda Samples is an experimantal/educational project meant as illustration of L
 - [dump-invocation](./dump-invocation.py) provides various details of the function invocation. The function returns a structure carrying the input parameter (event) of the function, various properties extracted from the context passed to the function by Lambda, environment variables, plus an instance ID generated in the initialization code outside of the function. The initialization code also involves an invocation counter which is incremented by every invocation of this function instance. The value of the counter is also involved in the returned structure.
 - [read-secret-string](./read-secret-string.py) reads the specified secret string from Secrets Manager. The value of the secret (together with several properties of the secret) is returned.
 - [read-ssm-parameter](./read-ssm-parameter.py) reads the specified parameter from SSM Parameter Store. The value of the parameter (together with several properties of the secret) is returned.
+- [sqs-recipient](./sqs-recipient.py) is automatically triggered by an SQS queue and consumes messages from the queue.
 
 Besides the above listed Lambda functions, the project also involves a CloudFormation template that can be used to create the above listed functions in AWS, together with other related AWS resources used by the functions.
 
 ## Deployment to AWS
 As mentioned above, the project involves a CloudFormation template that can be used to deploy the Lambda functions to AWS. The template also creates:
-- other resources (SSM parameter, secret in a secrets manager) accessed by the functions
+- other resources (SSM parameter, secret in a secrets manager, SQS queue + event source mapping) accessed/used by the functions
 - IAM roles (and the corresponding IAM policies) used as execution roles for the functions
 
 In order to create a CloudFormation stack based on the template, follow these steps:
@@ -68,3 +69,6 @@ The following snippet illustrates the JSON structure which in Base64-encoded for
     "parameter": "/lambda-samples/sample-param"
 }
 ```
+
+### Receive SQS Messages
+The [sqs-recipient](./sqs-recipient.py) function is automatically triggered by an SQS queue (assumed you have deployed the functions via the above described CloudFormation template). It does not make any sense to invoke this function manually.
