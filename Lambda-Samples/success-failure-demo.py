@@ -22,4 +22,4 @@ def main(event, context):
     result = event['result']
     if isinstance(result, str) and result.upper() == 'FAILURE':
         raise RuntimeError(f'Failure requested by the caller (result = "{result}", message = "{message}").')
-    return f'Failure requested by the caller (result = "{result}", message = "{message}").'
+    return f'Success requested by the caller (result = "{result}", message = "{message}").'
