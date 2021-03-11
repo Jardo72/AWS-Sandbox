@@ -17,23 +17,9 @@
 # limitations under the License.
 #
 
-from uuid import uuid4
-
-
-instance_id = str(uuid4())
-invocation_counter = 0
-message_counter = 0
-
-
 def main(event, context):
-    global invocation_counter, message_counter
-
-    invocation_counter += 1
-    message_counter += len(event['Records'])
-    print(f'Statistics (totals): {invocation_counter} invocations, {message_counter} messages consumed')
-
-    payloads = []
-    for single_message in event['Records']:
-        payloads.append(single_message['body'])
-    print(payloads)
-    return True
+    message = event['message']
+    result = event['result']
+    if isinstance(result, str) and result.upper() == 'FAILURE':
+        raise RuntimeError(f'Failure requested by the caller (result = "{result}", message = "{message}").')
+    return f'Failure requested by the caller (result = "{result}", message = "{message}").'
