@@ -27,26 +27,40 @@ Parameters:
   SSMParameterNameParam:
     Description: The name of the parameter stored in the SSM Parameter Store & read by one of the Lambda functions
     Type: String
+    Default: "/lambda-samples/sample-param"
 
   SSMParameterValueParam:
     Description: The value of the parameter stored in the SSM Parameter Store & read by one of the Lambda functions
     Type: String
+    MinLength: 5
+    MaxLength: 20
+    Default: "Sample value SSM"
 
   SecretNameParam:
     Description: The name of the secret stored in the Secrets Manager & read by one of the Lambda functions
     Type: String
+    Default: "lambda-secret"
 
   SecretValueParam:
     Description: The value of the secret stored in the Secrets Manager & read by one of the Lambda functions
     Type: String
+    MinLength: 5
+    MaxLength: 20
+    Default: "Secret value"
 
   EnvironmentVariableOneValueParam:
     Description: The value of a sample env. variable (SAMPLE_VAR_ONE) used for one of the Lambda functions
     Type: String
+    MinLength: 5
+    MaxLength: 20
+    Default: "Sample value #1"
 
   EnvironmentVariableTwoValueParam:
     Description: The value of a sample env. variable (SAMPLE_VAR_ONE) used for one of the Lambda functions
     Type: String
+    MinLength: 5
+    MaxLength: 20
+    Default: "Sample value #2"
 
   FunctionCodeS3BucketParam:
     Description: The name of the S3 bucket storing the ZIP files with the code for the Lambda functions
@@ -67,6 +81,11 @@ Parameters:
   SQSRecipientFunctionS3KeyParam:
     Description: S3 object key with the filename of the ZIP file containing the code for the read-secret function
     Type: String
+
+  SuccessFailureDestinationsDemoS3KeyParam:
+    Description: S3 object key with the filename of the ZIP file containing the code for the success-failure-destinations-demo function
+    Type: String
+
 
 Resources:
   SSMParameter:
@@ -89,6 +108,16 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: !Sub "${AWS::StackName}-Lambda-Trigger-Queue"
+
+  OnSuccessDestinationSQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-On-Success-Destination-Queue"
+
+  OnFailureDestinationSQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-On-Failure-Destination-Queue"
 
   # the InvocationDumpFunction in fact does not need any special permissions, but the Role
   # property is mandatory; so the easiest/cheapest way to solve the problem is to create

@@ -42,5 +42,9 @@
     {
         "ParameterKey": "SQSRecipientFunctionS3KeyParam",
         "ParameterValue": "LAMBDA-SAMPLES/sqs-recipient.zip"
+    },
+    {
+        "ParameterKey": "SuccessFailureDestinationsDemoS3KeyParam",
+        "ParameterValue": "LAMBDA-SAMPLES/success-failure-destinations-demo.zip"
     }
 ]

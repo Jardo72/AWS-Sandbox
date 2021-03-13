@@ -81,7 +81,7 @@ The following command illustrates how to invoke the [success-failure-destination
 aws lambda invoke --function-name SuccessFailureDestinationsDemo --payload <base64-encoded-json> success-failure-destinations-demo.json
 ```
 
-The following snippets illustrate the JSON structure which in Base64-encoded form is to be used as value for the `--payload` argument. The first input should lead to successful invocation of the function without any exception, so that the return value of the function should be sent to the on-success destination. The second input instructs the function to raise an exception, which should be sent to the on-failure destination.
+The following snippets illustrate the JSON structure which in Base64-encoded form is to be used as value for the `--payload` argument. The first input should lead to successful invocation of the function without any exception, so that the return value of the function should be sent to the on-success destination SQS queue. The second input instructs the function to raise an exception, which should be sent to the on-failure destination SQS queue.
 ```json
 {
     "message": "This input should lead to successful invocation of the function.",
