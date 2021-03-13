@@ -270,3 +270,31 @@ Resources:
       Enabled: True
       EventSourceArn: !GetAtt ["TriggerSQSQueue", "Arn"]
       FunctionName: !GetAtt ["SQSRecipientFunction", "Arn"]
+
+  SuccessFailureDestinationsDemoRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-SuccessFailureDestinationsDemo-Role"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+
+  SuccessFailureDestinationsDemoFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda function that illustrates on-success/on-failure destinations
+      FunctionName: SuccessFailureDestinationsDemo
+      Handler: sqs-recipient.main
+      Runtime: python3.8
+      Role: !GetAtt ["SuccessFailureDestinationsDemoRole", "Arn"]
+      Code: 
+        S3Bucket: !Ref FunctionCodeS3BucketParam
+        S3Key: !Ref SuccessFailureDestinationsDemoS3KeyParam
