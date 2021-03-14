@@ -76,9 +76,9 @@ The [sqs-recipient](./sqs-recipient.py) function is automatically triggered by a
 
 
 ### On-Success/On-Failure Destinations
-The following command illustrates how to invoke the [success-failure-destinations-demo](./success-failure-destinations-demo.py) function via the AWS CLI (the `--function-name` argument assumes you have deployed the functions via the above described CloudFormation template).
+The following command illustrates how to invoke the [success-failure-destinations-demo](./success-failure-destinations-demo.py) function asynchronously via the AWS CLI (the `--function-name` argument assumes you have deployed the functions via the above described CloudFormation template).
 ```
-aws lambda invoke --function-name SuccessFailureDestinationsDemo --payload <base64-encoded-json> success-failure-destinations-demo.json
+aws lambda invoke --function-name SuccessFailureDestinationsDemo --invocation-type Event --payload <base64-encoded-json> success-failure-destinations-demo.json
 ```
 
 The following snippets illustrate the JSON structure which in Base64-encoded form is to be used as value for the `--payload` argument. The first input should lead to successful invocation of the function without any exception, so that the return value of the function should be sent to the on-success destination SQS queue. The second input instructs the function to raise an exception, which should be sent to the on-failure destination SQS queue.
