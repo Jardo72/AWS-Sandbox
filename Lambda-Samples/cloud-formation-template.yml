@@ -271,6 +271,9 @@ Resources:
       EventSourceArn: !GetAtt ["TriggerSQSQueue", "Arn"]
       FunctionName: !GetAtt ["SQSRecipientFunction", "Arn"]
 
+  # TODO:
+  # - SQS full access is too much
+  # - it might make sense to create a special policy using the least privilege principle
   SuccessFailureDestinationsDemoRole:
     Type: AWS::IAM::Role
     Properties:
@@ -285,16 +288,28 @@ Resources:
           Action:
           - 'sts:AssumeRole'
       ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+      - arn:aws:iam::aws:policy/AmazonSQSFullAccess
 
   SuccessFailureDestinationsDemoFunction:
     Type: AWS::Lambda::Function
     Properties:
       Description: Lambda function that illustrates on-success/on-failure destinations
       FunctionName: SuccessFailureDestinationsDemo
-      Handler: sqs-recipient.main
+      Handler: success-failure-destinations-demo.main
       Runtime: python3.8
       Role: !GetAtt ["SuccessFailureDestinationsDemoRole", "Arn"]
       Code: 
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref SuccessFailureDestinationsDemoS3KeyParam
+
+  SuccessFailureDestinationsDemoEventInvokeConfig:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      DestinationConfig:
+        OnSuccess:
+          Destination: !GetAtt ["OnSuccessDestinationSQSQueue", "Arn"]
+        OnFailure:
+          Destination: !GetAtt ["OnFailureDestinationSQSQueue", "Arn"]
+      FunctionName: !Ref SuccessFailureDestinationsDemoFunction
+      Qualifier: $LATEST
+
