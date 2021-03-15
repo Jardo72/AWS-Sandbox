@@ -271,9 +271,7 @@ Resources:
       EventSourceArn: !GetAtt ["TriggerSQSQueue", "Arn"]
       FunctionName: !GetAtt ["SQSRecipientFunction", "Arn"]
 
-  # TODO:
-  # - SQS full access is too much
-  # - it might make sense to create a special policy using the least privilege principle
+  # SQS full access is more than needed, but this is the most convenient way to make this work
   SuccessFailureDestinationsDemoRole:
     Type: AWS::IAM::Role
     Properties:
