@@ -27,26 +27,40 @@ Parameters:
   SSMParameterNameParam:
     Description: The name of the parameter stored in the SSM Parameter Store & read by one of the Lambda functions
     Type: String
+    Default: "/lambda-samples/sample-param"
 
   SSMParameterValueParam:
     Description: The value of the parameter stored in the SSM Parameter Store & read by one of the Lambda functions
     Type: String
+    MinLength: 5
+    MaxLength: 20
+    Default: "Sample value SSM"
 
   SecretNameParam:
     Description: The name of the secret stored in the Secrets Manager & read by one of the Lambda functions
     Type: String
+    Default: "lambda-secret"
 
   SecretValueParam:
     Description: The value of the secret stored in the Secrets Manager & read by one of the Lambda functions
     Type: String
+    MinLength: 5
+    MaxLength: 20
+    Default: "Secret value"
 
   EnvironmentVariableOneValueParam:
     Description: The value of a sample env. variable (SAMPLE_VAR_ONE) used for one of the Lambda functions
     Type: String
+    MinLength: 5
+    MaxLength: 20
+    Default: "Sample value #1"
 
   EnvironmentVariableTwoValueParam:
     Description: The value of a sample env. variable (SAMPLE_VAR_ONE) used for one of the Lambda functions
     Type: String
+    MinLength: 5
+    MaxLength: 20
+    Default: "Sample value #2"
 
   FunctionCodeS3BucketParam:
     Description: The name of the S3 bucket storing the ZIP files with the code for the Lambda functions
@@ -61,8 +75,17 @@ Parameters:
     Type: String
 
   ReadSecretFunctionS3KeyParam:
+    Description: S3 object key with the filename of the ZIP file containing the code for the SQS-recipient function
+    Type: String
+
+  SQSRecipientFunctionS3KeyParam:
     Description: S3 object key with the filename of the ZIP file containing the code for the read-secret function
     Type: String
+
+  SuccessFailureDestinationsDemoS3KeyParam:
+    Description: S3 object key with the filename of the ZIP file containing the code for the success-failure-destinations-demo function
+    Type: String
+
 
 Resources:
   SSMParameter:
@@ -80,6 +103,21 @@ Resources:
       Description: Secret stored in the Secrets Manager & read by one of the Lambda functions
       Name: !Ref SecretNameParam
       SecretString: !Ref SecretValueParam
+
+  TriggerSQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-Lambda-Trigger-Queue"
+
+  OnSuccessDestinationSQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-On-Success-Destination-Queue"
+
+  OnFailureDestinationSQSQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Sub "${AWS::StackName}-On-Failure-Destination-Queue"
 
   # the InvocationDumpFunction in fact does not need any special permissions, but the Role
   # property is mandatory; so the easiest/cheapest way to solve the problem is to create
@@ -197,3 +235,79 @@ Resources:
       Code: 
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref ReadSecretFunctionS3KeyParam
+
+  SQSRecipientRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-SQSRecipient-Role"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+
+  SQSRecipientFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda function that reads the specified secret from the Secrets Manager using the SDK
+      FunctionName: ReceiveMessages
+      Handler: sqs-recipient.main
+      Runtime: python3.8
+      Role: !GetAtt ["SQSRecipientRole", "Arn"]
+      Code: 
+        S3Bucket: !Ref FunctionCodeS3BucketParam
+        S3Key: !Ref SQSRecipientFunctionS3KeyParam
+
+  SQSEventSourceMapping:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      Enabled: True
+      EventSourceArn: !GetAtt ["TriggerSQSQueue", "Arn"]
+      FunctionName: !GetAtt ["SQSRecipientFunction", "Arn"]
+
+  # SQS full access is more than needed, but this is the most convenient way to make this work
+  SuccessFailureDestinationsDemoRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-SuccessFailureDestinationsDemo-Role"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+
+  SuccessFailureDestinationsDemoFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda function that illustrates on-success/on-failure destinations
+      FunctionName: SuccessFailureDestinationsDemo
+      Handler: success-failure-destinations-demo.main
+      Runtime: python3.8
+      Role: !GetAtt ["SuccessFailureDestinationsDemoRole", "Arn"]
+      Code: 
+        S3Bucket: !Ref FunctionCodeS3BucketParam
+        S3Key: !Ref SuccessFailureDestinationsDemoS3KeyParam
+
+  SuccessFailureDestinationsDemoEventInvokeConfig:
+    Type: AWS::Lambda::EventInvokeConfig
+    Properties:
+      DestinationConfig:
+        OnSuccess:
+          Destination: !GetAtt ["OnSuccessDestinationSQSQueue", "Arn"]
+        OnFailure:
+          Destination: !GetAtt ["OnFailureDestinationSQSQueue", "Arn"]
+      FunctionName: !Ref SuccessFailureDestinationsDemoFunction
+      Qualifier: $LATEST
+

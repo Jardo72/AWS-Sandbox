@@ -5,12 +5,14 @@ Lambda Samples is an experimantal/educational project meant as illustration of L
 - [dump-invocation](./dump-invocation.py) provides various details of the function invocation. The function returns a structure carrying the input parameter (event) of the function, various properties extracted from the context passed to the function by Lambda, environment variables, plus an instance ID generated in the initialization code outside of the function. The initialization code also involves an invocation counter which is incremented by every invocation of this function instance. The value of the counter is also involved in the returned structure.
 - [read-secret-string](./read-secret-string.py) reads the specified secret string from Secrets Manager. The value of the secret (together with several properties of the secret) is returned.
 - [read-ssm-parameter](./read-ssm-parameter.py) reads the specified parameter from SSM Parameter Store. The value of the parameter (together with several properties of the secret) is returned.
+- [sqs-recipient](./sqs-recipient.py) is automatically triggered by an SQS queue and consumes messages from the queue. It demonstrates an event source mapping.
+- [success-failure-destinations-demo](./success-failure-destinations-demo.py) is a simple function that can be instructed to raise an exception. It is meant as demonstration of on-success/on-failure destinations. Both destinations are SQS queues.
 
 Besides the above listed Lambda functions, the project also involves a CloudFormation template that can be used to create the above listed functions in AWS, together with other related AWS resources used by the functions.
 
 ## Deployment to AWS
 As mentioned above, the project involves a CloudFormation template that can be used to deploy the Lambda functions to AWS. The template also creates:
-- other resources (SSM parameter, secret in a secrets manager) accessed by the functions
+- other resources (e.g. SSM parameter, secret in a secrets manager, SQS queues, event source mapping) accessed/used by the functions
 - IAM roles (and the corresponding IAM policies) used as execution roles for the functions
 
 In order to create a CloudFormation stack based on the template, follow these steps:
@@ -66,5 +68,30 @@ The following snippet illustrates the JSON structure which in Base64-encoded for
 {
     "region": "eu-central-1",
     "parameter": "/lambda-samples/sample-param"
+}
+```
+
+### Receive SQS Messages
+The [sqs-recipient](./sqs-recipient.py) function is automatically triggered by an SQS queue (assumed you have deployed the functions via the above described CloudFormation template). Therefore, it does not make any sense to invoke this function manually. Instead, send message(s) to the SQS queue configured as the trigger for the function.
+
+
+### On-Success/On-Failure Destinations
+The following command illustrates how to invoke the [success-failure-destinations-demo](./success-failure-destinations-demo.py) function asynchronously via the AWS CLI (the `--function-name` argument assumes you have deployed the functions via the above described CloudFormation template).
+```
+aws lambda invoke --function-name SuccessFailureDestinationsDemo --invocation-type Event --payload <base64-encoded-json> success-failure-destinations-demo.json
+```
+
+The following snippets illustrate the JSON structure which in Base64-encoded form is to be used as value for the `--payload` argument. The first input should lead to successful invocation of the function without any exception, so that the return value of the function should be sent to the on-success destination SQS queue. The second input instructs the function to raise an exception, which should be sent to the on-failure destination SQS queue.
+```json
+{
+    "message": "This input should lead to successful invocation of the function.",
+    "result": "Success"
+}
+```
+
+```json
+{
+    "message": "This input instructs the function to raise an exception.",
+    "result": "Failure"
 }
 ```
