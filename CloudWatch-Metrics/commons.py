@@ -33,8 +33,16 @@ class Constants:
         return 'RandomValue'
 
     @staticmethod
+    def metric_from_log() -> str:
+        return 'RandomValueFromLog'
+
+    @staticmethod
     def timestamp_format() -> str:
         return '%Y-%m-%dT%H:%M:%SZ'
+
+    @staticmethod
+    def log_group_name():
+        return 'CloudWatch-Metrics-Demo'
 
 
 @dataclass(frozen=True)
