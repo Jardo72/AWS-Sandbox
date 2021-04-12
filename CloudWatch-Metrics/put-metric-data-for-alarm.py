@@ -101,7 +101,7 @@ def publish_single_sample(cloud_watch, config_entry: ConfigEntry, instance_id: s
             }
         ]
     }
-    response = cloud_watch.put_metric_data(Namespace=Constants.metric(), MetricData=[sample])
+    response = cloud_watch.put_metric_data(Namespace=Constants.namespace(), MetricData=[sample])
     status_code = response['ResponseMetadata']['HTTPStatusCode']
     return Sample(datetime.utcnow(), value, status_code)
 
