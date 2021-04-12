@@ -1,0 +1,30 @@
+{
+    "periodSec": 3,
+    "scheduleEntries": [
+        {
+            "minValue": 70,
+            "maxValue": 100,
+            "numberOfSamples": 120
+        },
+        {
+            "minValue": 90,
+            "maxValue": 120,
+            "numberOfSamples": 160
+        },
+        {
+            "minValue": 70,
+            "maxValue": 100,
+            "numberOfSamples": 120
+        },
+        {
+            "minValue": 90,
+            "maxValue": 120,
+            "numberOfSamples": 60
+        },
+        {
+            "minValue": 60,
+            "maxValue": 85,
+            "numberOfSamples": 80
+        }
+    ]
+}
