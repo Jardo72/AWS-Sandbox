@@ -20,6 +20,7 @@
 from argparse import ArgumentParser, RawTextHelpFormatter
 from boto3 import client
 from dataclasses import dataclass
+from datetime import datetime
 from random import randint
 from time import sleep, time
 from typing import Optional, Tuple
@@ -32,6 +33,8 @@ from commons import Constants
 class Summary:
     log_stream_name: str
     values: Tuple[int, ...]
+    start_timestamp: str
+    end_timestamp: str
 
     @property
     def min_value(self) -> int:
@@ -91,6 +94,7 @@ def create_log_stream(cloud_watch, log_stream_name: str) -> None:
         # chances are the log group already exists - we do not want to fail in such a case
         pass
     cloud_watch.create_log_stream(logGroupName=Constants.log_group_name(), logStreamName=log_stream_name)
+    print(f'Log stream created (name = {log_stream_name})')
 
 
 def create_metric_filter(cloud_watch) -> None:
@@ -98,20 +102,21 @@ def create_metric_filter(cloud_watch) -> None:
         {
             'metricName': Constants.metric_from_log(),
             'metricNamespace': Constants.namespace(),
-            'metricValue': 'string',
-            'defaultValue': 123.0
+            'metricValue': '$randomValue'
         },
     ]
     cloud_watch.put_metric_filter(
         logGroupName=Constants.log_group_name(),
         filterName='RandomValueFilter',
+        filterPattern='[message, randomValue]',
         metricTransformations=metric_transformations)
+    print('Metric filter created')
 
 
 def publish_single_log_entry(cloud_watch, log_stream_name: str, min: int, max: int, sequence_token: Optional[str]) -> Tuple[int, str]:
     timestamp = current_time_millis()
     value = randint(min, max)
-    log_message = f'Random value for metric filter is {value}'
+    log_message = f'random-value-for-metric-filter, {value}'
     log_events = [ 
         { 
             'message': f'Dummy event not relevant for the metric filter (random value = {uuid4()})',
@@ -119,11 +124,11 @@ def publish_single_log_entry(cloud_watch, log_stream_name: str, min: int, max: i
         },
         { 
             'message': log_message,
-            'timestamp': timestamp + randint(5, 20)
+            'timestamp': timestamp + randint(5, 220)
         },
         { 
             'message': f'Dummy event irrelevant for the metric filter (random value = {uuid4()})',
-            'timestamp': timestamp + randint(25, 40)
+            'timestamp': timestamp + randint(200, 750)
         }
     ]
 
@@ -146,7 +151,9 @@ def publish_log_entries(number_of_entries: int, period_sec: int, min: int, max: 
     log_stream_name = str(uuid4())
     cloud_watch = client('logs')
     create_log_stream(cloud_watch, log_stream_name)
+    create_metric_filter(cloud_watch)
 
+    start_timestamp = datetime.utcnow().strftime(Constants.timestamp_format())
     sequence_token = None
     values = []
     for i in range(0, number_of_entries):
@@ -154,7 +161,9 @@ def publish_log_entries(number_of_entries: int, period_sec: int, min: int, max: 
         values.append(value)
         if i < number_of_entries - 1:
             sleep(period_sec)
-    return Summary(log_stream_name, tuple(values))
+    end_timestamp = datetime.utcnow().strftime(Constants.timestamp_format())
+
+    return Summary(log_stream_name, tuple(values), start_timestamp, end_timestamp)
 
 
 def print_summary(summary: Summary) -> None:
@@ -163,6 +172,8 @@ def print_summary(summary: Summary) -> None:
     print('- Summary')
     print('-----------')
     print(f'Log stream:                  {summary.log_stream_name}')
+    print(f'Start time:                  {summary.start_timestamp}')
+    print(f'End time:                    {summary.end_timestamp}')
     print(f'Number of values generated:  {len(summary.values)}')
     print(f'Min value:                   {summary.min_value}')
     print(f'Max value:                   {summary.max_value}')
