@@ -5,7 +5,7 @@
 - Python Flask application exposing several REST API endpoints
 - simplified model of Vienna public transport (all U-Bahn lines, plus single S-Bahn line) read from a JSON file
 - journy plan calculation based on Dijkstra's shortest path algorithm, itineraries of the lines etc.
-- Python 3
+- Python 3.8
 
 
 ## API Endpoints
@@ -48,7 +48,7 @@ The following snippet illustrates a configuration with model definition stored i
 As the application is comprised of just few Python source files, the source code is organized in a flat structure with all source files residing in the same directory.
 
 Dependencies on other Python modules:
-- [Library of Graph Algorithms for Python](https://github.com/Jardo72/python-graph-alg-lib) - TODO - eventually link to PyPI
+- [Library of Graph Algorithms for Python](https://github.com/Jardo72/python-graph-alg-lib) - TODO - https://pypi.org/project/python-graph-alg-lib/
 - AWS SDK for Python
 
 
