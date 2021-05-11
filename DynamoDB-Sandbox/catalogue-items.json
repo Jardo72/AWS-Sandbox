@@ -1,0 +1,527 @@
+{
+    "Catalogue": [
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "b3a5b36f-ab3f-4ea4-94fc-11ea107e71a3"
+                    },
+                    "category": {
+                        "S": "GPU"
+                    },
+                    "vendor": {
+                        "S": "Nvidia"
+                    },
+                    "productName": {
+                        "S": "Nvidia GeForce RTX 3070"
+                    },
+                    "price": {
+                        "N": "499.99"
+                    },
+                    "boostClockSpeedGHz": {
+                        "N": "1.73"
+                    },
+                    "memorySizeGB": {
+                        "N": "8"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "b869f26c-855d-4c2e-ac7e-c6234ecb747d"
+                    },
+                    "category": {
+                        "S": "GPU"
+                    },
+                    "vendor": {
+                        "S": "Nvidia"
+                    },
+                    "productName": {
+                        "S": "Nvidia GeForce RTX 3060 TI"
+                    },
+                    "price": {
+                        "N": "399.99"
+                    },
+                    "boostClockSpeedGHz": {
+                        "N": "1.67"
+                    },
+                    "memorySizeGB": {
+                        "N": "8"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "9bb92e76-daf0-4dab-9106-a47acd66f3c8"
+                    },
+                    "category": {
+                        "S": "GPU"
+                    },
+                    "vendor": {
+                        "S": "Nvidia"
+                    },
+                    "productName": {
+                        "S": "Nvidia GeForce RTX 3080"
+                    },
+                    "price": {
+                        "N": "699.99"
+                    },
+                    "boostClockSpeedGHz": {
+                        "N": "1.71"
+                    },
+                    "memorySizeGB": {
+                        "N": "10"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "e3ded8de-2eef-4536-8326-7880b4fc52d2"
+                    },
+                    "category": {
+                        "S": "GPU"
+                    },
+                    "vendor": {
+                        "S": "Nvidia"
+                    },
+                    "productName": {
+                        "S": "Nvidia GeForce RTX 3080"
+                    },
+                    "price": {
+                        "N": "1499.99"
+                    },
+                    "boostClockSpeedGHz": {
+                        "N": "1.70"
+                    },
+                    "memorySizeGB": {
+                        "N": "24"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "ec7f4259-ef29-47cb-b93b-cfa007c3d0c7"
+                    },
+                    "category": {
+                        "S": "CPU"
+                    },
+                    "vendor": {
+                        "S": "Intel"
+                    },
+                    "productName": {
+                        "S": "Intel Core i5-11500 Processor"
+                    },
+                    "price": {
+                        "N": "217.50"
+                    },
+                    "coreCount": {
+                        "N": "6"
+                    },
+                    "baseFrequencyGHz": {
+                        "N": "2.70"
+                    },
+                    "maxFrequencyGHz": {
+                        "N": "4.60"
+                    },
+                    "cacheMB": {
+                        "N": "12"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "dfb645e6-35bb-41ab-a2f8-9c94a0b6dd10"
+                    },
+                    "category": {
+                        "S": "CPU"
+                    },
+                    "vendor": {
+                        "S": "Intel"
+                    },
+                    "productName": {
+                        "S": "Intel Core i5-11600KF Processor"
+                    },
+                    "price": {
+                        "N": "281.73"
+                    },
+                    "coreCount": {
+                        "N": "6"
+                    },
+                    "baseFrequencyGHz": {
+                        "N": "3.90"
+                    },
+                    "maxFrequencyGHz": {
+                        "N": "4.90"
+                    },
+                    "cacheMB": {
+                        "N": "12"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "5c9ab2a0-5ce2-46a6-859d-c60041be5d12"
+                    },
+                    "category": {
+                        "S": "CPU"
+                    },
+                    "vendor": {
+                        "S": "Intel"
+                    },
+                    "productName": {
+                        "S": "Intel Core i5-11600K Processor"
+                    },
+                    "price": {
+                        "N": "269.99"
+                    },
+                    "coreCount": {
+                        "N": "6"
+                    },
+                    "baseFrequencyGHz": {
+                        "N": "3.90"
+                    },
+                    "maxFrequencyGHz": {
+                        "N": "4.90"
+                    },
+                    "cacheMB": {
+                        "N": "12"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "bf096793-3563-4995-9b26-e057ddefbef0"
+                    },
+                    "category": {
+                        "S": "CPU"
+                    },
+                    "vendor": {
+                        "S": "Intel"
+                    },
+                    "productName": {
+                        "S": "Intel Core i5-11600 Processor"
+                    },
+                    "price": {
+                        "N": "265.23"
+                    },
+                    "coreCount": {
+                        "N": "6"
+                    },
+                    "baseFrequencyGHz": {
+                        "N": "2.80"
+                    },
+                    "maxFrequencyGHz": {
+                        "N": "4.80"
+                    },
+                    "cacheMB": {
+                        "N": "12"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "9407ec5b-4b66-4b10-a998-a3a09c8b0b1b"
+                    },
+                    "category": {
+                        "S": "CPU"
+                    },
+                    "vendor": {
+                        "S": "AMD"
+                    },
+                    "productName": {
+                        "S": "AMD RYZEN 5 3600"
+                    },
+                    "price": {
+                        "N": "190"
+                    },
+                    "coreCount": {
+                        "N": "6"
+                    },
+                    "baseFrequencyGHz": {
+                        "N": "3.60"
+                    },
+                    "maxFrequencyGHz": {
+                        "N": "4.20"
+                    },
+                    "cacheMB": {
+                        "N": "4"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "c68d5a57-3be9-4eab-8cd9-c6d57fdfe397"
+                    },
+                    "category": {
+                        "S": "CPU"
+                    },
+                    "vendor": {
+                        "S": "AMD"
+                    },
+                    "productName": {
+                        "S": "AMD Ryzen 7 5800X"
+                    },
+                    "price": {
+                        "N": "473.90"
+                    },
+                    "coreCount": {
+                        "N": "8"
+                    },
+                    "baseFrequencyGHz": {
+                        "N": "3.80"
+                    },
+                    "maxFrequencyGHz": {
+                        "N": "4.70"
+                    },
+                    "cacheMB": {
+                        "N": "4"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "c6a34c94-c2e9-47fb-855c-08414fc64b98"
+                    },
+                    "category": {
+                        "S": "CPU"
+                    },
+                    "vendor": {
+                        "S": "AMD"
+                    },
+                    "productName": {
+                        "S": "AMD RYZEN 5 1600"
+                    },
+                    "price": {
+                        "N": "129.90"
+                    },
+                    "coreCount": {
+                        "N": "6"
+                    },
+                    "baseFrequencyGHz": {
+                        "N": "3.20"
+                    },
+                    "maxFrequencyGHz": {
+                        "N": "3.60"
+                    },
+                    "cacheMB": {
+                        "N": "3"
+                    }
+                }
+            }
+        },
+
+
+
+
+
+
+
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "8586ae49-645b-40fd-abbe-cf60184e3966"
+                    },
+                    "category": {
+                        "S": "Mouse"
+                    },
+                    "vendor": {
+                        "S": "Logitech"
+                    },
+                    "productName": {
+                        "S": "Logitech G102 Lightsync"
+                    },
+                    "price": {
+                        "N": "29.90"
+                    },
+                    "wireless": {
+                        "BOOL": false
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "413219ba-6e18-4dd8-aeb8-2b98738d379e"
+                    },
+                    "category": {
+                        "S": "Mouse"
+                    },
+                    "vendor": {
+                        "S": "Logitec"
+                    },
+                    "productName": {
+                        "S": "Logitech G305 Recoil"
+                    },
+                    "price": {
+                        "N": "55.99"
+                    },
+                    "wireless": {
+                        "BOOL": false
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "3a25d5c7-0900-4829-86dc-c87d14cc3153"
+                    },
+                    "category": {
+                        "S": "Mouse"
+                    },
+                    "vendor": {
+                        "S": "Logitec"
+                    },
+                    "productName": {
+                        "S": "Logitech M280"
+                    },
+                    "price": {
+                        "N": "29.90"
+                    },
+                    "wireless": {
+                        "BOOL": true
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "07405fc4-d1cc-4aef-98fb-e6c43e763346"
+                    },
+                    "category": {
+                        "S": "Mouse"
+                    },
+                    "vendor": {
+                        "S": "Logitech"
+                    },
+                    "productName": {
+                        "S": "Logitech M330 Silent Plus"
+                    },
+                    "price": {
+                        "N": "39.90"
+                    },
+                    "wireless": {
+                        "BOOL": true
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "9e10a897-1166-4d3a-8e71-5c85e0fb9be3"
+                    },
+                    "category": {
+                        "S": "Memory"
+                    },
+                    "vendor": {
+                        "S": "HP"
+                    },
+                    "productName": {
+                        "S": "HP SO-DIMM 8GB 2666MHz DDR4 ECC Memory"
+                    },
+                    "price": {
+                        "N": "87.73"
+                    },
+                    "memoryType": {
+                        "S": "DDR4"
+                    },
+                    "capacityGB": {
+                        "N": "8"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "d244acd4-b301-4fb7-a0fa-66a5d96ff3ce"
+                    },
+                    "category": {
+                        "S": "Memory"
+                    },
+                    "vendor": {
+                        "S": "Kingston"
+                    },
+                    "productName": {
+                        "S": "16GB DDR4 2400MHZ Kingston CL17 1Rx8"
+                    },
+                    "price": {
+                        "N": "86.53"
+                    },
+                    "memoryType": {
+                        "S": "DDR4"
+                    },
+                    "capacityGB": {
+                        "N": "16"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "articleId": {
+                        "S": "cc48ac3e-6ed0-4fb9-a6fb-890a5c1bcf0c"
+                    },
+                    "category": {
+                        "S": "Memory"
+                    },
+                    "vendor": {
+                        "S": "Kingston"
+                    },
+                    "productName": {
+                        "S": "SO-DIMM 4GB DDR4-2666MHz Kingston"
+                    },
+                    "price": {
+                        "N": "24.67"
+                    },
+                    "memoryType": {
+                        "S": "DDR4"
+                    },
+                    "capacityGB": {
+                        "N": "4"
+                    }
+                }
+            }
+        }
+    ]
+}
