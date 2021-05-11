@@ -1,12 +1,13 @@
 FROM python:3
 
-COPY ./requirements.txt /app/requirements.txt
-COPY ./*.py /app
-COPY ./config.json /app
-
 WORKDIR /app
-RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY ./requirements.txt ./
+COPY ./*.py ./
+COPY ./config.json ./
+
+RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 80
 
-CMD ["python3", "application.py", "config.json"]
+CMD ["python", "application.py", "config.json"]
