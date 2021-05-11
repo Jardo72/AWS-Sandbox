@@ -24,6 +24,7 @@ hs_err_pid*
 
 # IDEA
 *.iml
+.idea/
 
 # Python cache
 __pycache__/
