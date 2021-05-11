@@ -1,0 +1,15 @@
+# https://docs.aws.amazon.com/codebuild/latest/userguide/sample-docker.html
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Going to login to ECR
+
+  build:
+    commands:
+      - Going to build Docker image
+
+  post_build:
+    commands:
+      - Going to push Docker image
