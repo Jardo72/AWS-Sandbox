@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "FunctionCodeS3BucketParam",
+        "ParameterValue": "jardo72-ec2-installation-repo"
+    },    
+    {
+        "ParameterKey": "FunctionCodeS3KeyParam",
+        "ParameterValue": "LAMBDA-SAMPLES/alb-target.zip"
+    }
+]

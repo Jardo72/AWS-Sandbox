@@ -1,0 +1,107 @@
+#
+# Copyright 2020 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Three Lambda functions (all using the same codebase) behind an ALB using path based routing.
+  Each of the Lambda functions is used to serve a different path.
+
+Parameters:
+  FunctionCodeS3BucketParam:
+    Description: The name of the S3 bucket storing the ZIP files with the code for the Lambda functions
+    Type: String
+
+  FunctionCodeS3KeyParam:
+    Description: S3 object key with the filename of the ZIP file containing the common code for all three Lambda functions
+    Type: String
+
+Resources:
+  # the InvocationDumpFunction in fact does not need any special permissions, but the Role
+  # property is mandatory; so the easiest/cheapest way to solve the problem is to create
+  # a role and use an existing AWS managed policy
+  FunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-LambdaExecution-Role"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - "arn:aws:iam::aws:policy/AWSLambdaExecute"
+
+  RedFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda function used as ALB target for the /red path
+      FunctionName: !Sub "${AWS::StackName}-RedFunction"
+      Handler: alb-target.main
+      Runtime: python3.8
+      Role: !GetAtt ["FunctionExecutionRole", "Arn"]
+      Code:
+        S3Bucket: !Ref FunctionCodeS3BucketParam
+        S3Key: !Ref FunctionCodeS3KeyParam
+      Environment:
+        Variables:
+          COLOR: 'RED'
+
+  GreenFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda function used as ALB target for the /green path
+      FunctionName: !Sub "${AWS::StackName}-GreenFunction"
+      Handler: alb-target.main
+      Runtime: python3.8
+      Role: !GetAtt ["FunctionExecutionRole", "Arn"]
+      Code:
+        S3Bucket: !Ref FunctionCodeS3BucketParam
+        S3Key: !Ref FunctionCodeS3KeyParam
+      Environment:
+        Variables:
+          COLOR: 'GREEN'
+
+  BlueFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Lambda function used as ALB target for the /blue path
+      FunctionName: !Sub "${AWS::StackName}-BlueFunction"
+      Handler: alb-target.main
+      Runtime: python3.8
+      Role: !GetAtt ["FunctionExecutionRole", "Arn"]
+      Code:
+        S3Bucket: !Ref FunctionCodeS3BucketParam
+        S3Key: !Ref FunctionCodeS3KeyParam
+      Environment:
+        Variables:
+          COLOR: 'BLUE'
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: "${AWS::StackName}-LoadBalancer"
+      Scheme: internet-facing
+      SecurityGroups:
+      Subnets:
+      Type: application

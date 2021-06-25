@@ -18,6 +18,7 @@
 #
 
 from json import dumps
+from os import environ
 from uuid import uuid4
 
 
@@ -34,7 +35,8 @@ def main(event, context):
             'name': context.function_name,
             'version': context.function_version,
             'instanceId': instance_id,
-            'numberOfInvocations': incovation_counter,
+            'numberOfInvocations': incovation_counter,,
+            'colorEnvVar': environ['COLOR']
         },
         'inputEvent': event
     }
