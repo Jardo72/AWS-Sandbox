@@ -32,6 +32,40 @@ Parameters:
     Type: String
 
 Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.0.0.0/16
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  SubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  SubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
   # the InvocationDumpFunction in fact does not need any special permissions, but the Role
   # property is mandatory; so the easiest/cheapest way to solve the problem is to create
   # a role and use an existing AWS managed policy
@@ -96,12 +130,126 @@ Resources:
         Variables:
           COLOR: 'BLUE'
 
+  InboundHTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound HTTP traffic on port 80
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       IpAddressType: ipv4
-      Name: "${AWS::StackName}-LoadBalancer"
+      Name: !Sub "${AWS::StackName}-LoadBalancer"
       Scheme: internet-facing
-      SecurityGroups:
+      SecurityGroups: [!Ref InboundHTTPSecurityGroup]
       Subnets:
+        - !Ref SubnetOne
+        - !Ref SubnetTwo
       Type: application
+
+  HTTPListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - TargetGroupArn: !Ref BlueTargetGroup
+          Type: forward
+
+  RedLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ["RedFunction", "Arn"]
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+
+  RedTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: RedLambdaPermission
+    Properties:
+      TargetType: lambda
+      Targets:
+        - Id: !GetAtt ["RedFunction", "Arn"]
+
+  GreenLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ["GreenFunction", "Arn"]
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+
+  GreenTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: GreenLambdaPermission
+    Properties:
+      TargetType: lambda
+      Targets:
+        - Id: !GetAtt ["GreenFunction", "Arn"]
+
+  BlueLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ["BlueFunction", "Arn"]
+      Action: lambda:InvokeFunction
+      Principal: elasticloadbalancing.amazonaws.com
+
+  BlueTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    DependsOn: BlueLambdaPermission
+    Properties:
+      TargetType: lambda
+      Targets:
+        - Id: !GetAtt ["BlueFunction", "Arn"]
+
+  RedPathListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref RedTargetGroup
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - "/red"
+      Priority: 1
+
+  GreenPathListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref GreenTargetGroup
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - "/green"
+      Priority: 2
+
+  BluePathListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref HTTPListener
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref BlueTargetGroup
+      Conditions:
+        - Field: path-pattern
+          PathPatternConfig:
+            Values:
+              - "/blue"
+      Priority: 3
+
+Outputs:
+  DNSName:
+    Value: !GetAtt ["LoadBalancer", "DNSName"]
