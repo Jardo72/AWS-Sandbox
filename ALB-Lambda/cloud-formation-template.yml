@@ -66,9 +66,34 @@ Resources:
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
 
-  # the InvocationDumpFunction in fact does not need any special permissions, but the Role
+  # the subnets need a route table with default route to the Intenet Gateway
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  SubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetOne
+
+  SubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetTwo
+
+  # the Lambda functions in fact do not need any special permissions, but the Role
   # property is mandatory; so the easiest/cheapest way to solve the problem is to create
-  # a role and use an existing AWS managed policy
+  # a new role and use an existing AWS managed policy
   FunctionExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -147,7 +172,8 @@ Resources:
       IpAddressType: ipv4
       Name: !Sub "${AWS::StackName}-LoadBalancer"
       Scheme: internet-facing
-      SecurityGroups: [!Ref InboundHTTPSecurityGroup]
+      SecurityGroups:
+        - !Ref InboundHTTPSecurityGroup
       Subnets:
         - !Ref SubnetOne
         - !Ref SubnetTwo
@@ -253,3 +279,8 @@ Resources:
 Outputs:
   DNSName:
     Value: !GetAtt ["LoadBalancer", "DNSName"]
+
+# See also
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-elasticloadbalancingv2-listenerrule.html
+# https://gist.github.com/alexcasalboni/9f118ac10a59a5c4eb6bfd75d0a65773
+# https://www.infoq.com/articles/aws-vpc-cloudformation/
