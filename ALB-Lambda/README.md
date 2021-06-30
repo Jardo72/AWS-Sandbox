@@ -14,8 +14,8 @@ aws cloudformation create-stack --stack-name ALB-Lambda-Sample --template-body f
 
 ## Invocation
 The following URLs illustrate how the Lambda functions can be invoked via the load balancer:
-* http://<ALB-DNS-Name>/red
-* http://<ALB-DNS-Name>/green
-* http://<ALB-DNS-Name>/blue
+* `http://<ALB-DNS-Name>/red`
+* `http://<ALB-DNS-Name>/green`
+* `http://<ALB-DNS-Name>/blue`
 
 Obviously, the placeholder for the DNS name of the load balancer must be replaced with the real DNS name. The DNS name is the only output in the CloudFormation template, so the DNS name can be easily obtained directly from the CloudFormation stack after the completion of the deployment.
