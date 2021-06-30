@@ -186,8 +186,10 @@ Resources:
       Port: 80
       Protocol: HTTP
       DefaultActions:
-        - TargetGroupArn: !Ref BlueTargetGroup
-          Type: forward
+        - Type: fixed-response
+          FixedResponseConfig:
+            StatusCode: 404
+            MessageBody: No Lambda function registered for this path
 
   RedLambdaPermission:
     Type: AWS::Lambda::Permission
@@ -279,8 +281,3 @@ Resources:
 Outputs:
   DNSName:
     Value: !GetAtt ["LoadBalancer", "DNSName"]
-
-# See also
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-elasticloadbalancingv2-listenerrule.html
-# https://gist.github.com/alexcasalboni/9f118ac10a59a5c4eb6bfd75d0a65773
-# https://www.infoq.com/articles/aws-vpc-cloudformation/
