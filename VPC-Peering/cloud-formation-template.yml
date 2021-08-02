@@ -43,6 +43,15 @@ Parameters:
     Type: String
     Default: 10.1.0.0/24
 
+Mappings:
+  AMIMapping:
+    eu-central-1:
+      HVM64: ami-0453cb7b5f2b7fca2
+    eu-west-1:
+      HVM64: ami-02b4e72b17337d6c1
+    eu-west-2:
+      HVM64: ami-0d26eb3972b7f8c96
+
 Resources:
   VPCOne:
     Type: AWS::EC2::VPC
@@ -119,7 +128,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       SubnetId: !Ref PublicSubnetVPCOne
-      ImageId: ami-0a6dc7529cd559185
+      ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref SecurityGroupOne
@@ -199,7 +208,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       SubnetId: !Ref PublicSubnetVPCTwo
-      ImageId: ami-0a6dc7529cd559185
+      ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref SecurityGroupTwo

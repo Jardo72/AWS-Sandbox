@@ -17,6 +17,7 @@ aws cloudformation create-stack --stack-name VPC-Peering-Demo --template-body fi
 ```
 
 The CloudFormation template involves four parameters:
-* CIDR block for each of the VPCs.
+* CIDR block for each of the two VPCs.
 * CIDR block for the two public subnets (one in each VPC).
-The template also defines default values for all four parameters, so the parameter file can be omitted if the defaults are acceptable.
+
+The template also defines default values for all four parameters, so the parameter file can be omitted from the AWS CLI command if the defaults are acceptable. The template defines mapping for AMI IDs, so the template can be used in various AWS regions. However, the mapping only contains AMI IDs for three regions: eu-central-1, eu-west-1 and eu-west-2.
