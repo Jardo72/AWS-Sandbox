@@ -1,0 +1,227 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Demo with 2 custom VPCs, both in the same region and the same account. VPC peering
+  connection between the two VPCs is established.
+
+Parameters:
+  VPCOneCIDRParam:
+    Description: CIDR block for the first of the two VPCs
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicSubnetVPCOneCIDRParam:
+    Description: CIDR block for the one and only subnet in the first of the two VPCs
+    Type: String
+    Default: 10.0.0.0/24
+
+  VPCTwoCIDRParam:
+    Description: CIDR block for the second of the two VPCs
+    Type: String
+    Default: 10.1.0.0/16
+
+  PublicSubnetVPCTwoCIDRParam:
+    Description: CIDR block for the one and only subnet in the second of the two VPCs
+    Type: String
+    Default: 10.1.0.0/24
+
+Resources:
+  VPCOne:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.0.0.0/16
+
+  InternetGatewayOne:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachmentOne:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPCOne
+      InternetGatewayId: !Ref InternetGatewayOne
+
+  PublicSubnetVPCOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPCOne
+      CidrBlock: !Ref PublicSubnetVPCOneCIDRParam
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  RouteTableOne:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCOne
+
+  InternetGatewayRouteOne:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableOne
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGatewayOne
+
+  SubnetRouteTableAssociationOne:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTableOne
+      SubnetId: !Ref PublicSubnetVPCOne
+
+  SecurityGroupOne:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
+      VpcId: !Ref VPCOne
+
+  SecurityGroupOneSSHIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupOne
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      CidrIp: 0.0.0.0/0
+
+  SecurityGroupOneICMPIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupOne
+      IpProtocol: icmp
+      FromPort: -1
+      ToPort: -1
+      CidrIp: !Ref VPCTwoCIDRParam
+
+  EC2InstanceOne:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      SubnetId: !Ref PublicSubnetVPCOne
+      ImageId: ami-0a6dc7529cd559185
+      InstanceType: t2.nano
+      SecurityGroupIds:
+        - !Ref SecurityGroupOne
+
+  VPCTwo:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.1.0.0/16
+
+  InternetGatewayTwo:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachmentTwo:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPCTwo
+      InternetGatewayId: !Ref InternetGatewayTwo
+
+  PublicSubnetVPCTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPCTwo
+      CidrBlock: !Ref PublicSubnetVPCTwoCIDRParam
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  RouteTableTwo:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPCTwo
+
+  InternetGatewayRouteTwo:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableTwo
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGatewayTwo
+
+  SubnetRouteTableAssociationTwo:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTableTwo
+      SubnetId: !Ref PublicSubnetVPCTwo
+
+  SecurityGroupTwo:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
+      VpcId: !Ref VPCTwo
+
+  SecurityGroupTwoSSHIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupTwo
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      CidrIp: 0.0.0.0/0
+
+  SecurityGroupTwoICMPIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroupTwo
+      IpProtocol: icmp
+      FromPort: -1
+      ToPort: -1
+      CidrIp: !Ref VPCOneCIDRParam
+
+  EC2InstanceTwo:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+      SubnetId: !Ref PublicSubnetVPCTwo
+      ImageId: ami-0a6dc7529cd559185
+      InstanceType: t2.nano
+      SecurityGroupIds:
+        - !Ref SecurityGroupTwo
+
+  VPCPeeringConnection:
+    Type: AWS::EC2::VPCPeeringConnection
+    Properties:
+      VpcId: !Ref VPCOne
+      PeerOwnerId: !Ref 'AWS::AccountId'
+      PeerRegion: !Ref 'AWS::Region'
+      PeerVpcId: !Ref VPCTwo
+
+  VPCPeeringConnectionRouteOne:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableOne
+      DestinationCidrBlock: !Ref VPCTwoCIDRParam
+      VpcPeeringConnectionId: !Ref VPCPeeringConnection
+
+  VPCPeeringConnectionRouteTwo:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableTwo
+      DestinationCidrBlock: !Ref VPCOneCIDRParam
+      VpcPeeringConnectionId: !Ref VPCPeeringConnection
