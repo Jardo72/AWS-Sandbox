@@ -67,26 +67,6 @@ Resources:
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
 
-  # TODO: not needed - remove
-  # PrivateSubnetOne:
-  #   Type: AWS::EC2::Subnet
-  #   Properties:
-  #     VpcId: !Ref VPC
-  #     CidrBlock: 10.0.2.0/24
-  #     AvailabilityZone: !Select
-  #       - 0
-  #       - Fn::GetAZs: !Ref 'AWS::Region'
-
-  # TODO: not needed - remove
-  # PrivateSubnetTwo:
-  #   Type: AWS::EC2::Subnet
-  #   Properties:
-  #     VpcId: !Ref VPC
-  #     CidrBlock: 10.0.3.0/24
-  #     AvailabilityZone: !Select
-  #       - 1
-  #       - Fn::GetAZs: !Ref 'AWS::Region'
-
   # the public subnets need a route table with default route to the Internet Gateway
   PublicSubnetRouteTable:
     Type: AWS::EC2::RouteTable
@@ -155,8 +135,8 @@ Resources:
   # LoadBalancerListener:
   #   Type: AWS::ElasticLoadBalancingV2::Listener
   #   Properties:
-  #     Protocol: tcp
-  #     Port: !Ref !ELBPortParam
+  #     Protocol: http
+  #     Port: !Ref ELBPortParam
   #     LoadBalancerArn: !Ref LoadBalancer
 
   ASGLaunchTemplate:
@@ -186,7 +166,7 @@ Resources:
   #     AutoScalingGroupName: !Sub "${AWS::StackName}-EC2AutoScalingGroup"
   #     AvailabilityZones:
   #     MinSize: 3
-  #     MaxSize: 3
+  #     MaxSize: 6
   #     DesiredCapacity: 3
   #     LaunchTemplate: !Ref ASGLaunchTemplate
   #     LoadBalancerNames:
