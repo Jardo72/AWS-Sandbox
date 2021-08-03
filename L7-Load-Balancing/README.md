@@ -168,9 +168,12 @@ java -Dserver.address=192.168.0.10 -Dserver.port=8080 -jar ./target/aws-sandbox-
 
 ## How to Deploy the Application to AWS
 
-### EC2
+### Application Load Balancer + EC2 Auto Scaling Group
 TODO: parametrized CloudFormation template(s) that will create everything from VPC up to ASG + ELB
 
+```
+aws cloudformation create-stack --stack-name L7-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --on-failure ROLLBACK
+```
 
 ### ECS
 TODO

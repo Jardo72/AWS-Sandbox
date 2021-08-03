@@ -46,5 +46,6 @@ java -jar ./client/target/aws-sandbox-network-load-balancing-client-1.0-jar-with
 ## How to Deploy the Server to AWS
 
 ### Network Load Balancer + EC2 Auto Scaling Group
-TODO
-- CloudFormation template that will create the entire stack (incl. ASG, ELB)
+```
+aws cloudformation create-stack --stack-name L4-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --on-failure ROLLBACK
+```

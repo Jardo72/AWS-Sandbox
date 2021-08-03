@@ -1,0 +1,195 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  TODO
+
+Parameters:
+  ELBPortParam:
+    Description: TCP port the load balancer will use to accept incoming connections
+    Type: Number
+    Default: 1234
+
+  EC2PortParam:
+    Description: TCP port the application instances running on EC2 will use to accept incoming connections
+    Type: Number
+    Default: 1234
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.0.0.0/16
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PublicSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PrivateSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PrivateSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  # the public subnets need a route table with default route to the Internet Gateway
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetOne
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetTwo
+
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on ELB port from anywhere
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref ELBPortParam
+          ToPort: !Ref ELBPortParam
+          CidrIp: 0.0.0.0/0
+
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
+      VpcId: !Ref VPC
+
+  EC2InstanceSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EC2InstanceSecurityGroup
+      IpProtocol: tcp
+      FromPort: !Ref EC2PortParam
+      ToPort: !Ref EC2PortParam
+      SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: !Sub "${AWS::StackName}-LoadBalancer"
+      Scheme: internet-facing
+      # SecurityGroups:
+      #   - !Ref LoadBalancerSecurityGroup
+      Subnets:
+        - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
+      Type: network
+
+  # TODO
+  # LoadBalancerListener:
+  #   Type: AWS::ElasticLoadBalancingV2::Listener
+  #   Properties:
+  #     Protocol: tcp
+  #     Port: !Ref !ELBPortParam
+  #     LoadBalancerArn: !Ref LoadBalancer
+
+  ASGLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
+      LaunchTemplateData:
+        ImageId: ami-0a6dc7529cd559185
+        InstanceType: t2.micro
+        # IamInstanceProfile:
+        SecurityGroupIds:
+          - !Ref EC2InstanceSecurityGroup
+        UserData:
+          # TODO:
+          # - hardcoded S3 bucket, hardcoded object key
+          # - it might make sense to define the port as parameter as well
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install java-1.8.0-openjdk -y
+            aws s3 cp s3://jardo72-ec2-installation-repo/L4-LB-DEMO/aws-sandbox-network-load-balancing-server-1.0.jar /tmp/aws-sandbox-network-load-balancing-server-1.0.jar
+            java -jar /tmp/aws-sandbox-network-load-balancing-server-1.0.jar -IP-address=0.0.0.0 -TCP-port=${EC2PortParam} &
+
+  # EC2AutoScalingGroup:
+  #   Type: AWS::AutoScaling::AutoScalingGroup
+  #   Properties:
+  #     AutoScalingGroupName: !Sub "${AWS::StackName}-EC2AutoScalingGroup"
+  #     AvailabilityZones:
+  #     MinSize: 3
+  #     MaxSize: 3
+  #     DesiredCapacity: 3
+  #     LaunchTemplate: !Ref ASGLaunchTemplate
+  #     LoadBalancerNames:
+  #     HealthCheckGracePeriod: 180
+  #     HealthCheckType: ELB
+
+# see also
+# https://github.com/janvanzoggel/aws-cloudformation/blob/master/loadbalancers/network-loadbalancer.yaml

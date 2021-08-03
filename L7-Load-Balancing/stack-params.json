@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "ELBPortParam",
+        "ParameterValue": "80"
+    },
+    {
+        "ParameterKey": "EC2PortParam",
+        "ParameterValue": "80"
+    }
+]
