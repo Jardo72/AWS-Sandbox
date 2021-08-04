@@ -172,7 +172,7 @@ java -Dserver.address=192.168.0.10 -Dserver.port=8080 -jar ./target/aws-sandbox-
 TODO: parametrized CloudFormation template(s) that will create everything from VPC up to ASG + ELB
 
 ```
-aws cloudformation create-stack --stack-name L7-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --on-failure ROLLBACK
+aws cloudformation create-stack --stack-name L7-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
 
 ### ECS

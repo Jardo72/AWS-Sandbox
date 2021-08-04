@@ -22,6 +22,18 @@ Description: >-
   TODO
 
 Parameters:
+  DeploymentArtifactoryBucketNameParam:
+    Description: The name of the S3 bucket which will serve as the artifactory with JAR files
+    Type: String
+
+  DeploymentArtifactoryPrefixParam:
+    Description: The prefix of the application JAR file within the S3 bucket which will serve as the artifactory with JAR files
+    Type: String
+
+  ApplicationJARFileParam:
+    Description: The name of the application JAR file (fat runnable JAR file is expected)
+    Type: String
+
   ELBPortParam:
     Description: TCP port the load balancer will use to accept incoming connections
     Type: Number
@@ -33,6 +45,34 @@ Parameters:
     Default: 80
 
 Resources:
+  DeploymentArtifactoryReadAccessPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-DeploymentArtifactoryReadAccessPolicy"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - 's3:GetObject'
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref DeploymentArtifactoryBucketNameParam, '/*']]
+
+  DeploymentArtifactoryReaderRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-DeploymentArtifactoryReaderRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - !Ref DeploymentArtifactoryReadAccessPolicy
+
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -135,9 +175,18 @@ Resources:
   # LoadBalancerListener:
   #   Type: AWS::ElasticLoadBalancingV2::Listener
   #   Properties:
-  #     Protocol: http
+  #     Protocol: HTTP
   #     Port: !Ref ELBPortParam
   #     LoadBalancerArn: !Ref LoadBalancer
+  #     DefaultActions:
+  #       - Type: forward
+  #         TargetGroupArn: TODO
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+      - !Ref DeploymentArtifactoryReaderRole
 
   ASGLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -146,19 +195,17 @@ Resources:
       LaunchTemplateData:
         ImageId: ami-0a6dc7529cd559185
         InstanceType: t2.micro
-        # IamInstanceProfile:
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
         SecurityGroupIds:
           - !Ref EC2InstanceSecurityGroup
         UserData:
-          # TODO:
-          # - hardcoded S3 bucket, hardcoded object key
-          # - it might make sense to define the port as parameter as well
           Fn::Base64: !Sub |
             #!/bin/bash
             yum update -y
             yum install java-1.8.0-openjdk -y
-            aws s3 cp s3://jardo72-ec2-installation-repo/L7-LB-DEMO/aws-sandbox-application-load-balancing-server-1.0.jar /tmp/aws-sandbox-application-load-balancing-server-1.0.jar
-            java -Dserver.port=${EC2PortParam} -jar /tmp/aws-sandbox-application-load-balancing-server-1.0.jar &
+            aws s3 cp s3://${DeploymentArtifactoryBucketNameParam}/${DeploymentArtifactoryPrefixParam}/${ApplicationJARFileParam} /tmp/${ApplicationJARFileParam}
+            java -Dserver.port=${EC2PortParam} -jar /tmp/${ApplicationJARFileParam} &
 
   # EC2AutoScalingGroup:
   #   Type: AWS::AutoScaling::AutoScalingGroup
@@ -168,10 +215,13 @@ Resources:
   #     MinSize: 3
   #     MaxSize: 6
   #     DesiredCapacity: 3
-  #     LaunchTemplate: !Ref ASGLaunchTemplate
+  #     LaunchTemplate:
+  #       LaunchTemplateId: !Ref ASGLaunchTemplate
+  #       Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
   #     LoadBalancerNames:
   #     HealthCheckGracePeriod: 180
   #     HealthCheckType: ELB
 
 # see also
 # https://github.com/janvanzoggel/aws-cloudformation/blob/master/loadbalancers/network-loadbalancer.yaml
+# https://ec2spotworkshops.com/amazon-ec2-spot-cicd-workshop/lab2/clfn.html
