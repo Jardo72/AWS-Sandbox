@@ -207,20 +207,30 @@ Resources:
             aws s3 cp s3://${DeploymentArtifactoryBucketNameParam}/${DeploymentArtifactoryPrefixParam}/${ApplicationJARFileParam} /tmp/${ApplicationJARFileParam}
             java -Dserver.port=${EC2PortParam} -jar /tmp/${ApplicationJARFileParam} &
 
-  # EC2AutoScalingGroup:
-  #   Type: AWS::AutoScaling::AutoScalingGroup
-  #   Properties:
-  #     AutoScalingGroupName: !Sub "${AWS::StackName}-EC2AutoScalingGroup"
-  #     AvailabilityZones:
-  #     MinSize: 3
-  #     MaxSize: 6
-  #     DesiredCapacity: 3
-  #     LaunchTemplate:
-  #       LaunchTemplateId: !Ref ASGLaunchTemplate
-  #       Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
-  #     LoadBalancerNames:
-  #     HealthCheckGracePeriod: 180
-  #     HealthCheckType: ELB
+  EC2AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub "${AWS::StackName}-EC2AutoScalingGroup"
+      AvailabilityZones:
+        - !Select
+          - 0
+          - Fn::GetAZs: !Ref 'AWS::Region'
+        - !Select
+          - 1
+          - Fn::GetAZs: !Ref 'AWS::Region'
+      VPCZoneIdentifier:
+        - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
+      MinSize: 3
+      MaxSize: 6
+      DesiredCapacity: 3
+      LaunchTemplate:
+        LaunchTemplateId: !Ref ASGLaunchTemplate
+        Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
+      LoadBalancerNames:
+        - !Ref LoadBalancer
+      HealthCheckGracePeriod: 180
+      HealthCheckType: ELB
 
 # see also
 # https://github.com/janvanzoggel/aws-cloudformation/blob/master/loadbalancers/network-loadbalancer.yaml
