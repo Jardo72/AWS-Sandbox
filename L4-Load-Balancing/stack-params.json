@@ -1,5 +1,17 @@
 [
     {
+        "ParameterKey": "DeploymentArtifactoryBucketNameParam",
+        "ParameterValue": "jardo72-ec2-installation-repo"
+    },
+    {
+        "ParameterKey": "DeploymentArtifactoryPrefixParam",
+        "ParameterValue": "L4-LB-DEMO"
+    },
+    {
+        "ParameterKey": "ApplicationJARFileParam",
+        "ParameterValue": "aws-sandbox-network-load-balancing-server-1.0.jar"
+    },
+    {
         "ParameterKey": "ELBPortParam",
         "ParameterValue": "1234"
     },

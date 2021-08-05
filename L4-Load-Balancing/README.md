@@ -47,5 +47,5 @@ java -jar ./client/target/aws-sandbox-network-load-balancing-client-1.0-jar-with
 
 ### Network Load Balancer + EC2 Auto Scaling Group
 ```
-aws cloudformation create-stack --stack-name L4-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --on-failure ROLLBACK
+aws cloudformation create-stack --stack-name L4-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
