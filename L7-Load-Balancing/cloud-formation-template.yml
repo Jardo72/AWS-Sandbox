@@ -102,6 +102,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -111,6 +112,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -120,6 +122,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 2
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -161,22 +164,34 @@ Resources:
       GroupDescription: Allow inbound TCP traffic on ELB port from anywhere
       VpcId: !Ref VPC
       SecurityGroupIngress:
-        - IpProtocol: tcp
+        - IpProtocol: TCP
           FromPort: !Ref ELBPortParam
           ToPort: !Ref ELBPortParam
           CidrIp: 0.0.0.0/0
+
+  LoadBalancerSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref LoadBalancerSecurityGroup
+      IpProtocol: TCP
+      FromPort: !Ref EC2PortParam
+      ToPort: !Ref EC2PortParam
+      SourceSecurityGroupId: !Ref EC2InstanceSecurityGroup
 
   EC2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
       VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
 
   EC2InstanceSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
       GroupId: !Ref EC2InstanceSecurityGroup
-      IpProtocol: tcp
+      IpProtocol: TCP
       FromPort: !Ref EC2PortParam
       ToPort: !Ref EC2PortParam
       SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
@@ -266,17 +281,18 @@ Resources:
       VpcId: !Ref VPC
       Protocol: HTTP
       Port: !Ref EC2PortParam
-      HealthCheckIntervalSeconds: 30
+      HealthCheckIntervalSeconds: 20
       HealthCheckTimeoutSeconds: 10
       HealthyThresholdCount: 3
       UnhealthyThresholdCount: 3
+      HealthCheckProtocol: HTTP
       HealthCheckPath: /api/health-check
       Matcher:
         HttpCode: 200
 
 Outputs:
   LoadBalancerDNSName:
-    Description: DNS name of the ALB
+    Description: DNS name of the created application load balancer
     Value: !GetAtt LoadBalancer.DNSName
 
 # see also
