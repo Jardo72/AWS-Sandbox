@@ -44,6 +44,14 @@ Parameters:
     Type: Number
     Default: 80
 
+  EC2InstanceType:
+    Type: String
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+    Default: t2.micro
+
 Resources:
   DeploymentArtifactoryReadAccessPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
@@ -107,6 +115,15 @@ Resources:
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
 
+  PublicSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
   # the public subnets need a route table with default route to the Internet Gateway
   PublicSubnetRouteTable:
     Type: AWS::EC2::RouteTable
@@ -131,6 +148,12 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicSubnetRouteTable
       SubnetId: !Ref PublicSubnetTwo
+
+  PublicSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetThree
 
   LoadBalancerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -169,18 +192,18 @@ Resources:
       Subnets:
         - !Ref PublicSubnetOne
         - !Ref PublicSubnetTwo
+        - !Ref PublicSubnetThree
       Type: application
 
-  # TODO
-  # LoadBalancerListener:
-  #   Type: AWS::ElasticLoadBalancingV2::Listener
-  #   Properties:
-  #     Protocol: HTTP
-  #     Port: !Ref ELBPortParam
-  #     LoadBalancerArn: !Ref LoadBalancer
-  #     DefaultActions:
-  #       - Type: forward
-  #         TargetGroupArn: TODO
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Protocol: HTTP
+      Port: !Ref ELBPortParam
+      LoadBalancerArn: !Ref LoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -194,7 +217,7 @@ Resources:
       LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
       LaunchTemplateData:
         ImageId: ami-0a6dc7529cd559185
-        InstanceType: t2.micro
+        InstanceType: !Ref EC2InstanceType
         IamInstanceProfile:
           Name: !Ref EC2InstanceProfile
         SecurityGroupIds:
@@ -218,20 +241,46 @@ Resources:
         - !Select
           - 1
           - Fn::GetAZs: !Ref 'AWS::Region'
+        - !Select
+          - 2
+          - Fn::GetAZs: !Ref 'AWS::Region'
       VPCZoneIdentifier:
         - !Ref PublicSubnetOne
         - !Ref PublicSubnetTwo
+        - !Ref PublicSubnetThree
       MinSize: 3
       MaxSize: 6
       DesiredCapacity: 3
       LaunchTemplate:
         LaunchTemplateId: !Ref ASGLaunchTemplate
         Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
-      LoadBalancerNames:
-        - !Ref LoadBalancer
+      TargetGroupARNs:
+        - !Ref ALBTargetGroup
       HealthCheckGracePeriod: 180
       HealthCheckType: ELB
+
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${AWS::StackName}-ALBTargetGroup"
+      VpcId: !Ref VPC
+      Protocol: HTTP
+      Port: !Ref EC2PortParam
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 3
+      HealthCheckPath: /api/health-check
+      Matcher:
+        HttpCode: 200
+
+Outputs:
+  LoadBalancerDNSName:
+    Description: DNS name of the ALB
+    Value: !GetAtt LoadBalancer.DNSName
 
 # see also
 # https://github.com/janvanzoggel/aws-cloudformation/blob/master/loadbalancers/network-loadbalancer.yaml
 # https://ec2spotworkshops.com/amazon-ec2-spot-cicd-workshop/lab2/clfn.html
+# https://github.com/awsdocs/aws-cloudformation-user-guide/blob/main/doc_source/example-templates-autoscaling.md
+# https://s3.eu-west-2.amazonaws.com/cloudformation-templates-eu-west-2/ELBWithLockedDownAutoScaledInstances.template
