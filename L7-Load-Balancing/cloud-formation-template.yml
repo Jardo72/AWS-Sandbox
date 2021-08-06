@@ -55,7 +55,7 @@ Parameters:
   TargetCPUUtilizationThreshold:
     Description: Threshold for the aggregate CPU utilization for the autoscaling group. If the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group.
     Type: String
-    Default: 75
+    Default: 70
 
 Resources:
   DeploymentArtifactoryReadAccessPolicy:
@@ -276,7 +276,7 @@ Resources:
         Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
       TargetGroupARNs:
         - !Ref ALBTargetGroup
-      HealthCheckGracePeriod: 180
+      HealthCheckGracePeriod: 150
       HealthCheckType: ELB
       MetricsCollection:
         - Granularity: 1Minute
@@ -296,6 +296,11 @@ Resources:
       HealthCheckPath: /api/health-check
       Matcher:
         HttpCode: 200
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 15
+        - Key: load_balancing.algorithm.type
+          Value: round_robin
 
   ASGScalingPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
