@@ -52,6 +52,11 @@ Parameters:
       - t2.small
     Default: t2.micro
 
+  TargetCPUUtilizationThreshold:
+    Description: Threshold for the aggregate CPU utilization for the autoscaling group. If the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group.
+    Type: String
+    Default: 75
+
 Resources:
   DeploymentArtifactoryReadAccessPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
@@ -178,23 +183,23 @@ Resources:
       ToPort: !Ref EC2PortParam
       SourceSecurityGroupId: !Ref EC2InstanceSecurityGroup
 
+  # for the EC2 instances, the ingress traffic from the load balancer as well as from
+  # the Internet is needed; for instance, a REST request prescribing the outcome of
+  # subsequent health-checks will bypass the load balancer - it will be sent directly
+  # to a particular EC2 instance
   EC2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
       VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: TCP
+          FromPort: !Ref EC2PortParam
+          ToPort: !Ref EC2PortParam
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
-
-  EC2InstanceSecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref EC2InstanceSecurityGroup
-      IpProtocol: TCP
-      FromPort: !Ref EC2PortParam
-      ToPort: !Ref EC2PortParam
-      SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -273,6 +278,8 @@ Resources:
         - !Ref ALBTargetGroup
       HealthCheckGracePeriod: 180
       HealthCheckType: ELB
+      MetricsCollection:
+        - Granularity: 1Minute
 
   ALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -289,6 +296,17 @@ Resources:
       HealthCheckPath: /api/health-check
       Matcher:
         HttpCode: 200
+
+  ASGScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref EC2AutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        DisableScaleIn: false
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: !Ref TargetCPUUtilizationThreshold
 
 Outputs:
   LoadBalancerDNSName:

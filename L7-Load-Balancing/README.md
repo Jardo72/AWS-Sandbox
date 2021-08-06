@@ -169,8 +169,14 @@ java -Dserver.address=192.168.0.10 -Dserver.port=8080 -jar ./target/aws-sandbox-
 ## How to Deploy the Application to AWS
 
 ### Application Load Balancer + EC2 Auto Scaling Group
-TODO: parametrized CloudFormation template(s) that will create everything from VPC up to ASG + ELB
+The project involves parametrized CloudFormation template that will automatically create a setup with an application load balancer and an EC2 auto scaling group running several instances of the application. The CloudFormation template creates a complete stack with the following resources:
+* custom VPC with three public subnets, Internet Gateway, route table
+* Internet-facing application load balancer
+* security groups - load balancer, EC2 instances
+* launch template for the EC2 instances - user data, application JAR taken from an S3 bucket
+* EC2 auto scaling group - ELB health checks, target tracking scaling policy
 
+The following AWS CLI command illustrates how to use the CloudFormation template.
 ```
 aws cloudformation create-stack --stack-name L7-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
