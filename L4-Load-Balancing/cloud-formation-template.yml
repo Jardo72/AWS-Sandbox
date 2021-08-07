@@ -101,6 +101,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -110,6 +111,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -119,6 +121,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 2
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -128,6 +131,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -137,6 +141,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.4.0/24
+      MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -146,6 +151,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.0.5.0/24
+      MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -181,58 +187,43 @@ Resources:
       RouteTableId: !Ref PublicSubnetRouteTable
       SubnetId: !Ref PublicSubnetThree
 
-  LoadBalancerSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow inbound TCP traffic on ELB port from anywhere
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: !Ref ELBPortParam
-          ToPort: !Ref ELBPortParam
-          CidrIp: 0.0.0.0/0
-
+  # TODO: do we need to open the port this way?
   EC2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
       VpcId: !Ref VPC
+      SecurityGroupIngress:
+        IpProtocol: tcp
+        FromPort: !Ref EC2PortParam
+        ToPort: !Ref EC2PortParam
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
 
-  EC2InstanceSecurityGroupIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref EC2InstanceSecurityGroup
-      IpProtocol: tcp
-      FromPort: !Ref EC2PortParam
-      ToPort: !Ref EC2PortParam
-      SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
-
+  # security groups are not supported for network load balancers
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       IpAddressType: ipv4
       Name: !Sub "${AWS::StackName}-LoadBalancer"
       Scheme: internet-facing
-      # TODO:
-      # security groups seem to be relevant only for ALB, not for NLB
-      # SecurityGroups:
-      #   - !Ref LoadBalancerSecurityGroup
       Subnets:
         - !Ref PublicSubnetOne
         - !Ref PublicSubnetTwo
         - !Ref PublicSubnetThree
       Type: network
 
-  # TODO
-  # LoadBalancerListener:
-  #   Type: AWS::ElasticLoadBalancingV2::Listener
-  #   Properties:
-  #     Protocol: tcp
-  #     Port: !Ref !ELBPortParam
-  #     LoadBalancerArn: !Ref LoadBalancer
-  #     DefaultActions:
-  #       - Type: forward
-  #         TargetGroupArn: TODO
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Protocol: TCP
+      Port: !Ref ELBPortParam
+      LoadBalancerArn: !Ref LoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref NLBTargetGroup
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -285,12 +276,25 @@ Resources:
         Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
       HealthCheckGracePeriod: 180
       HealthCheckType: ELB
-      # TargetGroupARNs:
-      #   - !Ref TODO
+      TargetGroupARNs:
+        - !Ref NLBTargetGroup
+
+  NLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${AWS::StackName}-NLBTargetGroup"
+      VpcId: !Ref VPC
+      Protocol: TCP
+      Port: !Ref EC2PortParam
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      HealthCheckProtocol: TCP
 
 Outputs:
   LoadBalancerDNSName:
-    Description: DNS name of the NLB
+    Description: DNS name of the created network load balancer
     Value: !GetAtt LoadBalancer.DNSName
 
 # see also
