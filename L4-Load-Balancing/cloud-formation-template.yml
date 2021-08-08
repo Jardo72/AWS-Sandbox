@@ -96,6 +96,18 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
+  NATGatewayIPAddress:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      ConnectivityType: public
+      SubnetId: !Ref PublicSubnetOne
+      AllocationId: !GetAtt NATGatewayIPAddress.AllocationId
+
   PublicSubnetOne:
     Type: AWS::EC2::Subnet
     Properties:
@@ -187,17 +199,54 @@ Resources:
       RouteTableId: !Ref PublicSubnetRouteTable
       SubnetId: !Ref PublicSubnetThree
 
-  # TODO: do we need to open the port this way?
+  # the private subnets need a route table with default route to the NAT Gateway
+  PrivateSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  NATGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+
+  PrivateSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      SubnetId: !Ref PrivateSubnetOne
+
+  PrivateSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      SubnetId: !Ref PrivateSubnetTwo
+
+  PrivateSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      SubnetId: !Ref PrivateSubnetThree
+
+  # TODO: how do we allow the incoming traffic? the approach with the VPC CIDR block
+  # does not seem to work
+  # the CIDR block of the VPC is used for the ingress - we have to allow incoming
+  # application traffic from the load balancer, and we also have to allow health
+  # checks from the load balancer; as security groups are not supported for network
+  # load balancers, we cannot use a reference for the load balancer security group
   EC2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
       VpcId: !Ref VPC
       SecurityGroupIngress:
-        IpProtocol: tcp
-        FromPort: !Ref EC2PortParam
-        ToPort: !Ref EC2PortParam
-        CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: !Ref EC2PortParam
+          ToPort: !Ref EC2PortParam
+          # CidrIp: 10.0.0.0/16
+          CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0
