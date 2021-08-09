@@ -19,7 +19,12 @@
 
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  TODO
+  CloudFormation deployment of the L4 load balancing demo application. This template creates a complete stack
+  from scratch, starting with a custom VPC with Internet gateway, triplet of public subnets (each in a separate
+  AZ) and triplet of private subnets (again each in a separate AZ). The stack involves two primary components
+  - a network load balancer using the public subnets, and an auto scaling group with three EC2 instances running
+  the L4 load balancing server application. The EC2 instances are protected by a security group, and the L4 load
+  balancing server JAR file is copied from an S3 bucket at launch time.
 
 Parameters:
   DeploymentArtifactoryBucketNameParam:
@@ -165,7 +170,7 @@ Resources:
       CidrBlock: 10.0.5.0/24
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
-        - 1
+        - 2
         - Fn::GetAZs: !Ref 'AWS::Region'
 
   # the public subnets need a route table with default route to the Internet Gateway
@@ -314,9 +319,9 @@ Resources:
           - 2
           - Fn::GetAZs: !Ref 'AWS::Region'
       VPCZoneIdentifier:
-        - !Ref PublicSubnetOne
-        - !Ref PublicSubnetTwo
-        - !Ref PublicSubnetThree
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+        - !Ref PrivateSubnetThree
       MinSize: 3
       MaxSize: 3
       DesiredCapacity: 3
@@ -325,6 +330,8 @@ Resources:
         Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
       HealthCheckGracePeriod: 180
       HealthCheckType: ELB
+      MetricsCollection:
+        - Granularity: 1Minute
       TargetGroupARNs:
         - !Ref NLBTargetGroup
 
