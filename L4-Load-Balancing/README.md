@@ -46,6 +46,16 @@ java -jar ./client/target/aws-sandbox-network-load-balancing-client-1.0-jar-with
 ## How to Deploy the Server to AWS
 
 ### Network Load Balancer + EC2 Auto Scaling Group
+The project involves parametrized CloudFormation template that will automatically create a setup with a network load balancer and an EC2 auto scaling group running several instances of the application. The CloudFormation template creates a complete stack with the following resources:
+* custom VPC with Internet Gateway and NAT Gateway
+* three public subnets (each in a separate AZ) used by the load balancer, with a route table involving route to the Internet Gateway
+* three private subnets (each in a separate AZ) used by the EC2 instances, with route table involving route to the NAT Gateway
+* Internet-facing network load balancer
+* single security group used to proptect the EC2 instances
+* launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket
+* EC2 auto scaling group with ELB health checks and constant number of EC2 instances (no scaling policy)
+
+The following AWS CLI command illustrates how to use the CloudFormation template.
 ```
 aws cloudformation create-stack --stack-name L4-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```

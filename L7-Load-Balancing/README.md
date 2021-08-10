@@ -170,11 +170,11 @@ java -Dserver.address=192.168.0.10 -Dserver.port=8080 -jar ./target/aws-sandbox-
 
 ### Application Load Balancer + EC2 Auto Scaling Group
 The project involves parametrized CloudFormation template that will automatically create a setup with an application load balancer and an EC2 auto scaling group running several instances of the application. The CloudFormation template creates a complete stack with the following resources:
-* custom VPC with three public subnets, Internet Gateway, route table
+* custom VPC with three public subnets (each in separate AZ), Internet Gateway and custom route table with a route to the Internet Gateway
 * Internet-facing application load balancer
-* security groups - load balancer, EC2 instances
-* launch template for the EC2 instances - user data, application JAR taken from an S3 bucket
-* EC2 auto scaling group - ELB health checks, target tracking scaling policy
+* two security groups - one protecting the load balancer, the other proptecting the EC2 instances
+* launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket
+* EC2 auto scaling group with ELB health checks and target tracking scaling policy that dynamically adjusts the number of the EC2 instances based on the CPU utilization
 
 The following AWS CLI command illustrates how to use the CloudFormation template.
 ```
