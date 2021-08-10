@@ -18,5 +18,9 @@
     {
         "ParameterKey": "EC2PortParam",
         "ParameterValue": "1234"
+    },
+    {
+        "ParameterKey": "EC2InstanceType",
+        "ParameterValue": "t2.nano"
     }
 ]

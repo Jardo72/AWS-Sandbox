@@ -173,7 +173,7 @@ The project involves parametrized CloudFormation template that will automaticall
 * custom VPC with three public subnets (each in separate AZ), Internet Gateway and custom route table with a route to the Internet Gateway
 * Internet-facing application load balancer
 * two security groups - one protecting the load balancer, the other proptecting the EC2 instances
-* launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket
+* launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket (IAM instance profile allowing access to the S3 bucket is also created as part of the stack)
 * EC2 auto scaling group with ELB health checks and target tracking scaling policy that dynamically adjusts the number of the EC2 instances based on the CPU utilization
 
 The following AWS CLI command illustrates how to use the CloudFormation template.
@@ -181,5 +181,4 @@ The following AWS CLI command illustrates how to use the CloudFormation template
 aws cloudformation create-stack --stack-name L7-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
 
-### ECS
-TODO
+The template involves several parameters. For some of them, default values are defined, so the values of these parameters can be omitted when creating the CloudFormation stack. However, some of the parameters require explicit values when creating the stack as there are no default values. The [stack-params.json](./stack-params.json) file contains parameter values used during my experiments.

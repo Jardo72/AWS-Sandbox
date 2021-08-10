@@ -323,9 +323,3 @@ Outputs:
   LoadBalancerDNSName:
     Description: DNS name of the created application load balancer
     Value: !GetAtt LoadBalancer.DNSName
-
-# see also
-# https://github.com/janvanzoggel/aws-cloudformation/blob/master/loadbalancers/network-loadbalancer.yaml
-# https://ec2spotworkshops.com/amazon-ec2-spot-cicd-workshop/lab2/clfn.html
-# https://github.com/awsdocs/aws-cloudformation-user-guide/blob/main/doc_source/example-templates-autoscaling.md
-# https://s3.eu-west-2.amazonaws.com/cloudformation-templates-eu-west-2/ELBWithLockedDownAutoScaledInstances.template

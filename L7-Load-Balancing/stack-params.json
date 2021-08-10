@@ -18,5 +18,13 @@
     {
         "ParameterKey": "EC2PortParam",
         "ParameterValue": "80"
+    },
+    {
+        "ParameterKey": "EC2InstanceType",
+        "ParameterValue": "t2.micro"
+    },
+    {
+        "ParameterKey": "TargetCPUUtilizationThreshold",
+        "ParameterValue": "70"
     }
 ]

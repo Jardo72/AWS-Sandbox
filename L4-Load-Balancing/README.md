@@ -52,10 +52,12 @@ The project involves parametrized CloudFormation template that will automaticall
 * three private subnets (each in a separate AZ) used by the EC2 instances, with route table involving route to the NAT Gateway
 * Internet-facing network load balancer
 * single security group used to proptect the EC2 instances
-* launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket
+* launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket (IAM instance profile allowing access to the S3 bucket is also created as part of the stack)
 * EC2 auto scaling group with ELB health checks and constant number of EC2 instances (no scaling policy)
 
 The following AWS CLI command illustrates how to use the CloudFormation template.
 ```
 aws cloudformation create-stack --stack-name L4-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
+
+The template involves several parameters. For some of them, default values are defined, so the values of these parameters can be omitted when creating the CloudFormation stack. However, some of the parameters require explicit values when creating the stack as there are no default values. The [stack-params.json](./stack-params.json) file contains parameter values used during my experiments.
