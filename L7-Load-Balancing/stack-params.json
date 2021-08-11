@@ -25,6 +25,6 @@
     },
     {
         "ParameterKey": "TargetCPUUtilizationThreshold",
-        "ParameterValue": "70"
+        "ParameterValue": "63"
     }
 ]

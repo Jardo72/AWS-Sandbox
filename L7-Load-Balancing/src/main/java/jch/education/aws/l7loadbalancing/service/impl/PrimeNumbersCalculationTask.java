@@ -38,9 +38,15 @@ class PrimeNumbersCalculationTask implements Callable<PrimeNumbersCalculationRes
 
     private final int end;
 
-    public PrimeNumbersCalculationTask(int start, int end) {
+    private final int sleepPeriodicity;
+
+    private final int sleepDurationMillis;
+
+    public PrimeNumbersCalculationTask(int start, int end, int sleepPeriodicity, int sleepDurationMillis) {
         this.start = start;
         this.end = end;
+        this.sleepPeriodicity = sleepPeriodicity;
+        this.sleepDurationMillis = sleepDurationMillis;
     }
 
     @Override
@@ -48,9 +54,14 @@ class PrimeNumbersCalculationTask implements Callable<PrimeNumbersCalculationRes
         log.info("Starting prime numbers calculation #{}, range [{}; {}]", this.taskId, this.start, this.end);
 
         List<Integer> primeNumbers = new LinkedList<>();
+        int testedNumbers = 0;
         for (int number = this.start; number <= this.end; number++) {
             if (isPrimeNumber(number)) {
                 primeNumbers.add(number);
+            }
+            testedNumbers++;
+            if (testedNumbers % 100000 == 0) {
+                log.info("{} numbers tested", testedNumbers);
             }
         }
 
@@ -59,12 +70,21 @@ class PrimeNumbersCalculationTask implements Callable<PrimeNumbersCalculationRes
         return new PrimeNumbersCalculationResult(this.start, this.end, primeNumbers);
     }
 
-    private static boolean isPrimeNumber(int number) {
+    private boolean isPrimeNumber(int number) {
         for (int i = 2; i <= Math.sqrt(number); i++) {
             if (number % i == 0) {
                 return false;
             }
+            if (i % this.sleepPeriodicity == 0) {
+                sleep();
+            }
         }
         return true;
+    }
+
+    private void sleep() {
+        try {
+            Thread.sleep(this.sleepDurationMillis);
+        } catch (InterruptedException ignore) {}
     }
 }

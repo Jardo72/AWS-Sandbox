@@ -33,8 +33,8 @@ public class PrimeNumbersCalculationServiceImpl implements PrimeNumbersCalculati
     private final ExecutorService executor = Executors.newFixedThreadPool(20);
 
     @Override
-    public void startCalculation(int start, int end) {
-        PrimeNumbersCalculationTask task = new PrimeNumbersCalculationTask(start, end);
+    public void startCalculation(int start, int end, int sleepPeriodicity, int sleepDurationMillis) {
+        PrimeNumbersCalculationTask task = new PrimeNumbersCalculationTask(start, end, sleepPeriodicity, sleepDurationMillis);
         this.executor.submit(task);
     }
 }

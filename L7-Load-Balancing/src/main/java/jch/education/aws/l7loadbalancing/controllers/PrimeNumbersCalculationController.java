@@ -37,7 +37,8 @@ public class PrimeNumbersCalculationController {
     private Statistics statistics;
     @PostMapping(value = "/api/calculate-prime-numbers", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> startPrimeNumberCalculation(@RequestBody PrimeNumberCalculationRequest request) {
-        this.primeNumbersCalculationService.startCalculation(request.getStart(), request.getEnd());
+        this.primeNumbersCalculationService.startCalculation(request.getStart(), request.getEnd(),
+                request.getSleepPeriodicity(), request.getSleepDurationMillis());
         this.statistics.primeNumbersCalculationStarted();
         return ResponseEntity.ok().build();
     }

@@ -169,14 +169,14 @@ java -Dserver.address=192.168.0.10 -Dserver.port=8080 -jar ./target/aws-sandbox-
 ## How to Deploy the Application to AWS
 
 ### Application Load Balancer + EC2 Auto Scaling Group
-The project involves parametrized CloudFormation template that will automatically create a setup with an application load balancer and an EC2 auto scaling group running several instances of the application. The CloudFormation template creates a complete stack with the following resources:
-* custom VPC with three public subnets (each in separate AZ), Internet Gateway and custom route table with a route to the Internet Gateway
-* Internet-facing application load balancer
-* two security groups - one protecting the load balancer, the other proptecting the EC2 instances
-* launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket (IAM instance profile allowing access to the S3 bucket is also created as part of the stack)
-* EC2 auto scaling group with ELB health checks and target tracking scaling policy that dynamically adjusts the number of the EC2 instances based on the CPU utilization
+The project involves parametrized CloudFormation template ([cloud-formation-template.yml](./cloud-formation-template.yml)) that will automatically create a setup with an application load balancer and an EC2 auto scaling group running several instances of the application. The CloudFormation template creates a complete stack with the following resources:
+* Custom VPC with three public subnets (each in separate AZ), Internet Gateway and custom route table with a route to the Internet Gateway.
+* Internet-facing application load balancer.
+* Two security groups - one protecting the load balancer, the other proptecting the EC2 instances.
+* Launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket. IAM instance profile allowing access to the S3 bucket is also created as part of the stack. The S3 bucket is not part of the stack - it must exist when the creation of the CloudFormation stack is started, and the application JAR file must available in the S3 bucket.
+* EC2 auto scaling group with ELB health checks and target tracking scaling policy that dynamically adjusts the number of the EC2 instances based on the CPU utilization.
 
-The following AWS CLI command illustrates how to use the CloudFormation template.
+The following AWS CLI command illustrates how to use the CloudFormation template to create the stack.
 ```
 aws cloudformation create-stack --stack-name L7-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```

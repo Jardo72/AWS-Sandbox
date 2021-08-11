@@ -24,6 +24,10 @@ public class PrimeNumberCalculationRequest {
 
     private int end;
 
+    private int sleepPeriodicity;
+
+    private int sleepDurationMillis;
+
     public int getStart() {
         return start;
     }
@@ -38,5 +42,21 @@ public class PrimeNumberCalculationRequest {
 
     public void setEnd(int end) {
         this.end = end;
+    }
+
+    public int getSleepPeriodicity() {
+        return this.sleepPeriodicity;
+    }
+
+    public void setSleepPeriodicity(int sleepPeriodicity) {
+        this.sleepPeriodicity = sleepPeriodicity;
+    }
+
+    public int getSleepDurationMillis() {
+        return this.sleepDurationMillis;
+    }
+
+    public void setSleepDurationMillis(int sleepDurationMillis) {
+        this.sleepDurationMillis = sleepDurationMillis;
     }
 }

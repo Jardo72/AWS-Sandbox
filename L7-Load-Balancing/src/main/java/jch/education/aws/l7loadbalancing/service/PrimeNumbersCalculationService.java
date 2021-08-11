@@ -20,5 +20,5 @@ package jch.education.aws.l7loadbalancing.service;
 
 public interface PrimeNumbersCalculationService {
 
-    void startCalculation(int start, int end);
+    void startCalculation(int start, int end, int sleepPeriodicity, int sleepDurationMillis);
 }
