@@ -18,28 +18,38 @@
  */
 package jch.education.aws.l7loadbalancing.controllers;
 
-import jch.education.aws.l7loadbalancing.dto.PrimeNumberCalculationRequest;
-import jch.education.aws.l7loadbalancing.service.PrimeNumbersCalculationService;
+import jch.education.aws.l7loadbalancing.service.CPUConsumptionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class PrimeNumbersCalculationController {
+public class CPUConsumptionController {
+
+    private static final Logger log = LoggerFactory.getLogger(CPUConsumptionController.class);
 
     @Autowired
-    private PrimeNumbersCalculationService primeNumbersCalculationService;
+    private CPUConsumptionService cpuConsumptionService;
 
     @Autowired
     private Statistics statistics;
-    @PostMapping(value = "/api/calculate-prime-numbers", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> startPrimeNumberCalculation(@RequestBody PrimeNumberCalculationRequest request) {
-        this.primeNumbersCalculationService.startCalculation(request.getStart(), request.getEnd(),
-                request.getSleepPeriodicity(), request.getSleepDurationMillis());
-        this.statistics.primeNumbersCalculationStarted();
-        return ResponseEntity.ok().build();
+
+    @GetMapping(value = "/api/consume-cpu", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> consumeCpu() {
+        final long startTime = System.currentTimeMillis();
+
+        this.cpuConsumptionService.consume();
+        final long durationMillis = System.currentTimeMillis() - startTime;
+        this.statistics.cpuConsumed();
+
+        String message = String.format("CPU consumed for %d ms", durationMillis);
+        log.info(message);
+
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }
