@@ -58,7 +58,7 @@ Parameters:
   TargetCPUUtilizationThreshold:
     Description: Threshold for the aggregate CPU utilization for the autoscaling group. If the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group.
     Type: String
-    Default: 63
+    Default: 50
 
 Resources:
   DeploymentArtifactoryReadAccessPolicy:
