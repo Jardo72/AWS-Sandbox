@@ -19,9 +19,18 @@
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 from collections import Counter
+from dataclasses import dataclass
+from datetime import datetime
 from http.client import HTTPConnection
 from threading import Lock, Thread
 from time import perf_counter
+
+
+@dataclass(frozen=True)
+class Summary:
+    start_timestamp: str
+    end_timestamp: str
+    http_status_stats: Counter
 
 
 class RequestGeneratorThread(Thread):
@@ -68,6 +77,10 @@ class RequestGeneratorThread(Thread):
         return self._http_status_stats
 
 
+def current_timestamp():
+    return datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
 def print_section_header(title):
     print()
     print()
@@ -111,6 +124,7 @@ def dump_cmd_line_args(params):
 def generate_requests(params):
     print_section_header('Requests')
 
+    start_timestamp = current_timestamp()
     thread_list = []
     for _ in range(1, params.thread_count + 1):
         thread = RequestGeneratorThread(params)
@@ -121,24 +135,28 @@ def generate_requests(params):
     for thread in thread_list:
         thread.join()
         http_status_stats += thread.http_status_stats
+    end_timestamp = current_timestamp()
 
-    return http_status_stats
+    return Summary(start_timestamp, end_timestamp, http_status_stats)
 
 
-def print_stats(http_status_stats):
+def print_stats(summary):
     print_section_header('Summary (statistics)')
 
     print()
+    print(f'Start time: {summary.start_timestamp}')
+    print(f'End time:   {summary.end_timestamp}')
+    print()
     print('Requests per HTTP status code:')
-    for http_status in http_status_stats:
-        print(f'{http_status}: {http_status_stats[http_status]: 7}')
+    for http_status in summary.http_status_stats:
+        print(f'{http_status}: {summary.http_status_stats[http_status]: 7}')
 
 
 def main():
     params = parse_cmd_line_args()
     dump_cmd_line_args(params)
-    http_status_stats = generate_requests(params)
-    print_stats(http_status_stats)
+    summary = generate_requests(params)
+    print_stats(summary)
 
 
 if __name__ == "__main__":
