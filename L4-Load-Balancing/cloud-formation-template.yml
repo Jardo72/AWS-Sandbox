@@ -241,12 +241,13 @@ Resources:
       RouteTableId: !Ref PrivateSubnetRouteTable
       SubnetId: !Ref PrivateSubnetThree
 
-  # TODO: how do we allow the incoming traffic? the approach with the VPC CIDR block
-  # does not seem to work
-  # the CIDR block of the VPC is used for the ingress - we have to allow incoming
-  # application traffic from the load balancer, and we also have to allow health
-  # checks from the load balancer; as security groups are not supported for network
-  # load balancers, we cannot use a reference for the load balancer security group
+  # as security groups are not supported for network load balancers, we cannot use
+  # a reference to the load balancer security group for ingress rules; I tried to
+  # use CIDR block of the VPC for the ingress - we have to allow incoming application
+  # traffic from the load balancer, and we also have to allow health checks from
+  # the load balancer; however, it did not seem to work, so I decided to allow
+  # incoming traffic from anywhere, although it is less secure compared to the
+  # CIDR block of the VPC
   EC2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
