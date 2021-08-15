@@ -35,7 +35,7 @@ class Summary:
 
 class RequestGeneratorThread(Thread):
 
-    _sequence = 0
+    _sequence: int = 0
 
     _lock = Lock()
 
@@ -48,12 +48,12 @@ class RequestGeneratorThread(Thread):
         self._http_status_stats = Counter()
 
     @staticmethod
-    def _next_id():
+    def _next_id() -> int:
         with RequestGeneratorThread._lock:
             RequestGeneratorThread._sequence += 1
             return RequestGeneratorThread._sequence
 
-    def run(self):
+    def run(self) -> None:
         connection = HTTPConnection(self._host, self._port, timeout=15)
         start_time = perf_counter()
         request_count = 0
@@ -68,20 +68,20 @@ class RequestGeneratorThread(Thread):
                 execution_time_sec = perf_counter() - start_time
                 self._print_status(request_count, execution_time_sec)
 
-    def _print_status(self, request_count, execution_time_sec):
+    def _print_status(self, request_count: int, execution_time_sec: float) -> None:
         with RequestGeneratorThread._lock:
             print(f'Thread #{self._id}: {request_count} requests completed in {execution_time_sec:.1f} sec...')
 
     @property
-    def http_status_stats(self):
+    def http_status_stats(self) -> Counter:
         return self._http_status_stats
 
 
-def current_timestamp():
+def current_timestamp() -> str:
     return datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
-def print_section_header(title):
+def print_section_header(title: str) -> None:
     print()
     print()
     print(80 * '-')
@@ -113,7 +113,7 @@ def parse_cmd_line_args():
     return parser.parse_args()
 
 
-def dump_cmd_line_args(params):
+def dump_cmd_line_args(params) -> None:
     print_section_header('Test Parameters')
     print(f'Host:              {params.host}')
     print(f'Port:              {params.port}')
@@ -121,7 +121,7 @@ def dump_cmd_line_args(params):
     print(f'Number of threads: {params.thread_count}')
 
 
-def generate_requests(params):
+def generate_requests(params) -> Summary:
     print_section_header('Requests')
 
     start_timestamp = current_timestamp()
@@ -131,7 +131,7 @@ def generate_requests(params):
         thread.start()
         thread_list.append(thread)
 
-    http_status_stats = Counter()
+    http_status_stats: Counter = Counter()
     for thread in thread_list:
         thread.join()
         http_status_stats += thread.http_status_stats
@@ -140,7 +140,7 @@ def generate_requests(params):
     return Summary(start_timestamp, end_timestamp, http_status_stats)
 
 
-def print_stats(summary):
+def print_stats(summary: Summary) -> None:
     print_section_header('Summary (statistics)')
 
     print()
@@ -152,7 +152,7 @@ def print_stats(summary):
         print(f'{http_status}: {summary.http_status_stats[http_status]: 7}')
 
 
-def main():
+def main() -> None:
     params = parse_cmd_line_args()
     dump_cmd_line_args(params)
     summary = generate_requests(params)

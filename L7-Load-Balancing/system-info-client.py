@@ -21,9 +21,10 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from collections import Counter
 from http.client import HTTPConnection
 from json import loads
+from typing import Tuple
 
 
-def print_section_header(title):
+def print_section_header(title: str) -> None:
     print()
     print()
     print(80 * '-')
@@ -52,17 +53,17 @@ def parse_cmd_line_args():
     return parser.parse_args()
 
 
-def dump_cmd_line_args(params):
+def dump_cmd_line_args(params) -> None:
     print_section_header('Test Parameters')
     print(f'Host:          {params.host}')
     print(f'Port:          {params.port}')
     print(f'Request count: {params.request_count}')
 
 
-def generate_requests(params):
+def generate_requests(params) -> Tuple[Counter, Counter]:
     connection = HTTPConnection(params.host, params.port, timeout=15)
-    http_status_stats = Counter()
-    server_stats = Counter()
+    http_status_stats: Counter = Counter()
+    server_stats: Counter = Counter()
 
     print_section_header('Requests')
     for i in range(1, params.request_count + 1):
@@ -79,7 +80,7 @@ def generate_requests(params):
     return (server_stats, http_status_stats)
 
 
-def print_stats(server_stats, http_status_stats):
+def print_stats(server_stats: Counter, http_status_stats: Counter) -> None:
     print_section_header('Summary (statistics)')
 
     print()
@@ -93,7 +94,7 @@ def print_stats(server_stats, http_status_stats):
         print(f'{http_status}: {http_status_stats[http_status]: 7}')
 
 
-def main():
+def main() -> None:
     params = parse_cmd_line_args()
     dump_cmd_line_args(params)
     server_stats, http_status_stats = generate_requests(params)
