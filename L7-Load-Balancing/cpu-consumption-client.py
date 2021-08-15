@@ -17,9 +17,9 @@
 # limitations under the License.
 #
 
+from argparse import ArgumentParser, RawTextHelpFormatter
 from collections import Counter
 from http.client import HTTPConnection
-from sys import argv
 from threading import Lock, Thread
 from time import perf_counter
 
@@ -30,11 +30,11 @@ class RequestGeneratorThread(Thread):
 
     _lock = Lock()
 
-    def __init__(self, host, port, duration_min):
+    def __init__(self, params):
         Thread.__init__(self)
-        self._host = host
-        self._port = port
-        self._duration_sec = 60 * duration_min
+        self._host = params.host
+        self._port = params.port
+        self._duration_sec = 60 * params.duration_min
         self._id = RequestGeneratorThread._next_id()
         self._http_status_stats = Counter()
 
@@ -76,28 +76,44 @@ def print_section_header(title):
     print(80 * '-')
 
 
+def create_cmd_line_args_parser() -> ArgumentParser:
+    parser = ArgumentParser(description = "CPU Consumption Client", formatter_class = RawTextHelpFormatter)
+
+    parser.add_argument('host',
+        help='DNS name or IP address of the destination (e.g. load balancer) the requests are to be sent to',
+        type=str)
+    parser.add_argument('port',
+        help='TCP port of the destination (e.g. load balancer) the requests are to be sent to',
+        type=int)
+    parser.add_argument('duration_min',
+        help='timespan in minutes during which the load is to be generated',
+        type=int)
+    parser.add_argument('thread_count',
+        help='number of threads to be used to generate the requests',
+        type=int)
+
+    return parser
+
+
 def parse_cmd_line_args():
-    host = argv[1]
-    port = int(argv[2])
-    duration_min = int(argv[3])
-    thread_count = int(argv[4])
-    return (host, port, duration_min, thread_count)
+    parser = create_cmd_line_args_parser()
+    return parser.parse_args()
 
 
-def dump_cmd_line_args(host, port, duration_min, thread_count):
+def dump_cmd_line_args(params):
     print_section_header('Test Parameters')
-    print(f'Host:              {host}')
-    print(f'Port:              {port}')
-    print(f'Duration [min]:    {duration_min}')
-    print(f'Number of threads: {thread_count}')
+    print(f'Host:              {params.host}')
+    print(f'Port:              {params.port}')
+    print(f'Duration [min]:    {params.duration_min}')
+    print(f'Number of threads: {params.thread_count}')
 
 
-def generate_requests(host, port, duration_min, thread_count):
+def generate_requests(params):
     print_section_header('Requests')
 
     thread_list = []
-    for _ in range(1, thread_count + 1):
-        thread = RequestGeneratorThread(host, port, duration_min)
+    for _ in range(1, params.thread_count + 1):
+        thread = RequestGeneratorThread(params)
         thread.start()
         thread_list.append(thread)
 
@@ -119,9 +135,9 @@ def print_stats(http_status_stats):
 
 
 def main():
-    host, port, duration_min, thread_count = parse_cmd_line_args()
-    dump_cmd_line_args(host, port, duration_min, thread_count)
-    http_status_stats = generate_requests(host, port, duration_min, thread_count)
+    params = parse_cmd_line_args()
+    dump_cmd_line_args(params)
+    http_status_stats = generate_requests(params)
     print_stats(http_status_stats)
 
 

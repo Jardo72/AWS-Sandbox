@@ -17,10 +17,10 @@
 # limitations under the License.
 #
 
+from argparse import ArgumentParser, RawTextHelpFormatter
 from collections import Counter
 from http.client import HTTPConnection
 from json import loads
-from sys import argv
 
 
 def print_section_header(title):
@@ -31,27 +31,41 @@ def print_section_header(title):
     print(80 * '-')
 
 
+def create_cmd_line_args_parser() -> ArgumentParser:
+    parser = ArgumentParser(description = "System Info Client", formatter_class = RawTextHelpFormatter)
+
+    parser.add_argument('host',
+        help='DNS name or IP address of the destination (e.g. load balancer) the requests are to be sent to',
+        type=str)
+    parser.add_argument('port',
+        help='TCP port of the destination (e.g. load balancer) the requests are to be sent to',
+        type=int)
+    parser.add_argument('request_count',
+        help='minimum for the generated metric value',
+        type=int)
+
+    return parser
+
+
 def parse_cmd_line_args():
-    host = argv[1]
-    port = int(argv[2])
-    request_count = int(argv[3])
-    return (host, port, request_count)
+    parser = create_cmd_line_args_parser()
+    return parser.parse_args()
 
 
-def dump_cmd_line_args(host, port, request_count):
+def dump_cmd_line_args(params):
     print_section_header('Test Parameters')
-    print(f'Host:          {host}')
-    print(f'Port:          {port}')
-    print(f'Request count: {request_count}')
+    print(f'Host:          {params.host}')
+    print(f'Port:          {params.port}')
+    print(f'Request count: {params.request_count}')
 
 
-def generate_requests(host, port, request_count):
-    connection = HTTPConnection(host, port, timeout=15)
+def generate_requests(params):
+    connection = HTTPConnection(params.host, params.port, timeout=15)
     http_status_stats = Counter()
     server_stats = Counter()
 
     print_section_header('Requests')
-    for i in range(1, request_count + 1):
+    for i in range(1, params.request_count + 1):
         connection.request('GET', '/api/system-info')
         response = connection.getresponse()
         response_body = response.read().decode()
@@ -60,7 +74,7 @@ def generate_requests(host, port, request_count):
         http_status_stats.update({ response.status: 1 })
         server_stats.update({ server: 1 })
         if i % 250 == 0:
-            print(f'{i} of {request_count} requests completed...')
+            print(f'{i} of {params.request_count} requests completed...')
 
     return (server_stats, http_status_stats)
 
@@ -80,9 +94,9 @@ def print_stats(server_stats, http_status_stats):
 
 
 def main():
-    host, port, request_count = parse_cmd_line_args()
-    dump_cmd_line_args(host, port, request_count)
-    server_stats, http_status_stats = generate_requests(host, port, request_count)
+    params = parse_cmd_line_args()
+    dump_cmd_line_args(params)
+    server_stats, http_status_stats = generate_requests(params)
     print_stats(server_stats, http_status_stats)
 
 
