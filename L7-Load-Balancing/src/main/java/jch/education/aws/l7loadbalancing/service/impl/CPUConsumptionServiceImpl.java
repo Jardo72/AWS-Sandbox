@@ -18,23 +18,37 @@
  */
 package jch.education.aws.l7loadbalancing.service.impl;
 
-import jch.education.aws.l7loadbalancing.service.PrimeNumbersCalculationService;
+import jch.education.aws.l7loadbalancing.service.CPUConsumptionService;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.math.BigDecimal;
 
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_SINGLETON)
-public class PrimeNumbersCalculationServiceImpl implements PrimeNumbersCalculationService {
-
-    private final ExecutorService executor = Executors.newFixedThreadPool(20);
+public class CPUConsumptionServiceImpl implements CPUConsumptionService {
 
     @Override
-    public void startCalculation(int start, int end) {
-        PrimeNumbersCalculationTask task = new PrimeNumbersCalculationTask(start, end);
-        this.executor.submit(task);
+    public void consume() {
+        final long startTime = System.currentTimeMillis();
+
+        BigDecimal result = BigDecimal.ONE;
+        for (int i = 2; i <= Integer.MAX_VALUE; i++) {
+            result = result.multiply(new BigDecimal(i));
+            if (i % 1000 == 0) {
+                sleep();
+                long executionTime = System.currentTimeMillis() - startTime;
+                if (executionTime >= 1000) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private static void sleep() {
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException ignore) {}
     }
 }

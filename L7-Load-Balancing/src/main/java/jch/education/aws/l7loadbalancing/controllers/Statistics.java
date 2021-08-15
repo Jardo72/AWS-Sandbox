@@ -31,7 +31,7 @@ public class Statistics {
 
     private long healthCheckCount = 0;
 
-    private long primeNumbersCalculationCount = 0;
+    private long cpuConsumptionRequestCount = 0;
 
     public synchronized void systemInfoProvided() {
         this.systemInfoRequestCount++;
@@ -41,12 +41,12 @@ public class Statistics {
         this.healthCheckCount++;
     }
 
-    public synchronized void primeNumbersCalculationStarted() {
-        this.primeNumbersCalculationCount++;
+    public synchronized void cpuConsumed() {
+        this.cpuConsumptionRequestCount++;
     }
 
     public synchronized StatisticInformation getSnapshot() {
         return new StatisticInformation(this.systemInfoRequestCount, this.healthCheckCount,
-                this.primeNumbersCalculationCount);
+                this.cpuConsumptionRequestCount);
     }
 }

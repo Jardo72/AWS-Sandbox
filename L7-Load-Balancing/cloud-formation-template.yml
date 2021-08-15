@@ -1,0 +1,331 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  CloudFormation deployment of the L7 load balancing demo application, with complete stack whose primary
+  components are an application load balancer and an auto scaling group with EC2 instances running the L7
+  load balancing server application. The auto scaling group scales the number of EC2 instances depending
+  on the CPU utilization.
+
+Parameters:
+  DeploymentArtifactoryBucketNameParam:
+    Description: The name of the S3 bucket which will serve as the artifactory with JAR files
+    Type: String
+
+  DeploymentArtifactoryPrefixParam:
+    Description: The prefix of the application JAR file within the S3 bucket which will serve as the artifactory with JAR files
+    Type: String
+
+  ApplicationJARFileParam:
+    Description: The name of the application JAR file (fat runnable JAR file is expected)
+    Type: String
+
+  ELBPortParam:
+    Description: TCP port the load balancer will use to accept incoming connections
+    Type: Number
+    Default: 80
+
+  EC2PortParam:
+    Description: TCP port the application instances running on EC2 will use to accept incoming connections
+    Type: Number
+    Default: 80
+
+  EC2InstanceType:
+    Type: String
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+    Default: t2.micro
+
+  TargetCPUUtilizationThreshold:
+    Description: Threshold for the aggregate CPU utilization for the autoscaling group. If the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group.
+    Type: String
+    Default: 50
+
+Mappings:
+  AMIMapping:
+    eu-central-1:
+      HVM64: ami-0453cb7b5f2b7fca2
+    eu-west-1:
+      HVM64: ami-02b4e72b17337d6c1
+    eu-west-2:
+      HVM64: ami-0d26eb3972b7f8c96
+
+Resources:
+  DeploymentArtifactoryReadAccessPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-DeploymentArtifactoryReadAccessPolicy"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - 's3:GetObject'
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref DeploymentArtifactoryBucketNameParam, '/*']]
+
+  DeploymentArtifactoryReaderRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-DeploymentArtifactoryReaderRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - !Ref DeploymentArtifactoryReadAccessPolicy
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.0.0.0/16
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PublicSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PublicSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  # the public subnets need a route table with default route to the Internet Gateway
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetOne
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetTwo
+
+  PublicSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetThree
+
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on ELB port from anywhere
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: TCP
+          FromPort: !Ref ELBPortParam
+          ToPort: !Ref ELBPortParam
+          CidrIp: 0.0.0.0/0
+
+  LoadBalancerSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref LoadBalancerSecurityGroup
+      IpProtocol: TCP
+      FromPort: !Ref EC2PortParam
+      ToPort: !Ref EC2PortParam
+      SourceSecurityGroupId: !Ref EC2InstanceSecurityGroup
+
+  # for the EC2 instances, the ingress traffic from the load balancer as well as from
+  # the Internet is needed; for instance, a REST request prescribing the outcome of
+  # subsequent health-checks will bypass the load balancer - it will be sent directly
+  # to a particular EC2 instance
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: TCP
+          FromPort: !Ref EC2PortParam
+          ToPort: !Ref EC2PortParam
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: !Sub "${AWS::StackName}-LoadBalancer"
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+      Subnets:
+        - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
+        - !Ref PublicSubnetThree
+      Type: application
+
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Protocol: HTTP
+      Port: !Ref ELBPortParam
+      LoadBalancerArn: !Ref LoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+      - !Ref DeploymentArtifactoryReaderRole
+
+  ASGLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
+      LaunchTemplateData:
+        ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
+        InstanceType: !Ref EC2InstanceType
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref EC2InstanceSecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install java-1.8.0-openjdk -y
+            aws s3 cp s3://${DeploymentArtifactoryBucketNameParam}/${DeploymentArtifactoryPrefixParam}/${ApplicationJARFileParam} /tmp/${ApplicationJARFileParam}
+            java -Dserver.port=${EC2PortParam} -jar /tmp/${ApplicationJARFileParam} &
+
+  EC2AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub "${AWS::StackName}-EC2AutoScalingGroup"
+      AvailabilityZones:
+        - !Select
+          - 0
+          - Fn::GetAZs: !Ref 'AWS::Region'
+        - !Select
+          - 1
+          - Fn::GetAZs: !Ref 'AWS::Region'
+        - !Select
+          - 2
+          - Fn::GetAZs: !Ref 'AWS::Region'
+      VPCZoneIdentifier:
+        - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
+        - !Ref PublicSubnetThree
+      MinSize: 3
+      MaxSize: 6
+      DesiredCapacity: 3
+      LaunchTemplate:
+        LaunchTemplateId: !Ref ASGLaunchTemplate
+        Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
+      TargetGroupARNs:
+        - !Ref ALBTargetGroup
+      HealthCheckGracePeriod: 150
+      HealthCheckType: ELB
+      MetricsCollection:
+        - Granularity: 1Minute
+
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${AWS::StackName}-ALBTargetGroup"
+      VpcId: !Ref VPC
+      Protocol: HTTP
+      Port: !Ref EC2PortParam
+      HealthCheckIntervalSeconds: 20
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 3
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /api/health-check
+      Matcher:
+        HttpCode: 200
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 15
+        - Key: load_balancing.algorithm.type
+          Value: round_robin
+
+  ASGScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref EC2AutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        DisableScaleIn: false
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: !Ref TargetCPUUtilizationThreshold
+
+Outputs:
+  LoadBalancerDNSName:
+    Description: DNS name of the created application load balancer
+    Value: !GetAtt LoadBalancer.DNSName

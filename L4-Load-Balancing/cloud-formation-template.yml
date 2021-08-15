@@ -1,0 +1,361 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  CloudFormation deployment of the L4 load balancing demo application, with complete stack whose primary
+  components are a network load balancer and an auto scaling group with three EC2 instances running the L4
+  load balancing server application.
+
+Parameters:
+  DeploymentArtifactoryBucketNameParam:
+    Description: The name of the S3 bucket which will serve as the artifactory with JAR files
+    Type: String
+
+  DeploymentArtifactoryPrefixParam:
+    Description: The prefix of the application JAR file within the S3 bucket which will serve as the artifactory with JAR files
+    Type: String
+
+  ApplicationJARFileParam:
+    Description: The name of the application JAR file (fat runnable JAR file is expected)
+    Type: String
+
+  ELBPortParam:
+    Description: TCP port the load balancer will use to accept incoming connections
+    Type: Number
+    Default: 1234
+
+  EC2PortParam:
+    Description: TCP port the application instances running on EC2 will use to accept incoming connections
+    Type: Number
+    Default: 1234
+
+  EC2InstanceType:
+    Type: String
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+    Default: t2.nano
+
+Mappings:
+  AMIMapping:
+    eu-central-1:
+      HVM64: ami-0453cb7b5f2b7fca2
+    eu-west-1:
+      HVM64: ami-02b4e72b17337d6c1
+    eu-west-2:
+      HVM64: ami-0d26eb3972b7f8c96
+
+Resources:
+  DeploymentArtifactoryReadAccessPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-DeploymentArtifactoryReadAccessPolicy"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+          - 's3:GetObject'
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref DeploymentArtifactoryBucketNameParam, '/*']]
+
+  DeploymentArtifactoryReaderRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-DeploymentArtifactoryReaderRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - 'sts:AssumeRole'
+      ManagedPolicyArns:
+      - !Ref DeploymentArtifactoryReadAccessPolicy
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.0.0.0/16
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  NATGatewayIPAddress:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      ConnectivityType: public
+      SubnetId: !Ref PublicSubnetOne
+      AllocationId: !GetAtt NATGatewayIPAddress.AllocationId
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PublicSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PublicSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.2.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PrivateSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PrivateSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.4.0/24
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PrivateSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.5.0/24
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  # the public subnets need a route table with default route to the Internet Gateway
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetOne
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetTwo
+
+  PublicSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetThree
+
+  # the private subnets need a route table with default route to the NAT Gateway
+  PrivateSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  NATGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NATGateway
+
+  PrivateSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      SubnetId: !Ref PrivateSubnetOne
+
+  PrivateSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      SubnetId: !Ref PrivateSubnetTwo
+
+  PrivateSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateSubnetRouteTable
+      SubnetId: !Ref PrivateSubnetThree
+
+  # as security groups are not supported for network load balancers, we cannot use
+  # a reference to the load balancer security group for ingress rules; I tried to
+  # use CIDR block of the VPC for the ingress - we have to allow incoming application
+  # traffic from the load balancer, and we also have to allow health checks from
+  # the load balancer; however, it did not seem to work, so I decided to allow
+  # incoming traffic from anywhere, although it is less secure compared to the
+  # CIDR block of the VPC
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref EC2PortParam
+          ToPort: !Ref EC2PortParam
+          # CidrIp: 10.0.0.0/16
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  # security groups are not supported for network load balancers
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: !Sub "${AWS::StackName}-LoadBalancer"
+      Scheme: internet-facing
+      Subnets:
+        - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
+        - !Ref PublicSubnetThree
+      Type: network
+
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Protocol: TCP
+      Port: !Ref ELBPortParam
+      LoadBalancerArn: !Ref LoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref NLBTargetGroup
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+      - !Ref DeploymentArtifactoryReaderRole
+
+  ASGLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
+      LaunchTemplateData:
+        ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
+        InstanceType: !Ref EC2InstanceType
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref EC2InstanceSecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install java-1.8.0-openjdk -y
+            aws s3 cp s3://${DeploymentArtifactoryBucketNameParam}/${DeploymentArtifactoryPrefixParam}/${ApplicationJARFileParam} /tmp/${ApplicationJARFileParam}
+            java -jar /tmp/${ApplicationJARFileParam} -IP-address=0.0.0.0 -TCP-port=${EC2PortParam} &
+
+  EC2AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub "${AWS::StackName}-EC2AutoScalingGroup"
+      AvailabilityZones:
+        - !Select
+          - 0
+          - Fn::GetAZs: !Ref 'AWS::Region'
+        - !Select
+          - 1
+          - Fn::GetAZs: !Ref 'AWS::Region'
+        - !Select
+          - 2
+          - Fn::GetAZs: !Ref 'AWS::Region'
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+        - !Ref PrivateSubnetThree
+      MinSize: 3
+      MaxSize: 3
+      DesiredCapacity: 3
+      LaunchTemplate:
+        LaunchTemplateId: !Ref ASGLaunchTemplate
+        Version: !GetAtt ASGLaunchTemplate.LatestVersionNumber
+      HealthCheckGracePeriod: 180
+      HealthCheckType: ELB
+      MetricsCollection:
+        - Granularity: 1Minute
+      TargetGroupARNs:
+        - !Ref NLBTargetGroup
+
+  NLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${AWS::StackName}-NLBTargetGroup"
+      VpcId: !Ref VPC
+      Protocol: TCP
+      Port: !Ref EC2PortParam
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      HealthCheckProtocol: TCP
+
+Outputs:
+  LoadBalancerDNSName:
+    Description: DNS name of the created network load balancer
+    Value: !GetAtt LoadBalancer.DNSName

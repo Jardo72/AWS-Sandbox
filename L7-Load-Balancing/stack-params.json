@@ -1,0 +1,30 @@
+[
+    {
+        "ParameterKey": "DeploymentArtifactoryBucketNameParam",
+        "ParameterValue": "jardo72-ec2-installation-repo"
+    },
+    {
+        "ParameterKey": "DeploymentArtifactoryPrefixParam",
+        "ParameterValue": "L7-LB-DEMO"
+    },
+    {
+        "ParameterKey": "ApplicationJARFileParam",
+        "ParameterValue": "aws-sandbox-application-load-balancing-server-1.0.jar"
+    },
+    {
+        "ParameterKey": "ELBPortParam",
+        "ParameterValue": "80"
+    },
+    {
+        "ParameterKey": "EC2PortParam",
+        "ParameterValue": "80"
+    },
+    {
+        "ParameterKey": "EC2InstanceType",
+        "ParameterValue": "t2.micro"
+    },
+    {
+        "ParameterKey": "TargetCPUUtilizationThreshold",
+        "ParameterValue": "50"
+    }
+]

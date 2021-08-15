@@ -16,27 +16,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package jch.education.aws.l7loadbalancing.dto;
+package jch.education.aws.l7loadbalancing.service;
 
-public class PrimeNumberCalculationRequest {
+public interface CPUConsumptionService {
 
-    private int start;
-
-    private int end;
-
-    public int getStart() {
-        return start;
-    }
-
-    public void setStart(int start) {
-        this.start = start;
-    }
-
-    public int getEnd() {
-        return end;
-    }
-
-    public void setEnd(int end) {
-        this.end = end;
-    }
+    void consume();
 }
