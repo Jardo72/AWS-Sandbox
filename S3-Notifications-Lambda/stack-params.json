@@ -1,0 +1,18 @@
+[
+    {
+        "ParameterKey": "UploadAreaBucketNameParam",
+        "ParameterValue": "jardo72-ice-hockey-game-results-upload"
+    },
+    {
+        "ParameterKey": "StandingsQueueNameParam",
+        "ParameterValue": "Ice-Hockey-Standings"
+    },
+    {
+        "ParameterKey": "DeploymentBucketNameParam",
+        "ParameterValue": "jardo72-ec2-installation-repo"
+    },
+    {
+        "ParameterKey": "DeploymentArchiveNameParam",
+        "ParameterValue": "S3-EVENT-NOTIFICATIONS/event-handler.zip"
+    }
+]
