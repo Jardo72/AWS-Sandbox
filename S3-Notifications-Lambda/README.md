@@ -6,13 +6,12 @@
 - upload of such a file triggers the Lambda function which parses the game results, calculates standings based on the parsed game results, and sends the calculated standings to an SQS queue
 
 ## Source Code Organization and Build
-- Maven multi-module
-- library
-  + completely independent of AWS SDK
-  + provides functionality like parsing of game results, calculation and generation of standings
-- Lambda function just integrates the functionality provided by the library into the Lambda environment and with the AWS services used
+
 
 ## Deployment
+- compress all Python files to a ZIP file
+- upload to an S3 bucket
+- use CloudFormation to deploy
 
 ```
 aws cloudformation create-stack --stack-name Lambda-Ice-Hockey --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK

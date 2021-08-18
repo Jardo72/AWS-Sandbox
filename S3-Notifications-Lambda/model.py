@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum, unique
 
@@ -26,6 +28,16 @@ class ResultType(Enum):
     REGULATION = 1
     OVERTIME = 2
     SHOOTOUT = 3
+
+    @staticmethod
+    def from_abbreviation(abbreviation: str) -> ResultType:
+        if abbreviation == 'SO':
+            return ResultType.SHOOTOUT
+        elif abbreviation == 'OT':
+            return ResultType.OVERTIME
+
+        message = f'Unexpected abbreviation "{abbreviation}" - cannot resolve result type.'
+        raise ValueError(message)
 
 
 @dataclass(frozen=True)
@@ -50,11 +62,11 @@ class GameResult:
 
     @property
     def visitor_team(self) -> str:
-        return self.visitor_team.team
+        return self.visitor_team_record.team
 
     @property
     def visitor_team_goals(self) -> int:
-        return self.visitor_team.goals
+        return self.visitor_team_record.goals
 
 
 @dataclass(frozen=True)
