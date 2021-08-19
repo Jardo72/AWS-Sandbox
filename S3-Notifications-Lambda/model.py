@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+# for Python 3.8, this is needed if a static method wants to declare
+# its own class as return type
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -78,7 +80,7 @@ class GameStatistics:
 
     @property
     def overall_game_count(self) -> int:
-        return self.regulation_win_count + self.overtime_win_count + self.regulation_loss_count + slef.overtime_loss_count
+        return self.regulation_win_count + self.overtime_win_count + self.regulation_loss_count + self.overtime_loss_count
 
 
 @dataclass(frozen=True)
