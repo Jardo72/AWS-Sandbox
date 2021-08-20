@@ -88,6 +88,14 @@ class Score:
     goals_for: int
     goals_against: int
 
+    @property
+    def difference(self) -> int:
+        return self.goals_for - self.goals_against
+
+    @property
+    def ratio(self) -> float:
+        return self.goals_for / self.goals_against
+
 
 @dataclass(frozen=True)
 class StandingsEntry:
@@ -107,3 +115,55 @@ class StandingsEntry:
     @property
     def goals_against(self) -> int:
         return self.score.goals_against
+
+    @property
+    def score_difference(self) -> int:
+        return self.score.difference
+
+    @property
+    def score_ratio(self) -> float:
+        return self.score.ratio
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, StandingsEntry):
+            return False
+        if self.points != other.points:
+            return False
+        if self.score_difference != other.score_difference:
+            return False
+        if self.score_ratio != other.score_ratio:
+            return False
+        return True
+
+
+    def __lt__(self, other: StandingsEntry) -> bool:
+        if self.points < other.points:
+            return True
+        elif self.points > other.points:
+            return False
+
+        if self.score_difference < other.score_difference:
+            return True
+        elif self.score_difference > other.score_difference:
+            return False
+
+        if self.score_ratio < other.score_ratio:
+            return True
+
+        return False
+
+    def __gt__(self, other: StandingsEntry) -> bool:
+        if self.points > other.points:
+            return True
+        elif self.points < other.points:
+            return False
+
+        if self.score_difference > other.score_difference:
+            return True
+        elif self.score_difference < other.score_difference:
+            return False
+
+        if self.score_ratio > other.score_ratio:
+            return True
+
+        return False
