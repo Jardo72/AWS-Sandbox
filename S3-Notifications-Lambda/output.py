@@ -30,16 +30,15 @@ def _standings_entries(entries: Sequence[StandingsEntry]) -> str:
     result = ''
     for index, single_entry in enumerate(entries):
         rank = index + 1
-        result += f'{rank:2}.{single_entry.team}'
-        result += f'    {single_entry.overall_game_count:2d}'
-        result += f' {single_entry.regulation_win_count:2d}'
-        result += f' {single_entry.overtime_win_count:2d}'
-        result += f' {single_entry.overtime_loss_count:2d}'
-        result += f' {single_entry.regulation_loss_count:2d}'
-        result += f' {single_entry.goals_for:2d}'
-        result += f':{single_entry.goals_against:2d}'
-        result += f' {single_entry.points:3d}'
-        result += '\n'
+        result += f'{rank:2}.{single_entry.team}    '
+        result += f'{single_entry.overall_game_count:2d} '
+        result += f'{single_entry.regulation_win_count:2d} '
+        result += f'{single_entry.overtime_win_count:2d} '
+        result += f'{single_entry.overtime_loss_count:2d} '
+        result += f'{single_entry.regulation_loss_count:2d} '
+        result += f'{single_entry.goals_for:2d}:'
+        result += f'{single_entry.goals_against:2d} '
+        result += f'{single_entry.points:3d}\n'
     return result
 
 
