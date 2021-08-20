@@ -109,6 +109,22 @@ class StandingsEntry:
         return self.game_statistics.overall_game_count
 
     @property
+    def regulation_win_count(self) -> int:
+        return self.game_statistics.regulation_win_count
+
+    @property
+    def overtime_win_count(self) -> int:
+        return self.game_statistics.overtime_win_count
+
+    @property
+    def overtime_loss_count(self) -> int:
+        return self.game_statistics.overtime_loss_count
+
+    @property
+    def regulation_loss_count(self) -> int:
+        return self.game_statistics.regulation_loss_count
+
+    @property
     def goals_for(self) -> int:
         return self.score.goals_for
 

@@ -80,14 +80,3 @@ def read_single_line(line: str) -> GameResult:
     )
     _validate(game_result, line)
     return game_result
-
-
-# TODO: remove
-if __name__ == "__main__":
-    print(read_single_line('SVK-BLR 5:2'))
-    print()
-
-    print(read_single_line('SVK-BLR 5:4 OT'))
-    print()
-
-    read_single_line('SVK-GER 3:1 XY')

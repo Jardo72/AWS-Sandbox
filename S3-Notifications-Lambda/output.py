@@ -17,23 +17,45 @@
 # limitations under the License.
 #
 
+from typing import Sequence
+
 from model import StandingsEntry
 
 
 def _column_headings() -> str:
-    return '          GP RW OW OL RL GF:GA PTS'
+    return '          GP RW OW OL RL GF:GA PTS\n'
+
+
+def _standings_entries(entries: Sequence[StandingsEntry]) -> str:
+    result = ''
+    for index, single_entry in enumerate(entries):
+        rank = index + 1
+        result += f'{rank:2}.{single_entry.team}'
+        result += f'    {single_entry.overall_game_count:2d}'
+        result += f' {single_entry.regulation_win_count:2d}'
+        result += f' {single_entry.overtime_win_count:2d}'
+        result += f' {single_entry.overtime_loss_count:2d}'
+        result += f' {single_entry.regulation_loss_count:2d}'
+        result += f' {single_entry.goals_for:2d}'
+        result += f':{single_entry.goals_against:2d}'
+        result += f' {single_entry.points:3d}'
+        result += '\n'
+    return result
 
 
 def _legend() -> str:
-    return
-"""
+    return """
 Legend
 GP .... Games Played
 RW .... Regulation Wins
 OW .... Overtime + Shootout Wins
-RL .... Regulation Losses
 OL .... Overtime + Shootout Losses
+RL .... Regulation Losses
 GF .... Goals For
 GF .... Goals Against
 PTS ... Points
 """
+
+
+def print_standings(entries: Sequence[StandingsEntry]) -> str:
+    return _column_headings() + _standings_entries(entries) + _legend()

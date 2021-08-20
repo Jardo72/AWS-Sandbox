@@ -62,7 +62,6 @@ class _StandingsEntryCollector:
         self._add(goals_for, goals_against, game_result.type)
 
     def _add(self, goals_for: int, goals_against: int, result_type: ResultType) -> None:
-        print(f'Adding {goals_for}:{goals_against} {result_type} to {self._team}')
         self._goals_against += goals_against
         self._goals_for += goals_for
         if goals_for > goals_against:
@@ -77,7 +76,6 @@ class _StandingsEntryCollector:
                 self._regulation_loss_count += 1
             else:
                 self._overtime_loss_count += 1
-        print(f'Updated points = {self._points}, updated score = {self._goals_for}:{self._goals_against}')
 
     @property
     def standings_entry(self) -> StandingsEntry:
@@ -125,8 +123,3 @@ class StandingsCalculator:
 
     def calculate_standings(self) -> Sequence[StandingsEntry]:
         return list(sorted(self._collector.standings_entries, reverse=True))
-
-
-# TODO: remove
-if __name__ == "__main__":
-    print("Hello world")
