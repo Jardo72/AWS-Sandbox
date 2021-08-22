@@ -9,7 +9,7 @@
 
 
 ## Deployment
-- compress all Python files to a ZIP file
+- compress all Python files to a single flat ZIP file (no directory structure)
 - upload to an S3 bucket
 - use CloudFormation to deploy
 

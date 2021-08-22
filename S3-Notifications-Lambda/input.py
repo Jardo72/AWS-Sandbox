@@ -17,8 +17,10 @@
 # limitations under the License.
 #
 
+from io import StringIO
 from model import GameResult, ResultType, SingleGameTeamRecord
 from re import compile, search
+from typing import Sequence
 
 
 class InvalidInputError(Exception):
@@ -80,3 +82,8 @@ def read_single_line(line: str) -> GameResult:
     )
     _validate(game_result, line)
     return game_result
+
+
+def read_all_lines(lines: str) -> Sequence[GameResult]:
+    with StringIO(lines.strip()) as input:
+        return [read_single_line(single_line) for single_line in input.readlines()]
