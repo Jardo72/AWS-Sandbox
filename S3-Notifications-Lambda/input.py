@@ -72,7 +72,7 @@ def _validate(game_result: GameResult, line: str) -> None:
 
 def read_single_line(line: str) -> GameResult:
     pattern = compile('^([A-Z]{3})-([A-Z]{3}) (\d+):(\d+)( (OT|SO))?$')
-    match = pattern.match(line)
+    match = pattern.match(line.strip())
     if match is None:
         InvalidInputError.raise_syntactic_error(line)
     game_result = GameResult(

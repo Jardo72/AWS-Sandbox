@@ -23,3 +23,9 @@ TODO:
 - however, it seems that CloudFormation can create a Lambda function that will configure the S3 event notification
 - see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-notificationconfig.html
 - see https://aws.amazon.com/premiumsupport/knowledge-center/cloudformation-s3-notification-lambda/
+
+## Functionality
+- input data format
+- standings calculation (env. variables as configuration, tie breaking in case of equal points)
+- standings format
+- test data
