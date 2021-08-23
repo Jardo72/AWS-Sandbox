@@ -5,12 +5,12 @@
 - files uploaded to an S3 bucket representing results of ice hockey games
 - upload of such a file triggers the Lambda function which parses the game results, calculates standings based on the parsed game results, and sends the calculated standings to an SQS queue
 
-## Source Code Organization and Build
+## Source Code Organization
 
 
 ## Deployment
-- compress all Python files to a single flat ZIP file (no directory structure)
-- upload to an S3 bucket
+- compress all Python files except of [test.py](./test.py) to a single flat ZIP file (no directory structure)
+- upload the ZIP file to an S3 bucket
 - use CloudFormation to deploy
 
 ```
@@ -25,7 +25,7 @@ TODO:
 - see https://aws.amazon.com/premiumsupport/knowledge-center/cloudformation-s3-notification-lambda/
 
 ## Functionality
-- input data format
+- input data format (text file, UTF-8, format of single game result)
 - standings calculation (env. variables as configuration, tie breaking in case of equal points)
 - standings format
 - test data

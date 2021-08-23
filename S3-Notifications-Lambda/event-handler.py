@@ -66,15 +66,9 @@ def _read_game_results(record):
     object_key = unquote_plus(record['s3']['object']['key'], encoding='utf-8')
     print(f'Processing file - bucket = "{bucket_name}", object key = "{object_key}"')
 
-    # TODO:
-    # - the content type should be text/plain
     object = s3_client.get_object(Bucket=bucket_name, Key=object_key)
-    print(f'Content type: {object["ContentType"]}')
     data = object["Body"].read()
-    print(f'Body (type = {type(data)}): {data}')
     data = data.decode('utf-8')
-    print(f'Body after decoding (type = {type(data)}): {data}')
-
     return read_all_lines(data)
 
 
