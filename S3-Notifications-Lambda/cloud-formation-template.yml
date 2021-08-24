@@ -97,6 +97,7 @@ Resources:
       Handler: event-handler.main
       Runtime: python3.8
       Role: !GetAtt ["ImportHandlerExecutionRole", "Arn"]
+      Timeout: 10
       Code:
         S3Bucket:  !Ref DeploymentBucketNameParam
         S3Key: !Ref DeploymentArchiveNameParam
