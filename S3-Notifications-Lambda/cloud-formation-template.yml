@@ -42,6 +42,7 @@ Resources:
     Properties:
       BucketName: !Ref UploadAreaBucketNameParam
       AccessControl: Private
+      # when the notification configuration is created, the stack creation is failing
       # NotificationConfiguration:
       #   LambdaConfigurations:
       #     - Event: s3:ObjectCreated:*
@@ -62,6 +63,10 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref UploadAreaBucketNameParam, '/*']]
           - Effect: Allow
             Action:
               - sqs:SendMessage
@@ -87,7 +92,6 @@ Resources:
             Action:
               - "sts:AssumeRole"
       ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/AWSLambdaExecute"
         - !Ref  ImportHandlerAccessPolicy
 
   ImportHandlerFunction:
