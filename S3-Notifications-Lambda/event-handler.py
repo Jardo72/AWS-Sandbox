@@ -58,14 +58,18 @@ class _LambdaConfiguration(Configuration):
 
 
 configuration = _LambdaConfiguration()
+sqs_client = client('sqs')
 s3_client = client('s3')
 
 
-def _read_game_results(record):
+def _extract_file_properties(record):
     bucket_name = record['s3']['bucket']['name']
     object_key = unquote_plus(record['s3']['object']['key'], encoding='utf-8')
-    print(f'Processing file - bucket = "{bucket_name}", object key = "{object_key}"')
+    return (bucket_name, object_key)
 
+
+def _read_game_results(bucket_name, object_key):
+    print(f'Processing file with game results - bucket = "{bucket_name}", object key = "{object_key}"')
     object = s3_client.get_object(Bucket=bucket_name, Key=object_key)
     data = object["Body"].read()
     data = data.decode('utf-8')
@@ -79,17 +83,35 @@ def _calculate_standings(game_results):
     return calculator.calculate_standings()
 
 
+def _send_message(message_body, bucket_name, object_key):
+    queue_url = environ['STANDINGS_QUEUE']
+    response = sqs_client.send_message(
+        QueueUrl=queue_url,
+        MessageGroupId='hockey-game-results',
+        MessageAttributes={
+            'Bucket': {
+                'DataType': 'String',
+                'StringValue': bucket_name
+            },
+            'Filename': {
+                'DataType': 'String',
+                'StringValue': object_key
+            }
+        },
+        MessageBody=message_body
+    )
+    print(f'Standings sent to SQS queue {queue_url}, message ID = {response["MessageId"]}')
+
+
 def _process_single_file(record):
-    game_results = _read_game_results(record)
+    bucket_name, object_key = _extract_file_properties(record)
+    game_results = _read_game_results(bucket_name, object_key)
     standings = _calculate_standings(game_results)
-    print(print_standings(standings))
+    output = print_standings(standings)
+    _send_message(output, bucket_name, object_key)
 
 
-# https://stackoverflow.com/questions/46928105/reading-files-triggered-by-s3-event
-# https://docs.aws.amazon.com/code-samples/latest/catalog/python-s3-s3_basics-object_wrapper.py.html
 def main(event, context):
-    print(f'S3 notification event handler invoked, look at the event: {event}')
-
     for record in event['Records']:
         _process_single_file(record)
-    return 'Done :-)'
+    return True

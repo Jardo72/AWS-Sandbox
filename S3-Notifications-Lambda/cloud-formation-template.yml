@@ -51,6 +51,9 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       QueueName: !Ref StandingsQueueNameParam
+      FifoQueue: True
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 60
 
   ImportHandlerAccessPolicy:
     Type: AWS::IAM::ManagedPolicy

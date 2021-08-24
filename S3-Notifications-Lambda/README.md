@@ -1,7 +1,7 @@
 # 
 
 ## Introduction
-- Lambda function used as event handler for S3 event notifications
+- AWS Lambda function used as event handler for S3 event notifications
 - files uploaded to an S3 bucket representing results of ice hockey games
 - upload of such a file triggers the Lambda function which parses the game results, calculates standings based on the parsed game results, and sends the calculated standings to an SQS queue
 

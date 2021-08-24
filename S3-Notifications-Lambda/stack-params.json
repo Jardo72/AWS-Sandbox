@@ -5,7 +5,7 @@
     },
     {
         "ParameterKey": "StandingsQueueNameParam",
-        "ParameterValue": "Ice-Hockey-Standings"
+        "ParameterValue": "Ice-Hockey-Standings.fifo"
     },
     {
         "ParameterKey": "DeploymentBucketNameParam",
