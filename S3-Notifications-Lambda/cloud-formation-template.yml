@@ -70,7 +70,7 @@ Resources:
           - Effect: Allow
             Action:
               - sqs:SendMessage
-            Resource: !GetAtt ["StandingsQueue", "Arn"]
+            Resource: !GetAtt StandingsQueue.Arn
           - Effect: Allow
             Action:
               - logs:CreateLogGroup
@@ -81,7 +81,7 @@ Resources:
   ImportHandlerExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${AWS::StackName}-ImportHandlerExecutor"
+      RoleName: !Sub "${AWS::StackName}-ImportHandlerExecutionRole"
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -92,7 +92,7 @@ Resources:
             Action:
               - "sts:AssumeRole"
       ManagedPolicyArns:
-        - !Ref  ImportHandlerAccessPolicy
+        - !Ref ImportHandlerAccessPolicy
 
   ImportHandlerFunction:
     Type: AWS::Lambda::Function
@@ -100,10 +100,10 @@ Resources:
       FunctionName: ImportHandler
       Handler: event-handler.main
       Runtime: python3.8
-      Role: !GetAtt ["ImportHandlerExecutionRole", "Arn"]
+      Role: !GetAtt ImportHandlerExecutionRole.Arn
       Timeout: 10
       Code:
-        S3Bucket:  !Ref DeploymentBucketNameParam
+        S3Bucket: !Ref DeploymentBucketNameParam
         S3Key: !Ref DeploymentArchiveNameParam
       Environment:
         Variables:
@@ -118,7 +118,80 @@ Resources:
   ImportHandlerInvocationPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt ["ImportHandlerFunction", "Arn"]
+      FunctionName: !GetAtt ImportHandlerFunction.Arn
       Action: "lambda:InvokeFunction"
       Principal: s3.amazonaws.com
-      SourceArn: !GetAtt ["UploadAreaBucket", "Arn"]
+      SourceArn: !GetAtt UploadAreaBucket.Arn
+
+  NotificationConfiguratorAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-NotificationConfiguratorPermissions"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetBucketNotification
+              - s3:PutBucketNotification
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref UploadAreaBucketNameParam]]
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: 'arn:aws:logs:*:*:*'
+
+  NotificationConfiguratorExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-NotificationConfiguratorExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref NotificationConfiguratorAccessPolicy
+
+  NotificationConfiguratorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: NotificationConfigurator
+      Handler: index.main
+      Runtime: python3.8
+      Role: !GetAtt NotificationConfiguratorExecutionRole.Arn
+      Timeout: 60
+      Code:
+        ZipFile: |
+          from boto3 import client
+          import cfnresponse
+
+          def main(event, context):
+              print(f'Event = {event}')
+              response_data = {}
+              cfnresponse.send(event, context, 'SUCCESS', response_data)
+              return 'SUCCESS'
+
+  NotificationConfigurationTrigger:
+    Type: 'Custom::LambdaTrigger'
+    DependsOn:
+      - UploadAreaBucket
+    Properties:
+      ServiceToken: !GetAtt NotificationConfiguratorFunction.Arn
+      LambdaArn: !GetAtt ImportHandlerFunction.Arn
+      Bucket: !Ref  UploadAreaBucketNameParam
+
+# TODO: chances are we do not need this at all
+# Outputs:
+#   ImportHandlerFunctionArn:
+#     Description: ARN of the Lambda function serving as event handler for S3 notifications
+#     Value: !GetAtt ImportHandlerFunction.Arn
+
+#   UploadAreaBucketArn:
+#     Description: ARN of the S3 bucket for which the S3 notifications are to be configured
+#     Value: !GetAtt UploadAreaBucket.Arn
