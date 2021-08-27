@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-from sys import argv
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 from input import read_single_line
 from model import ResultType
@@ -42,9 +42,21 @@ class TestConfiguration(Configuration):
         raise ValueError(f'Unexpected result type: {result_type}.')
 
 
+def create_command_line_arguments_parser() -> ArgumentParser:
+    parser = ArgumentParser(description='Hockey Game Processor - Test Application', formatter_class=RawTextHelpFormatter)
+    parser.add_argument('game_results_file', help='input file with game results to be processed')
+    return parser
+
+
+def parse_command_line_arguments():
+    parser = create_command_line_arguments_parser()
+    return parser.parse_args()
+
+
 def main():
+    params = parse_command_line_arguments()
     calculator = StandingsCalculator(TestConfiguration())
-    with open(argv[1]) as input_file:
+    with open(params.game_results_file) as input_file:
         for line in input_file.readlines():
             game_result = read_single_line(line)
             calculator.add(game_result)

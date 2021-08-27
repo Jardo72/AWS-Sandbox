@@ -98,7 +98,7 @@ Resources:
   ImportHandlerFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: ImportHandler
+      FunctionName: !Sub "${AWS::StackName}-ImportHandler"
       Handler: event-handler.main
       Runtime: python3.8
       Role: !GetAtt ImportHandlerExecutionRole.Arn
@@ -162,7 +162,7 @@ Resources:
   S3NotificationConfiguratorFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: S3NotificationConfigurator
+      FunctionName: !Sub "${AWS::StackName}-S3NotificationConfigurator"
       Handler: index.main
       Runtime: python3.8
       Role: !GetAtt S3NotificationConfiguratorExecutionRole.Arn
