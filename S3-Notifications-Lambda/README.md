@@ -9,9 +9,9 @@
 
 
 ## Deployment
-- compress all Python files except of [test.py](./test.py) to a single flat ZIP file (no directory structure)
+- compress all Python files except of [test.py](./test.py) and [setup-s3-notification.py](./setup-s3-notification.py) to a single flat ZIP file (no directory structure)
 - upload the ZIP file to an S3 bucket
-- use CloudFormation to deploy
+- use the CloudFormation template [cloud-formation-template.yml](./cloud-formation-template.yml) to deploy
 
 ```
 aws cloudformation create-stack --stack-name Lambda-Ice-Hockey --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
