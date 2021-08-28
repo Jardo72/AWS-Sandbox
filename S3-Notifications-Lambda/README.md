@@ -1,7 +1,7 @@
 # S3 Event Notifications Demo
 
 ## Introduction
-S3 Event Notifications Demo is an experimantal/educational serverless application meant as illustration S3 event notifications. Lambda function is used as event handler for S3 event notifications. Files uploaded to an S3 bucket are supposed to represent results of ice hockey games. Upload of such a file triggers the Lambda function which parses the game results, calculates standings based on the parsed game results, and sends the calculated standings to an SQS queue. The files with game results are expected in plain text with UTF-8 encoding. The following snippet illustrates the expected format of the game results.
+S3 Event Notifications Demo is an experimantal/educational serverless AWS application meant as illustration of S3 event notifications. Lambda function is used as event handler for the S3 event notifications. Files uploaded to an S3 bucket are supposed to represent results of ice hockey games. Upload of such a file triggers the Lambda function which parses the game results, calculates standings based on the parsed game results, and sends the calculated standings to an SQS queue. The files with game results are expected in plain text with UTF-8 encoding. The following snippet illustrates the expected format of the game results (OT = overtime, SO = shootout).
 
 ```
 RUS-CZE 4:3
@@ -34,7 +34,7 @@ SVK-CZE 3:7
 RUS-BLR 6:0
 ```
 
-The standings sent to the SQS queue are also in form of plain text sent as message body. The name of the S3 bucket and the name of the file with game results are also sent to SQS as message attributes. The following snippet illustrates the standings based on the game results from the snippet above.
+The standings sent to the SQS queue are also in form of plain text sent as message body. The name of the S3 bucket and the name of the file with game results are also sent to SQS as message attributes. The following snippet illustrates the standings calculated from the game results from the snippet above. In other words, the snippet below illustrates the structure of the messages sent to SQS.
 
 ```
           GP RW OW OL RL GF:GA PTS
@@ -62,14 +62,14 @@ The calculation of standings, namely the tie-breaking procedure, is simplified. 
 - The greater differential between goals for and against.
 - The greater ratio between goals for and against.
 
-The [test-data](./test-data) directory contains several files that can be used as test data.
+The [test-data](./test-data) directory contains several files with game results that can be used as test data.
 
 
 ## Source Code Organization
 - The [event-handler.py](./event-handler.py) module contains the Lambda function used as event handler for the S3 notification. However, this module does not implement the business logic (i.e. parsing of game results, plus calculation and printing of standings). The business logic is implemented by other modules, and the [event-handler.py](./event-handler.py) module just integrates them into the Lambda execution environment.
-- There is a bunch of of modules which together implement the above mentioned business logic: [input.py](./input.py), [model.py](./model.py), [output.py](./output.py) and [standings.py](./standings.py).
+- There is a bunch of modules which together implement the above mentioned business logic: [input.py](./input.py), [model.py](./model.py), [output.py](./output.py) and [standings.py](./standings.py).
 - The [test.py](./test.py) module allows to test the business logic locally, without the Lambda execution environment. This module is in fact not a part of the application.
-- The [setup-s3-notification.py](./setup-s3-notification.py) is also not a part of the application. It was used to test setup of the S3 event notification via the SDK before embedding the Python code into the CloudFormation template (see [Deployment](#deployment) for more details).
+- The [setup-s3-notification.py](./setup-s3-notification.py) is also not a part of the application. It was used to test setup of the S3 event notification via the AWS SDK before embedding the Python code into the CloudFormation template (see [Deployment](#deployment) for more details).
 
 
 ## <a name="deployment"></a>Deployment
@@ -86,5 +86,5 @@ aws cloudformation create-stack --stack-name Lambda-Ice-Hockey --template-body f
 
 As outlined above, the template involves several parameters. The [stack-params.json](./stack-params.json) file contains parameter values used during my experiments.
 
-The configuration of the S3 event notification is a bit tricky as the notification cannot be configured when the S3 bucket is being created. Therefore, the CloudFormation template involves a custom resource in form of a Lambda function that uses the SDK to setup the notification (see the S3NotificationConfiguration and S3NotificationConfiguratorFunction resources in the template). The Lambda function is implemented in Python directly in the CloudFormation template. For more details, look at the [AWS Documentation](https://aws.amazon.com/premiumsupport/knowledge-center/cloudformation-s3-notification-lambda/).
+The configuration of the S3 event notification is a bit tricky as the notification cannot be configured when the S3 bucket is being created. Therefore, the CloudFormation template involves a custom resource in form of a Lambda function that uses the AWS SDK to setup the notification (see the S3NotificationConfiguration and S3NotificationConfiguratorFunction resources in the template). The Lambda function is implemented in Python directly in the CloudFormation template. For more details, look at the [AWS Documentation](https://aws.amazon.com/premiumsupport/knowledge-center/cloudformation-s3-notification-lambda/).
 
