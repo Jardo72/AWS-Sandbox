@@ -58,13 +58,24 @@ GF .... Goals Against
 PTS ... Points
 ```
 
+The calculation of standings, namely the tie-breaking procedure, is simplified. If two or more teams are tied in points, the standing of the teams is determined in the following order:
+- The greater differential between goals for and against.
+- The greater ratio between goals for and against.
+
+The [test-data](./test-data) directory contains several files that can be used as test data.
+
+
 ## Source Code Organization
+- The [event-handler.py](./event-handler.py) module contains the Lambda function used as event handler for the S3 notification. However, this module does not implement the business logic (i.e. parsing of game results, plus calculation and printing of standings). The business logic is implemented by other modules, and the [event-handler.py](./event-handler.py) module just integrates them into the Lambda execution environment.
+- There is a bunch of of modules which together implement the above mentioned business logic: [input.py](./input.py), [model.py](./model.py), [output.py](./output.py) and [standings.py](./standings.py).
+- The [test.py](./test.py) module allows to test the business logic locally, without the Lambda execution environment. This module is in fact not a part of the application.
+- The [setup-s3-notification.py](./setup-s3-notification.py) is also not a part of the application. It was used to test setup of the S3 event notification via the SDK before embedding the Python code into the CloudFormation template (see [Deployment](#deployment) for more details).
 
 
-## Deployment
+## <a name="deployment"></a>Deployment
 The project involves a CloudFormation template ([cloud-formation-template.yml](./cloud-formation-template.yml)) which simplifies the deployment. The CloudFormation template creates the entire stack (S3 bucket, event handler Lambda function with an appropriate execution role, SQS queue) and configures the S3 event notification so that a file upload to the S3 bucket triggers the event handler Lambda function. In order to deploy the application, follow these steps:
-1. Compress all Python files except of [test.py](./test.py) and [setup-s3-notification.py](./setup-s3-notification.py) to a single flat ZIP file (no directory structure).
-2. Upload the ZIP file to an S3 bucket from which it will be taken by CloudFormation (the name of the bucket and the filename will have to be specified as parameter values).
+1. Compress all Python files except of [test.py](./test.py) and [setup-s3-notification.py](./setup-s3-notification.py) to a single flat ZIP file (no directory structure within the ZIP file).
+2. Upload the ZIP file to an S3 bucket from which it will be taken by CloudFormation (the name of the bucket and the filename will have to be specified as parameter values when creating the stack).
 3. Use the CloudFormation template [cloud-formation-template.yml](./cloud-formation-template.yml) to provision and configure all AWS resources comprising the application.
 
 The following AWS CLI command illustrates how to use the CloudFormation template to create the stack.
@@ -73,11 +84,7 @@ The following AWS CLI command illustrates how to use the CloudFormation template
 aws cloudformation create-stack --stack-name Lambda-Ice-Hockey --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
 
-TODO:
-- see https://aws.amazon.com/premiumsupport/knowledge-center/cloudformation-s3-notification-lambda/
+As outlined above, the template involves several parameters. The [stack-params.json](./stack-params.json) file contains parameter values used during my experiments.
 
-## Functionality
-- input data format (text file, UTF-8, format of single game result)
-- standings calculation (env. variables as configuration, tie breaking in case of equal points)
-- standings format
-- test data
+The configuration of the S3 event notification is a bit tricky as the notification cannot be configured when the S3 bucket is being created. Therefore, the CloudFormation template involves a custom resource in form of a Lambda function that uses the SDK to setup the notification (see the S3NotificationConfiguration and S3NotificationConfiguratorFunction resources in the template). The Lambda function is implemented in Python directly in the CloudFormation template. For more details, look at the [AWS Documentation](https://aws.amazon.com/premiumsupport/knowledge-center/cloudformation-s3-notification-lambda/).
+
