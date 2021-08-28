@@ -58,7 +58,7 @@ GF .... Goals Against
 PTS ... Points
 ```
 
-The calculation of standings, namely the tie-breaking procedure, is simplified. If two or more teams are tied in points, the standing of the teams is determined in the following order:
+The calculation of standings, namely the tie-breaking procedure, is simplified - no head-to-head metric is used. If two or more teams are tied in points, the standing of the teams is determined in the following order:
 - The greater differential between goals for and against.
 - The greater ratio between goals for and against.
 
