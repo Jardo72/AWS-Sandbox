@@ -17,6 +17,10 @@
 # limitations under the License.
 #
 
+# for Python 3.8, this is needed if a static method wants to declare
+# its own class as return type
+from __future__ import annotations
+
 from io import StringIO
 from model import GameResult, ResultType, SingleGameTeamRecord
 from re import compile, search
@@ -29,14 +33,14 @@ class InvalidInputError(Exception):
         Exception.__init__(self, message_template.format(game_result, game_result=game_result))
 
     @staticmethod
-    def raise_syntactic_error(game_result: str) -> None:
+    def syntactic_error(game_result: str) -> InvalidInputError:
         message_template = 'Invalid game result (syntactic error): "{game_result}".'
-        raise InvalidInputError(message_template, game_result)
+        return InvalidInputError(message_template, game_result)
 
     @staticmethod
-    def raise_semantic_error(game_result: str) -> None:
+    def semantic_error(game_result: str) -> InvalidInputError:
         message_template = 'Invalid game result (semantic error): "{game_result}".'
-        raise InvalidInputError(message_template, game_result)
+        return InvalidInputError(message_template, game_result)
 
 
 def _extract_team_record(match, team_re_group: int, goals_re_group: int) -> SingleGameTeamRecord:
@@ -53,28 +57,28 @@ def _extract_result_type(match, line: str) -> ResultType:
             result = ResultType.from_abbreviation(suffix)
         return result
     except ValueError:
-        InvalidInputError.raise_syntactic_error(line)
+        raise InvalidInputError.syntactic_error(line)
 
 
 
 def _validate(game_result: GameResult, line: str) -> None:
     if game_result.home_team == game_result.visitor_team:
-        InvalidInputError.raise_semantic_error(line)
+        raise InvalidInputError.semantic_error(line)
 
     if game_result.home_team_goals == game_result.visitor_team_goals:
-        InvalidInputError.raise_semantic_error(line)
+        raise InvalidInputError.semantic_error(line)
 
     if game_result.type in [ResultType.OVERTIME, ResultType.SHOOTOUT]:
         difference = abs(game_result.home_team_goals - game_result.visitor_team_goals)
         if difference > 1:
-            InvalidInputError.raise_semantic_error(line)
+            raise InvalidInputError.semantic_error(line)
 
 
 def read_single_line(line: str) -> GameResult:
     pattern = compile('^([A-Z]{3})-([A-Z]{3}) (\d+):(\d+)( (OT|SO))?$')
     match = pattern.match(line.strip())
     if match is None:
-        InvalidInputError.raise_syntactic_error(line)
+        raise InvalidInputError.syntactic_error(line)
     game_result = GameResult(
         _extract_team_record(match, 1, 3),
         _extract_team_record(match, 2, 4),
