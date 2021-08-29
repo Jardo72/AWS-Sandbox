@@ -4,7 +4,5 @@ AUT-SVK 1:2
 BLR-AUT 5:2
 SVK-POL 5:1
 
-AUT-POL
-SVK-BLR
-
-https://en.wikipedia.org/wiki/Ice_hockey_at_the_2022_Winter_Olympics_%E2%80%93_Men%27s_qualification#Pre-qualification_Round_2
+POL-AUT 1:4
+SVK-BLR 2:1
