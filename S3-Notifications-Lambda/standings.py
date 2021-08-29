@@ -121,5 +121,9 @@ class StandingsCalculator:
     def add(self, game_result: GameResult) -> None:
         self._collector.add(game_result)
 
+    def add_all(self, game_result: Sequence[GameResult]) -> None:
+        for single_game_result in game_result:
+            self.add(single_game_result)
+
     def calculate_standings(self) -> Sequence[StandingsEntry]:
         return list(sorted(self._collector.standings_entries, reverse=True))

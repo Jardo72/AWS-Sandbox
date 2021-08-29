@@ -19,7 +19,7 @@
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 
-from input import read_single_line
+from input import read_all_lines
 from model import ResultType
 from output import print_standings
 from standings import Configuration, StandingsCalculator
@@ -57,9 +57,8 @@ def main():
     params = parse_command_line_arguments()
     calculator = StandingsCalculator(TestConfiguration())
     with open(params.game_results_file) as input_file:
-        for line in input_file.readlines():
-            game_result = read_single_line(line)
-            calculator.add(game_result)
+        game_results = read_all_lines(input_file.read())
+        calculator.add_all(game_results)
     standings = calculator.calculate_standings()
     print(print_standings(standings))
 

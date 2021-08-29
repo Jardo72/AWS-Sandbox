@@ -74,7 +74,7 @@ def _validate(game_result: GameResult, line: str) -> None:
             raise InvalidInputError.semantic_error(line)
 
 
-def read_single_line(line: str) -> GameResult:
+def _read_single_line(line: str) -> GameResult:
     pattern = compile('^([A-Z]{3})-([A-Z]{3}) (\d+):(\d+)( (OT|SO))?$')
     match = pattern.match(line.strip())
     if match is None:
@@ -90,4 +90,4 @@ def read_single_line(line: str) -> GameResult:
 
 def read_all_lines(lines: str) -> Sequence[GameResult]:
     with StringIO(lines.strip()) as input:
-        return [read_single_line(single_line) for single_line in input.readlines()]
+        return [_read_single_line(single_line) for single_line in input.readlines() if single_line.strip()]

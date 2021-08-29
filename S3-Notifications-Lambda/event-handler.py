@@ -78,8 +78,7 @@ def _read_game_results(bucket_name, object_key):
 
 def _calculate_standings(game_results):
     calculator = StandingsCalculator(configuration)
-    for single_game_result in game_results:
-        calculator.add(single_game_result)
+    calculator.add_all(game_results)
     return calculator.calculate_standings()
 
 
