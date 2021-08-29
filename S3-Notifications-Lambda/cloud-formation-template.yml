@@ -1,0 +1,236 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  UploadAreaBucketNameParam:
+    Description: The name of the S3 bucket for upload of game results
+    Type: String
+
+  StandingsQueueNameParam:
+    Description: The name of the SQS queue for publishing of standings
+    Type: String
+
+  DeploymentBucketNameParam:
+    Description: The name of the S3 bucket used to deploy the Lambda function and the Lambda layer
+    Type: String
+
+  DeploymentArchiveNameParam:
+    Description: The name of the S3 object (ZIP file with Python code) used to deploy the Lambda function
+    Type: String
+
+Resources:
+  UploadAreaBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref UploadAreaBucketNameParam
+      AccessControl: Private
+      # when the notification configuration is created, the stack creation is failing; therefore,
+      # custom resource in form of Lambda function using the SDK is used to setup the notification
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: s3:ObjectCreated:*
+      #       Function: !GetAtt ["ImportHandlerFunction", "Arn"]
+
+  StandingsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: !Ref StandingsQueueNameParam
+      FifoQueue: True
+      ContentBasedDeduplication: True
+      VisibilityTimeout: 60
+
+  ImportHandlerAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-ImportHandlerPermissions"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref UploadAreaBucketNameParam, '/*']]
+          - Effect: Allow
+            Action:
+              - sqs:SendMessage
+            Resource: !GetAtt StandingsQueue.Arn
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: 'arn:aws:logs:*:*:*'
+
+  ImportHandlerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-ImportHandlerExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref ImportHandlerAccessPolicy
+
+  ImportHandlerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-ImportHandler"
+      Handler: event-handler.main
+      Runtime: python3.8
+      Role: !GetAtt ImportHandlerExecutionRole.Arn
+      Timeout: 10
+      Code:
+        S3Bucket: !Ref DeploymentBucketNameParam
+        S3Key: !Ref DeploymentArchiveNameParam
+      Environment:
+        Variables:
+          REGULATION_WIN_POINTS: 3
+          OVERTIME_WIN_POINTS: 2
+          SHOOTOUT_WIN_POINTS: 2
+          REGULATION_LOSS_POINTS: 0
+          OVERTIME_LOSS_POINTS: 1
+          SHOOTOUT_LOSS_POINTS: 1
+          STANDINGS_QUEUE: !Ref StandingsQueue
+
+  ImportHandlerInvocationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt ImportHandlerFunction.Arn
+      Action: "lambda:InvokeFunction"
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt UploadAreaBucket.Arn
+
+  S3NotificationConfiguratorAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-S3NotificationConfiguratorPermissions"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetBucketNotification
+              - s3:PutBucketNotification
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref UploadAreaBucketNameParam]]
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: 'arn:aws:logs:*:*:*'
+
+  S3NotificationConfiguratorExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-S3NotificationConfiguratorExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref S3NotificationConfiguratorAccessPolicy
+
+  S3NotificationConfiguratorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-S3NotificationConfigurator"
+      Handler: index.main
+      Runtime: python3.8
+      Role: !GetAtt S3NotificationConfiguratorExecutionRole.Arn
+      Timeout: 60
+      Code:
+        ZipFile: |
+          # according to AWS documentation, the cfnresponse module must be imported this way; other
+          # forms of import will not work
+          import boto3
+          import cfnresponse
+
+
+          def create_s3():
+              s3 = boto3.resource('s3')
+              print('S3 resource created...')
+              return s3
+
+
+          def setup_notification(lambda_arn, bucket_name):
+              s3 = create_s3()
+              print(f'Going to setup notification, Lambda ARN = {lambda_arn}, bucket name = {bucket_name}...')
+              bucket_notification = s3.BucketNotification(bucket_name)
+              response = bucket_notification.put(
+                  NotificationConfiguration={
+                      'LambdaFunctionConfigurations': [
+                          {
+                              'LambdaFunctionArn': lambda_arn,
+                              'Events': [
+                                  's3:ObjectCreated:*'
+                              ]
+                          }
+                      ]
+                  }
+              )
+              print(f'Put request completed, response = {response}')
+
+
+          def cleanup_notification(bucket_name):
+              s3 = create_s3()
+              print(f'Going to cleanup notification, bucket name = {bucket_name}...')
+              bucket_notification = s3.BucketNotification(bucket_name)
+              response = bucket_notification.put(
+                  NotificationConfiguration={}
+              )
+              print(f'Delete request completed, response = {response}')
+
+
+          def main(event, context):
+              print(f'Event = {event}')
+              lambda_arn = event['ResourceProperties']['LambdaFunctionArn']
+              bucket_name = event['ResourceProperties']['BucketName']
+              response_status = 'SUCCESS'
+              response_data = {}
+              try:
+                  if event['RequestType'] in ['Create', 'Update']:
+                      setup_notification(lambda_arn, bucket_name)
+                  elif event['RequestType'] == 'Delete':
+                      cleanup_notification(bucket_name)
+              except Exception as e:
+                  print(f'Error: {e}')
+                  response_status = 'FAILED'
+              cfnresponse.send(event, context, response_status, response_data)
+
+  S3NotificationConfiguration:
+    Type: 'Custom::S3NotificationConfiguration'
+    DependsOn:
+      - UploadAreaBucket
+    Properties:
+      ServiceToken: !GetAtt S3NotificationConfiguratorFunction.Arn
+      LambdaFunctionArn: !GetAtt ImportHandlerFunction.Arn
+      BucketName: !Ref  UploadAreaBucketNameParam
