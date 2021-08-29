@@ -20,9 +20,10 @@
 
 from boto3 import client
 from os import environ
+from traceback import format_exc, print_exc
 from urllib.parse import unquote_plus
 
-from input import read_all_lines
+from input import InvalidInputError, read_all_lines
 from model import ResultType, StandingsEntry
 from output import print_standings
 from standings import Configuration, StandingsCalculator
@@ -104,10 +105,14 @@ def _send_message(message_body, bucket_name, object_key):
 
 def _process_single_file(record):
     bucket_name, object_key = _extract_file_properties(record)
-    game_results = _read_game_results(bucket_name, object_key)
-    standings = _calculate_standings(game_results)
-    output = print_standings(standings)
-    _send_message(output, bucket_name, object_key)
+    try:
+        game_results = _read_game_results(bucket_name, object_key)
+        standings = _calculate_standings(game_results)
+        output = print_standings(standings)
+        _send_message(output, bucket_name, object_key)
+    except InvalidInputError as e:
+        print_exc()
+        _send_message(format_exc(), bucket_name, object_key)
 
 
 def main(event, context):

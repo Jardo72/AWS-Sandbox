@@ -19,10 +19,11 @@
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 
-from input import read_all_lines
+from input import InvalidInputError, read_all_lines
 from model import ResultType
 from output import print_standings
 from standings import Configuration, StandingsCalculator
+from traceback import print_exc
 
 
 class TestConfiguration(Configuration):
@@ -54,13 +55,21 @@ def parse_command_line_arguments():
 
 
 def main():
-    params = parse_command_line_arguments()
-    calculator = StandingsCalculator(TestConfiguration())
-    with open(params.game_results_file) as input_file:
-        game_results = read_all_lines(input_file.read())
-        calculator.add_all(game_results)
-    standings = calculator.calculate_standings()
-    print(print_standings(standings))
+    try :
+        params = parse_command_line_arguments()
+        calculator = StandingsCalculator(TestConfiguration())
+        with open(params.game_results_file) as input_file:
+            game_results = read_all_lines(input_file.read())
+            calculator.add_all(game_results)
+        standings = calculator.calculate_standings()
+        print(print_standings(standings))
+    except InvalidInputError as e:
+        print()
+        print('An error has occured when parsing the game results.')
+        print(str(e))
+        print()
+        print('Details:')
+        print_exc()
 
 
 if __name__ == "__main__":
