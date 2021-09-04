@@ -19,7 +19,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >-
-  TODO
+  Nested stack template for the nested stacks demo.
 
 Parameters:
   FunctionNameParam:
