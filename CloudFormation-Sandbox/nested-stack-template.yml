@@ -1,0 +1,61 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  TODO
+
+Parameters:
+  FunctionNameParam:
+    Description: Name of the Lambda function to be created
+    Type: String
+  LambdaExecutionRoleParam:
+    Description: ARN of the IAM role to be used as execution role for the Lambda function
+    Type: String
+  DemoVariableValueParam:
+    Description: Value of an illustrational environment variable for the Lambda function created by this template
+    Type: String
+    Default: Hardcoded default value from nested stack template
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Ref FunctionNameParam
+      Handler: index.main
+      Runtime: python3.8
+      Role: !Ref LambdaExecutionRoleParam
+      Timeout: 60
+      Code:
+        ZipFile: |
+          from os import environ
+
+          def main(event, context):
+              print(f'Event = {event}')
+              env_vars = {name: value for name, value in environ.items()}
+              print(f'Environment variables = {env_vars}')
+              return 'Event dumped, function invocation completed'
+      Environment:
+        Variables:
+          DEMO_VARIABLE: !Ref DemoVariableValueParam
+
+Outputs:
+  LambdaFunctionArn:
+    Description: ARN of the Lambda function created by this template
+    Value: !GetAtt LambdaFunction.Arn
