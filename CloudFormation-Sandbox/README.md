@@ -15,5 +15,5 @@ aws cloudformation create-stack --stack-name CFN-Sandbox-Lambda-Function --templ
 ## Nested Stacks Demo
 
 ```
-aws cloudformation create-stack --stack-name CFN-Sandbox-Nested-Stacks --template-body file://nested-stacks-template.yml --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
+aws cloudformation create-stack --stack-name CFN-Sandbox-Nested-Stacks --template-body file://nested-stacks-parent-template.yml --parameters file://nested-stacks-parent-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
