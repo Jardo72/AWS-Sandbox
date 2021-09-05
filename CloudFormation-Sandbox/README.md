@@ -26,3 +26,9 @@ Deployment via AWS CLI (the nested stack template must be stored in an S3 bucket
 ```
 aws cloudformation create-stack --stack-name CFN-Sandbox-Nested-Stacks --template-body file://nested-stacks-parent-template.yml --parameters file://nested-stacks-parent-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
+
+## Conditions Demo
+
+```
+aws cloudformation create-stack --stack-name CFN-Sandbox-Conditions --template-body file://conditions-template.yml --parameters file://conditions-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
+```

@@ -1,0 +1,141 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  Creates up to three Lambda functions (red, green, blue). The number of Lambda functions actually
+  created is determined by parameters which are evaluated by conditions. For each created function,
+  its ARN is published as an output value (i.e. the number of output values is also driven by
+  parameters and conditions).
+
+Parameters:
+  RedFunctionFlagParam:
+    Description: Flag indicating whether the RedFunction resource is to be created or not
+    Type: String
+    AllowedValues: [true, false]
+    Default: false
+
+  GreenFunctionFlagParam:
+    Description: Flag indicating whether the GreenFunction resource is to be created or not
+    Type: String
+    AllowedValues: [true, false]
+    Default: true
+
+  BlueFunctionFlagParam:
+    Description: Flag indicating whether the GreenFunction resource is to be created or not
+    Type: String
+    AllowedValues: [true, false]
+    Default: true
+
+Conditions:
+  CreateRedFunction: !Equals [true, !Ref RedFunctionFlagParam]
+
+  CreateGreenFunction: !Equals [true, !Ref GreenFunctionFlagParam]
+
+  CreateBlueFunction: !Equals [true, !Ref BlueFunctionFlagParam]
+
+Resources:
+  CloudWatchLogsAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-CloudWatchLogsPermissions"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: 'arn:aws:logs:*:*:*'
+
+  FunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-FunctionExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - !Ref CloudWatchLogsAccessPolicy
+
+  RedFunction:
+    Type: AWS::Lambda::Function
+    Condition: CreateRedFunction
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-RedFunction"
+      Handler: index.main
+      Runtime: python3.8
+      Role: !GetAtt FunctionExecutionRole.Arn
+      Timeout: 5
+      Code:
+        ZipFile: |
+          def main(event, context):
+              print('Red function invoked...')
+              return 'Hi there from red function'
+
+  GreenFunction:
+    Type: AWS::Lambda::Function
+    Condition: CreateGreenFunction
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-GreenFunction"
+      Handler: index.main
+      Runtime: python3.8
+      Role: !GetAtt FunctionExecutionRole.Arn
+      Timeout: 5
+      Code:
+        ZipFile: |
+          def main(event, context):
+              print('Green function invoked...')
+              return 'Hi there from green function'
+
+  BlueFunction:
+    Type: AWS::Lambda::Function
+    Condition: CreateGreenFunction
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-BlueFunction"
+      Handler: index.main
+      Runtime: python3.8
+      Role: !GetAtt FunctionExecutionRole.Arn
+      Timeout: 5
+      Code:
+        ZipFile: |
+          def main(event, context):
+              print('Blue function invoked...')
+              return 'Hi there from blue function'
+
+Outputs:
+  RedFunctionArn:
+    Description: ARN of the Lambda function defined as RedFunction resource
+    Condition: CreateRedFunction
+    Value: !GetAtt RedFunction.Arn
+  GreenFunctionArn:
+    Description: ARN of the Lambda function defined as GreenFunction resource
+    Condition: CreateGreenFunction
+    Value: !GetAtt GreenFunction.Arn
+  BlueFunctionArn:
+    Description: ARN of the Lambda function defined as BlueFunction resource
+    Condition: CreateBlueFunction
+    Value: !GetAtt BlueFunction.Arn

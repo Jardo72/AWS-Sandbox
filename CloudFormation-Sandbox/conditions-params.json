@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "RedFunctionFlagParam",
+        "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "GreenFunctionFlagParam",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "BlueFunctionFlagParam",
+        "ParameterValue": "true"
+    }
+]
