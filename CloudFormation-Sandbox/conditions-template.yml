@@ -131,10 +131,12 @@ Outputs:
     Description: ARN of the Lambda function defined as RedFunction resource
     Condition: CreateRedFunction
     Value: !GetAtt RedFunction.Arn
+
   GreenFunctionArn:
     Description: ARN of the Lambda function defined as GreenFunction resource
     Condition: CreateGreenFunction
     Value: !GetAtt GreenFunction.Arn
+
   BlueFunctionArn:
     Description: ARN of the Lambda function defined as BlueFunction resource
     Condition: CreateBlueFunction

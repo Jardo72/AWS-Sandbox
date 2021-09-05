@@ -32,3 +32,9 @@ aws cloudformation create-stack --stack-name CFN-Sandbox-Nested-Stacks --templat
 ```
 aws cloudformation create-stack --stack-name CFN-Sandbox-Conditions --template-body file://conditions-template.yml --parameters file://conditions-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
+
+## Intrinsic Functions Demo
+
+```
+aws cloudformation create-stack --stack-name CFN-Sandbox-Intrinsic-Functions --template-body file://intrinsic-functions-demo-template.yml --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
+```
