@@ -52,7 +52,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.0.0/24
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 2, 8 ]]
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -61,7 +61,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 2, 8 ]]
       AvailabilityZone: !Select
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
@@ -117,7 +117,7 @@ Resources:
       FunctionName: !Sub "${AWS::StackName}-RedFunction"
       Handler: alb-target.main
       Runtime: python3.8
-      Role: !GetAtt ["FunctionExecutionRole", "Arn"]
+      Role: !GetAtt FunctionExecutionRole.Arn
       Code:
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref FunctionCodeS3KeyParam
@@ -132,7 +132,7 @@ Resources:
       FunctionName: !Sub "${AWS::StackName}-GreenFunction"
       Handler: alb-target.main
       Runtime: python3.8
-      Role: !GetAtt ["FunctionExecutionRole", "Arn"]
+      Role: !GetAtt FunctionExecutionRole.Arn
       Code:
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref FunctionCodeS3KeyParam
@@ -147,7 +147,7 @@ Resources:
       FunctionName: !Sub "${AWS::StackName}-BlueFunction"
       Handler: alb-target.main
       Runtime: python3.8
-      Role: !GetAtt ["FunctionExecutionRole", "Arn"]
+      Role: !GetAtt FunctionExecutionRole.Arn
       Code:
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref FunctionCodeS3KeyParam
@@ -194,7 +194,7 @@ Resources:
   RedLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt ["RedFunction", "Arn"]
+      FunctionName: !GetAtt RedFunction.Arn
       Action: lambda:InvokeFunction
       Principal: elasticloadbalancing.amazonaws.com
 
@@ -204,12 +204,12 @@ Resources:
     Properties:
       TargetType: lambda
       Targets:
-        - Id: !GetAtt ["RedFunction", "Arn"]
+        - Id: !GetAtt RedFunction.Arn
 
   GreenLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt ["GreenFunction", "Arn"]
+      FunctionName: !GetAtt GreenFunction.Arn
       Action: lambda:InvokeFunction
       Principal: elasticloadbalancing.amazonaws.com
 
@@ -219,12 +219,12 @@ Resources:
     Properties:
       TargetType: lambda
       Targets:
-        - Id: !GetAtt ["GreenFunction", "Arn"]
+        - Id: !GetAtt GreenFunction.Arn
 
   BlueLambdaPermission:
     Type: AWS::Lambda::Permission
     Properties:
-      FunctionName: !GetAtt ["BlueFunction", "Arn"]
+      FunctionName: !GetAtt BlueFunction.Arn
       Action: lambda:InvokeFunction
       Principal: elasticloadbalancing.amazonaws.com
 
@@ -234,7 +234,7 @@ Resources:
     Properties:
       TargetType: lambda
       Targets:
-        - Id: !GetAtt ["BlueFunction", "Arn"]
+        - Id: !GetAtt BlueFunction.Arn
 
   RedPathListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
@@ -280,4 +280,4 @@ Resources:
 
 Outputs:
   DNSName:
-    Value: !GetAtt ["LoadBalancer", "DNSName"]
+    Value: !GetAtt LoadBalancer.DNSName
