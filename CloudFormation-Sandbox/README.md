@@ -51,7 +51,6 @@ Creates a stack with a dummy IAM policy and several output values produced by va
 
 Source code:
 - [intrinsic-functions-demo-template.yml](./intrinsic-functions-demo-template.yml)
-- [conditions-params.json](./conditions-params.json)
 
 Deployment via AWS CLI:
 ```
