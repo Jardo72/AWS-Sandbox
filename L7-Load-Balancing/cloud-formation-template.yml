@@ -18,7 +18,7 @@
 #
 
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
+Description: |
   CloudFormation deployment of the L7 load balancing demo application, with complete stack whose primary
   components are an application load balancer and an auto scaling group with EC2 instances running the L7
   load balancing server application. The auto scaling group scales the number of EC2 instances depending
@@ -118,7 +118,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.0.0/24
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
@@ -128,7 +128,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.1.0/24
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 1
@@ -138,7 +138,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: 10.0.2.0/24
+      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 2
