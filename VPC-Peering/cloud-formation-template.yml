@@ -28,20 +28,10 @@ Parameters:
     Type: String
     Default: 10.0.0.0/16
 
-  PublicSubnetVPCOneCIDRParam:
-    Description: CIDR block for the one and only subnet in the first of the two VPCs
-    Type: String
-    Default: 10.0.0.0/24
-
   VPCTwoCIDRParam:
     Description: CIDR block for the second of the two VPCs
     Type: String
     Default: 10.1.0.0/16
-
-  PublicSubnetVPCTwoCIDRParam:
-    Description: CIDR block for the one and only subnet in the second of the two VPCs
-    Type: String
-    Default: 10.1.0.0/24
 
 Mappings:
   AMIMapping:
@@ -58,7 +48,7 @@ Resources:
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      CidrBlock: 10.0.0.0/16
+      CidrBlock: !Ref VPCOneCIDRParam
 
   InternetGatewayOne:
     Type: AWS::EC2::InternetGateway
@@ -73,7 +63,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPCOne
-      CidrBlock: !Ref PublicSubnetVPCOneCIDRParam
+      CidrBlock: !Select [0, !Cidr [!Ref VPCOneCIDRParam, 1, 8 ]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
@@ -138,7 +128,7 @@ Resources:
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      CidrBlock: 10.1.0.0/16
+      CidrBlock: !Ref VPCTwoCIDRParam
 
   InternetGatewayTwo:
     Type: AWS::EC2::InternetGateway
@@ -153,7 +143,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPCTwo
-      CidrBlock: !Ref PublicSubnetVPCTwoCIDRParam
+      CidrBlock: !Select [0, !Cidr [!Ref VPCTwoCIDRParam, 1, 8 ]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
