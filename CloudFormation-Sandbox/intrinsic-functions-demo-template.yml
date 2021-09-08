@@ -47,3 +47,9 @@ Outputs:
   CidrOutcome:
     Description: Outcome of !Cidr ["10.0.0.0/16", 3, 8 ]
     Value: !Join ["; ", !Cidr ["10.0.0.0/16", 3, 8 ]]
+
+  AZsOutcome:
+    Description: Outcome of Fn::GetAZs !Ref 'AWS::Region'
+    Value: !Join
+      - ";"
+      - Fn::GetAZs: !Ref 'AWS::Region'
