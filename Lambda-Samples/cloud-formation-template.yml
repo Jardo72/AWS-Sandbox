@@ -145,7 +145,7 @@ Resources:
       FunctionName: DumpInvocation
       Handler: dump-invocation.main
       Runtime: python3.8
-      Role: !GetAtt ["InvocationDumpRole", "Arn"]
+      Role: !GetAtt InvocationDumpRole.Arn
       Code:
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref InvocationDumpFunctionS3KeyParam
@@ -191,7 +191,7 @@ Resources:
       FunctionName: ReadSSMParameter
       Handler: read-ssm-parameter.main
       Runtime: python3.8
-      Role: !GetAtt ["SSMParameterReadRole", "Arn"]
+      Role: !GetAtt SSMParameterReadRole.Arn
       Code: 
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref ReadSSMParameterFunctionS3KeyParam
@@ -231,7 +231,7 @@ Resources:
       FunctionName: ReadSecret
       Handler: read-secret-string.main
       Runtime: python3.8
-      Role: !GetAtt ["SecretsReaderRole", "Arn"]
+      Role: !GetAtt SecretsReaderRole.Arn
       Code: 
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref ReadSecretFunctionS3KeyParam
@@ -259,7 +259,7 @@ Resources:
       FunctionName: ReceiveMessages
       Handler: sqs-recipient.main
       Runtime: python3.8
-      Role: !GetAtt ["SQSRecipientRole", "Arn"]
+      Role: !GetAtt SQSRecipientRole.Arn
       Code: 
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref SQSRecipientFunctionS3KeyParam
@@ -268,8 +268,8 @@ Resources:
     Type: AWS::Lambda::EventSourceMapping
     Properties:
       Enabled: True
-      EventSourceArn: !GetAtt ["TriggerSQSQueue", "Arn"]
-      FunctionName: !GetAtt ["SQSRecipientFunction", "Arn"]
+      EventSourceArn: !GetAtt TriggerSQSQueue.Arn
+      FunctionName: !GetAtt SQSRecipientFunction.Arn
 
   # SQS full access is more than needed, but this is the most convenient way to make this work
   SuccessFailureDestinationsDemoRole:
@@ -295,7 +295,7 @@ Resources:
       FunctionName: SuccessFailureDestinationsDemo
       Handler: success-failure-destinations-demo.main
       Runtime: python3.8
-      Role: !GetAtt ["SuccessFailureDestinationsDemoRole", "Arn"]
+      Role: !GetAtt SuccessFailureDestinationsDemoRole.Arn
       Code: 
         S3Bucket: !Ref FunctionCodeS3BucketParam
         S3Key: !Ref SuccessFailureDestinationsDemoS3KeyParam
@@ -305,9 +305,8 @@ Resources:
     Properties:
       DestinationConfig:
         OnSuccess:
-          Destination: !GetAtt ["OnSuccessDestinationSQSQueue", "Arn"]
+          Destination: !GetAtt OnSuccessDestinationSQSQueue.Arn
         OnFailure:
-          Destination: !GetAtt ["OnFailureDestinationSQSQueue", "Arn"]
+          Destination: !GetAtt OnFailureDestinationSQSQueue.Arn
       FunctionName: !Ref SuccessFailureDestinationsDemoFunction
       Qualifier: $LATEST
-
