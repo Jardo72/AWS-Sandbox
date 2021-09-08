@@ -4,15 +4,7 @@
         "ParameterValue": "10.0.0.0/16"
     },
     {
-        "ParameterKey": "PublicSubnetVPCOneCIDRParam",
-        "ParameterValue": "10.0.0.0/24"
-    },
-    {
         "ParameterKey": "VPCTwoCIDRParam",
         "ParameterValue": "10.1.0.0/16"
-    },
-    {
-        "ParameterKey": "PublicSubnetVPCTwoCIDRParam",
-        "ParameterValue": "10.1.0.0/24"
     }
 ]

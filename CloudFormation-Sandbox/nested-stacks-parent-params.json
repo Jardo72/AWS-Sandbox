@@ -1,0 +1,6 @@
+[
+    {
+        "ParameterKey": "NestedStacksTemplateURLParam",
+        "ParameterValue": "https://jardo72-ec2-installation-repo.s3.eu-central-1.amazonaws.com/CLOUDFORMATION-SANDBOX/nested-stack-template.yml"
+    }
+]
