@@ -17,4 +17,12 @@ python application.py
 ```
 
 
-## Beanstalk Deployment
+## ECS Deployment - Fargate Launch Type
+
+```
+```
+
+## ECS Deployment - EC2 Type
+
+```
+```
