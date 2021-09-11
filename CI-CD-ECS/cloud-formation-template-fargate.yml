@@ -139,6 +139,45 @@ Resources:
               Service: ecs-tasks.amazonaws.com
             Action: 'sts:AssumeRole'
 
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "${AWS::StackName}-LogGroup"
+      RetentionInDays: 1
+
+  ECSTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: Application
+          Essential: true
+          Image: !Ref DockerImageParam
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-stream-prefix: Application
+              awslogs-region: !Ref AWS::Region
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: !Ref ContainerInstancePortParam
+              Protocol: TCP
+      Cpu: 256
+      ExecutionRoleArn: !Ref ContainerInstanceRole
+      Memory: 0.5GB
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      TaskRoleArn: !Ref TaskRole
+
+  # ECSService:
+  #   Type: AWS::ECS::Service
+  #   Properties:
+  #     Cluster: !Ref ECSCluster
+  #     ServiceName: !Sub "${AWS::StackName}-ECS-Service"
+  #     LaunchType: FARGATE
+  #     TaskDefinition: !Ref ECSTaskDefinition
+
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -167,7 +206,11 @@ Resources:
 Outputs:
   LoadBalancerDNSName:
     Description: DNS name of the created application load balancer
-    Value: TODO
-    # Value: !GetAtt LoadBalancer.DNSName
+    Value: !GetAtt LoadBalancer.DNSName
 
-# see https://github.com/1Strategy/fargate-cloudformation-example/blob/master/fargate.yaml
+# see also
+# - https://github.com/1Strategy/fargate-cloudformation-example/blob/master/fargate.yaml
+# - https://github.com/thomasstep/aws-cloudformation-reference/blob/98d23f0b5eef9db731e98b3c38cc8957c60ad8e3/fargate/hello-world/hello-world-fargate.yml
+# - https://thomasstep.com/blog/cloudformation-example-for-simple-fargate-app
+
+
