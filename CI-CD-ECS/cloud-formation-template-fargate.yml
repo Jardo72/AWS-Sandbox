@@ -170,6 +170,7 @@ Resources:
         - FARGATE
       TaskRoleArn: !Ref TaskRole
 
+  # TODO
   # ECSService:
   #   Type: AWS::ECS::Service
   #   Properties:
@@ -192,16 +193,36 @@ Resources:
         - !Ref PublicSubnetThree
       Type: application
 
-  # TODO
-  # LoadBalancerListener:
-  #   Type: AWS::ElasticLoadBalancingV2::Listener
-  #   Properties:
-  #     Protocol: HTTP
-  #     Port: !Ref ELBPortParam
-  #     LoadBalancerArn: !Ref LoadBalancer
-  #     DefaultActions:
-  #       - Type: forward
-  #         TargetGroupArn: !Ref TODO
+  LoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${AWS::StackName}-ALBTargetGroup"
+      VpcId: !Ref VPC
+      Protocol: HTTP
+      Port: !Ref ContainerInstancePortParam
+      HealthCheckIntervalSeconds: 20
+      HealthCheckTimeoutSeconds: 10
+      HealthyThresholdCount: 3
+      UnhealthyThresholdCount: 3
+      HealthCheckProtocol: HTTP
+      HealthCheckPath: /version
+      Matcher:
+        HttpCode: 200
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 15
+        - Key: load_balancing.algorithm.type
+          Value: round_robin
+
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Protocol: HTTP
+      Port: !Ref ContainerInstancePortParam
+      LoadBalancerArn: !Ref LoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref LoadBalancerTargetGroup
 
 Outputs:
   LoadBalancerDNSName:
@@ -212,5 +233,3 @@ Outputs:
 # - https://github.com/1Strategy/fargate-cloudformation-example/blob/master/fargate.yaml
 # - https://github.com/thomasstep/aws-cloudformation-reference/blob/98d23f0b5eef9db731e98b3c38cc8957c60ad8e3/fargate/hello-world/hello-world-fargate.yml
 # - https://thomasstep.com/blog/cloudformation-example-for-simple-fargate-app
-
-
