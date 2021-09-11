@@ -22,6 +22,19 @@ Description: |
   TODO
 
 Parameters:
+  DockerImageParam:
+    Description: Docker image to be used to start the ECS service
+    Type: String
+
+  ELBPortParam:
+    Description: TCP port the load balancer will use to accept incoming connections
+    Type: Number
+    Default: 80
+
+  ContainerInstancePortParam:
+    Description: TCP port the container instances will use to accept incoming connections
+    Type: Number
+    Default: 80
 
 Resources:
   VPC:
@@ -30,6 +43,15 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: 10.0.0.0/16
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
 
   PublicSubnetOne:
     Type: AWS::EC2::Subnet
@@ -66,7 +88,86 @@ Resources:
     Properties:
       ClusterName: !Sub "${AWS::StackName}-ECS-Cluster"
 
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on ELB port from anywhere
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: TCP
+          FromPort: !Ref ELBPortParam
+          ToPort: !Ref ELBPortParam
+          CidrIp: 0.0.0.0/0
+
+  ContainerInstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on cluster instance port from the load balancer
+      VpcId: !Ref VPC
+
+  ContainerInstanceSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ContainerInstanceSecurityGroup
+      IpProtocol: TCP
+      FromPort: !Ref ContainerInstancePortParam
+      ToPort: !Ref ContainerInstancePortParam
+      SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+
+  ContainerInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-ContainerInstanceRole"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        # TODO: check if this makes sense - sounds like a task role rather than instance role
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-TaskRole"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: !Sub "${AWS::StackName}-LoadBalancer"
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+      Subnets:
+        - !Ref PublicSubnetOne
+        - !Ref PublicSubnetTwo
+        - !Ref PublicSubnetThree
+      Type: application
+
+  # TODO
+  # LoadBalancerListener:
+  #   Type: AWS::ElasticLoadBalancingV2::Listener
+  #   Properties:
+  #     Protocol: HTTP
+  #     Port: !Ref ELBPortParam
+  #     LoadBalancerArn: !Ref LoadBalancer
+  #     DefaultActions:
+  #       - Type: forward
+  #         TargetGroupArn: !Ref TODO
 
 Outputs:
+  LoadBalancerDNSName:
+    Description: DNS name of the created application load balancer
+    Value: TODO
+    # Value: !GetAtt LoadBalancer.DNSName
 
 # see https://github.com/1Strategy/fargate-cloudformation-example/blob/master/fargate.yaml

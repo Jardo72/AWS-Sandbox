@@ -20,6 +20,8 @@ python application.py
 ## ECS Deployment - Fargate Launch Type
 
 ```
+aws cloudformation create-stack --stack-name ECS-Fargate-Demo --template-body file://cloud-formation-template-fargate.yml --parameters file://stack-params-fargate.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
+
 ```
 
 ## ECS Deployment - EC2 Type

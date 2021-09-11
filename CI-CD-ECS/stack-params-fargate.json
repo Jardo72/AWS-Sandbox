@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "DockerImageParam",
+        "ParameterValue": "467504711004.dkr.ecr.eu-central-1.amazonaws.com/ci-cd-ecs:latest"
+    },
+    {
+        "ParameterKey": "ELBPortParam",
+        "ParameterValue": "80"
+    },
+    {
+        "ParameterKey": "ContainerInstancePortParam",
+        "ParameterValue": "80"
+    }
+]
