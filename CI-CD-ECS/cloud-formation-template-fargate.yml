@@ -19,7 +19,7 @@
 
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
-  TODO
+  ECS Fargate service with application load balancer and autoscaling.
 
 Parameters:
   DockerImageParam:
@@ -170,14 +170,32 @@ Resources:
         - FARGATE
       TaskRoleArn: !Ref TaskRole
 
-  # TODO
-  # ECSService:
-  #   Type: AWS::ECS::Service
-  #   Properties:
-  #     Cluster: !Ref ECSCluster
-  #     ServiceName: !Sub "${AWS::StackName}-ECS-Service"
-  #     LaunchType: FARGATE
-  #     TaskDefinition: !Ref ECSTaskDefinition
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - LoadBalancerListener
+    Properties:
+      Cluster: !Ref ECSCluster
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 2
+      HealthCheckGracePeriodSeconds: 60
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: Application
+          # TODO: container port or host port?
+          ContainerPort: 80
+          TargetGroupArn: !Ref LoadBalancerTargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          SecurityGroups:
+            - !Ref ContainerInstanceSecurityGroup
+          Subnets:
+            - !Ref PublicSubnetOne
+            - !Ref PublicSubnetTwo
+      ServiceName: !Sub "${AWS::StackName}-ECS-Service"
+      TaskDefinition: !Ref ECSTaskDefinition
 
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -213,6 +231,7 @@ Resources:
           Value: 15
         - Key: load_balancing.algorithm.type
           Value: round_robin
+      TargetType: ip
 
   LoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener

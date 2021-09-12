@@ -24,11 +24,13 @@ from socket import getfqdn
 from sys import version
 
 
+start_time = datetime.utcnow()
 application = Flask(__name__)
 
 
 @application.route('/version')
 def get_version():
+    print('Request received: /version')
     return {
         'application': 'V1',
         'python': version
@@ -37,18 +39,23 @@ def get_version():
 
 @application.route('/hostname')
 def get_hostname():
+    print('Request received: /hostname')
     return getfqdn()
 
 
 @application.route('/start-time')
 def get_start_time():
-    return date.strftime(datetime.utcnow(), 'Start time = %d-%b-%Y %H:%M:%S UTC')
+    print('Request received: /start-time')
+    return date.strftime(start_time, 'Start time = %d-%b-%Y %H:%M:%S UTC')
 
 
 @application.route('/environment-variables')
 def get_environment_variables():
+    print('Request received: /environment-variables')
     return {name: value for name, value in environ.items()}
 
 
 if __name__ == "__main__":
+    start_time_str = date.strftime(start_time, '%d-%b-%Y %H:%M:%S UTC')
+    print(f'Starting the application, start time = {start_time_str}')
     application.run(host='0.0.0.0', port=80, debug=True)
