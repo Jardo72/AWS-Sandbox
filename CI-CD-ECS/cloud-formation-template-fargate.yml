@@ -83,6 +83,36 @@ Resources:
         - 2
         - Fn::GetAZs: !Ref 'AWS::Region'
 
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref PublicSubnetOne
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref PublicSubnetTwo
+
+  PublicSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref PublicSubnetThree
+
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
@@ -188,7 +218,8 @@ Resources:
           TargetGroupArn: !Ref LoadBalancerTargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: DISABLED
+          # TODO: may be DISABLED?
+          AssignPublicIp: ENABLED
           SecurityGroups:
             - !Ref ContainerInstanceSecurityGroup
           Subnets:
@@ -214,23 +245,25 @@ Resources:
   LoadBalancerTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub "${AWS::StackName}-ALBTargetGroup"
+      Name: !Sub "${AWS::StackName}-TargetGroup"
       VpcId: !Ref VPC
       Protocol: HTTP
       Port: !Ref ContainerInstancePortParam
+      HealthCheckEnabled: true
       HealthCheckIntervalSeconds: 20
       HealthCheckTimeoutSeconds: 10
       HealthyThresholdCount: 3
       UnhealthyThresholdCount: 3
       HealthCheckProtocol: HTTP
+      HealthCheckPort: !Ref ContainerInstancePortParam
       HealthCheckPath: /version
       Matcher:
         HttpCode: 200
-      TargetGroupAttributes:
-        - Key: deregistration_delay.timeout_seconds
-          Value: 15
-        - Key: load_balancing.algorithm.type
-          Value: round_robin
+      # TargetGroupAttributes:
+      #   - Key: deregistration_delay.timeout_seconds
+      #     Value: 15
+      #   - Key: load_balancing.algorithm.type
+      #     Value: round_robin
       TargetType: ip
 
   LoadBalancerListener:
