@@ -55,6 +55,21 @@ def get_environment_variables():
     return {name: value for name, value in environ.items()}
 
 
+@application.route('/consume-cpu')
+def get_cpu_consumption():
+    print('Request received: /consume-cpu')
+    start_time = perf_counter()
+    result = 1000000
+    for i in range(1000000, 1000000000000):
+        result *= i
+        if i % 1000 == 0:
+            sleep(0.01)
+            execution_time = perf_counter() - start_time
+            if execution_time >= 1:
+                print(f'CPU consumed for {execution_time} sec')
+                return
+
+
 if __name__ == "__main__":
     start_time_str = date.strftime(start_time, '%d-%b-%Y %H:%M:%S UTC')
     print(f'Starting the application, start time = {start_time_str}')

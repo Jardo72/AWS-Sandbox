@@ -9,6 +9,7 @@ API endpoints
 - `GET /hostname`
 - `GET /start-time`
 - `GET /environment-variables`
+- `GET /consume-cpu`
 
 ## How to Start the Application
 
