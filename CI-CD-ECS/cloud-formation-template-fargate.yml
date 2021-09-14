@@ -225,6 +225,7 @@ Resources:
           Subnets:
             - !Ref PublicSubnetOne
             - !Ref PublicSubnetTwo
+            - !Ref PublicSubnetThree
       ServiceName: !Sub "${AWS::StackName}-ECS-Service"
       TaskDefinition: !Ref ECSTaskDefinition
 
@@ -259,11 +260,11 @@ Resources:
       HealthCheckPath: /version
       Matcher:
         HttpCode: 200
-      # TargetGroupAttributes:
-      #   - Key: deregistration_delay.timeout_seconds
-      #     Value: 15
-      #   - Key: load_balancing.algorithm.type
-      #     Value: round_robin
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 15
+        - Key: load_balancing.algorithm.type
+          Value: round_robin
       TargetType: ip
 
   LoadBalancerListener:
