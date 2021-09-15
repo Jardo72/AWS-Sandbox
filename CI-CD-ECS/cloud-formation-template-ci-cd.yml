@@ -42,16 +42,15 @@ Resources:
           - Sid: AllowPushPull
             Effect: Allow
             Principal:
-              AWS:
-                - !Join ["", ["arn:aws:iam:::", !Ref "AWS::AccountId", ":user/", !Ref "IAMUsernameParam"]] 
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:user/${IAMUsernameParam}"
             Action:
-              - "ecr:GetDownloadUrlForLayer"
               - "ecr:BatchGetImage"
               - "ecr:BatchCheckLayerAvailability"
-              - "ecr:PutImage"
-              - "ecr:InitiateLayerUpload"
-              - "ecr:UploadLayerPart"
               - "ecr:CompleteLayerUpload"
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:PutImage"
+              - "ecr:UploadLayerPart"
 
   # TODO
   # CodeBuildProject:
@@ -60,9 +59,9 @@ Resources:
   #     Name: 
 
 Outputs:
-  RepositoryName:
-    Description: The name of the created ECR repository
-    Value: !GetAtt ECRRepository.RepositoryName
+  RepositoryUri:
+    Description: The URI of the created ECR repository
+    Value: !GetAtt ECRRepository.RepositoryUri
 
 # see
 # - https://stelligent.com/2016/05/26/automating-ecs-provisioning-in-cloudformation-part-1/
