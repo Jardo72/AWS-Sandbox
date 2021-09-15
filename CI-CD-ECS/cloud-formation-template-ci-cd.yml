@@ -22,6 +22,11 @@ Description: |
   TODO
 
 Parameters:
+  CodeCommitRepositoryParam:
+    Description: The name of the CodeCommit repository to be created
+    Type: String
+    Default: ci-cd-ecs-demo
+  
   ECRRepositoryNameParam:
     Description: The name of the ECR repository to be created
     Type: String
@@ -32,6 +37,12 @@ Parameters:
     Type: String
 
 Resources:
+  CodeCommitRepository:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: !Ref CodeCommitRepositoryParam
+      RepositoryDescription: TODO
+
   ECRRepository:
     Type: AWS::ECR::Repository
     Properties:
@@ -56,7 +67,7 @@ Resources:
   # CodeBuildProject:
   #   Type: AWS::CodeBuild::Project
   #   Properties:
-  #     Name: 
+  #     Name:
 
 Outputs:
   RepositoryUri:
