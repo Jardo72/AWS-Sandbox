@@ -1,5 +1,13 @@
 [
     {
+        "ParameterKey": "BucketOneNameParam",
+        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-two"
+    },
+    {
+        "ParameterKey": "BucketTwoNameParam",
+        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-one"
+    },
+    {
         "ParameterKey": "VPCOneCIDRParam",
         "ParameterValue": "10.0.0.0/16"
     },
