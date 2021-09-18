@@ -19,28 +19,28 @@
 
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
-  TODO
+  Demonstration of gateway VPC endpoints (S3) and IAM policies with conditions.
 
 Parameters:
-  BucketOneNameParam:
-    Description: The name of the first S3 bucket
+  UnrestrictedBucketNameParam:
+    Description: The name of the S3 bucket without any bucket policy
     Type: String
 
-  BucketTwoNameParam:
-    Description: The name of the second S3 bucket
+  VPCRestrictedBucketNameParam:
+    Description: The name of the S3 bucket with bucket policy allowing only access from the green VPC
     Type: String
 
-  BucketThreeNameParam:
-    Description: The name of the third S3 bucket
+  VPCEndpointRestrictedBucketNameParam:
+    Description: The name of the S3 bucket with bucket policy allowing only access via the the green VPC endpoint
     Type: String
 
-  VPCOneCIDRParam:
-    Description: CIDR block for the first of the two VPCs
+  RedVPCCIDRParam:
+    Description: CIDR block for the first of the two VPCs labeled as red as EC2 instances running in it will have no access to the restricted buckets
     Type: String
     Default: 10.0.0.0/16
 
-  VPCTwoCIDRParam:
-    Description: CIDR block for the second of the two VPCs
+  GreenVPCCIDRParam:
+    Description: CIDR block for the second of the two VPCs (labeled as green)
     Type: String
     Default: 10.1.0.0/16
 
@@ -50,231 +50,229 @@ Parameters:
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
 
 Resources:
-  BucketOne:
+  UnrestrictedBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref BucketOneNameParam
+      BucketName: !Ref UnrestrictedBucketNameParam
       AccessControl: Private
 
-  BucketOnePolicy:
+  VPCRestrictedBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref VPCRestrictedBucketNameParam
+      AccessControl: Private
+
+  VPCRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref BucketOneNameParam
+      Bucket: !Ref VPCRestrictedBucketNameParam
       PolicyDocument:
         Version: 2012-10-17
         Statement:
           - Action:
               - "s3:GetObject"
             Effect: Deny
-            Resource: !Sub "arn:aws:s3:::${BucketOneNameParam}/*"
+            Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}/*"
             Principal: "*"
             Condition:
               StringNotEquals:
-                aws:sourceVpc: !Ref VPCOne
+                aws:sourceVpc: !Ref GreenVPC
           - Action:
               - "s3:ListBucket"
             Effect: Deny
-            Resource: !Sub "arn:aws:s3:::${BucketOneNameParam}"
+            Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}"
             Principal: "*"
             Condition:
               StringNotEquals:
-                aws:sourceVpc: !Ref VPCOne
+                aws:sourceVpc: !Ref GreenVPC
 
-  BucketTwo:
+  VPCEndpointRestrictedBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref BucketTwoNameParam
+      BucketName: !Ref VPCEndpointRestrictedBucketNameParam
       AccessControl: Private
 
-  BucketTwoPolicy:
+  VPCEndpointRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref BucketTwoNameParam
+      Bucket: !Ref VPCEndpointRestrictedBucketNameParam
       PolicyDocument:
         Version: 2012-10-17
         Statement:
           - Action:
               - "s3:GetObject"
             Effect: Deny
-            Resource: !Sub "arn:aws:s3:::${BucketTwoNameParam}/*"
+            Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}/*"
             Principal: "*"
             Condition:
               StringNotEquals:
-                aws:sourceVpce: !Ref VPCEndpointTwo
+                aws:sourceVpce: !Ref GreenVPCEndpoint
           - Action:
               - "s3:ListBucket"
             Effect: Deny
-            Resource: !Sub "arn:aws:s3:::${BucketTwoNameParam}"
+            Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}"
             Principal: "*"
             Condition:
               StringNotEquals:
-                aws:sourceVpce: !Ref VPCEndpointTwo
+                aws:sourceVpce: !Ref GreenVPCEndpoint
 
-  BucketThree:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref BucketThreeNameParam
-      AccessControl: Private
-
-  VPCOne:
+  RedVPC:
     Type: AWS::EC2::VPC
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      CidrBlock: !Ref VPCOneCIDRParam
+      CidrBlock: !Ref RedVPCCIDRParam
 
-  InternetGatewayOne:
+  RedInternetGateway:
     Type: AWS::EC2::InternetGateway
 
-  VPCGatewayAttachmentOne:
+  RedVPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref VPCOne
-      InternetGatewayId: !Ref InternetGatewayOne
+      VpcId: !Ref RedVPC
+      InternetGatewayId: !Ref RedInternetGateway
 
-  PublicSubnetVPCOne:
+  RedSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPCOne
-      CidrBlock: !Select [0, !Cidr [!Ref VPCOneCIDRParam, 1, 8 ]]
+      VpcId: !Ref RedVPC
+      CidrBlock: !Select [0, !Cidr [!Ref RedVPCCIDRParam, 1, 8 ]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
 
-  RouteTableOne:
+  RedRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPCOne
+      VpcId: !Ref RedVPC
 
-  InternetGatewayRouteOne:
+  RedInternetGatewayRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref RouteTableOne
+      RouteTableId: !Ref RedRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGatewayOne
+      GatewayId: !Ref RedInternetGateway
 
-  SubnetRouteTableAssociationOne:
+  RedSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref RouteTableOne
-      SubnetId: !Ref PublicSubnetVPCOne
+      RouteTableId: !Ref RedRouteTable
+      SubnetId: !Ref RedSubnet
 
-  SecurityGroupOne:
+  RedSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
-      VpcId: !Ref VPCOne
+      GroupDescription: Allow inbound SSH traffic
+      VpcId: !Ref RedVPC
+      SecurityGroupIngress:
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
 
-  SecurityGroupOneSSHIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref SecurityGroupOne
-      IpProtocol: tcp
-      FromPort: 22
-      ToPort: 22
-      CidrIp: 0.0.0.0/0
-
-  VPCEndpointOne:
+  RedVPCEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       RouteTableIds:
-        - !Ref RouteTableOne
+        - !Ref RedRouteTable
       ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
       VpcEndpointType: Gateway
-      VpcId: !Ref VPCOne
+      VpcId: !Ref RedVPC
 
-  EC2InstanceOne:
+  RedEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
-      SubnetId: !Ref PublicSubnetVPCOne
+      SubnetId: !Ref RedSubnet
       ImageId: !Ref CurrentVersionAMIIdParam
       InstanceType: t2.nano
       SecurityGroupIds:
-        - !Ref SecurityGroupOne
+        - !Ref RedSecurityGroup
+      Tags:
+        - Key: Name
+          Value: Red
 
-  VPCTwo:
+  GreenVPC:
     Type: AWS::EC2::VPC
     Properties:
       EnableDnsSupport: true
       EnableDnsHostnames: true
-      CidrBlock: !Ref VPCTwoCIDRParam
+      CidrBlock: !Ref GreenVPCCIDRParam
 
-  InternetGatewayTwo:
+  GreenInternetGateway:
     Type: AWS::EC2::InternetGateway
 
-  VPCGatewayAttachmentTwo:
+  GreenVPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref VPCTwo
-      InternetGatewayId: !Ref InternetGatewayTwo
+      VpcId: !Ref GreenVPC
+      InternetGatewayId: !Ref GreenInternetGateway
 
-  PublicSubnetVPCTwo:
+  GreenSubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref VPCTwo
-      CidrBlock: !Select [0, !Cidr [!Ref VPCTwoCIDRParam, 1, 8 ]]
+      VpcId: !Ref GreenVPC
+      CidrBlock: !Select [0, !Cidr [!Ref GreenVPCCIDRParam, 1, 8 ]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
 
-  RouteTableTwo:
+  GreenRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref VPCTwo
+      VpcId: !Ref GreenVPC
 
-  InternetGatewayRouteTwo:
+  GreenInternetGatewayRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref RouteTableTwo
+      RouteTableId: !Ref GreenRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGatewayTwo
+      GatewayId: !Ref GreenInternetGateway
 
-  SubnetRouteTableAssociationTwo:
+  GreenSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref RouteTableTwo
-      SubnetId: !Ref PublicSubnetVPCTwo
+      RouteTableId: !Ref GreenRouteTable
+      SubnetId: !Ref GreenSubnet
 
-  SecurityGroupTwo:
+  GreenSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
-      VpcId: !Ref VPCTwo
+      GroupDescription: Allow inbound SSH traffic
+      VpcId: !Ref GreenVPC
+      SecurityGroupIngress:
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
 
-  SecurityGroupTwoSSHIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref SecurityGroupTwo
-      IpProtocol: tcp
-      FromPort: 22
-      ToPort: 22
-      CidrIp: 0.0.0.0/0
-
-  VPCEndpointTwo:
+  GreenVPCEndpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
       RouteTableIds:
-        - !Ref RouteTableTwo
+        - !Ref GreenRouteTable
       ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
       VpcEndpointType: Gateway
-      VpcId: !Ref VPCTwo
+      VpcId: !Ref GreenVPC
 
-  EC2InstanceTwo:
+  GreenEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
-      SubnetId: !Ref PublicSubnetVPCTwo
+      SubnetId: !Ref GreenSubnet
       ImageId: !Ref CurrentVersionAMIIdParam
       InstanceType: t2.nano
       SecurityGroupIds:
-        - !Ref SecurityGroupTwo
+        - !Ref GreenSecurityGroup
+      Tags:
+        - Key: Name
+          Value: Green
 
 # see
 # - https://www.1strategy.com/blog/2020/06/23/getting-crafty-with-iam-conditions/

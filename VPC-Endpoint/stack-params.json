@@ -1,22 +1,22 @@
 [
     {
-        "ParameterKey": "BucketOneNameParam",
-        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-one"
+        "ParameterKey": "UnrestrictedBucketNameParam",
+        "ParameterValue": "jardo72-vpc-endpoint-demo-unrestricted-bucket"
     },
     {
-        "ParameterKey": "BucketTwoNameParam",
-        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-two"
+        "ParameterKey": "VPCRestrictedBucketNameParam",
+        "ParameterValue": "jardo72-vpc-endpoint-demo-vpc-restricted-bucket"
     },
     {
-        "ParameterKey": "BucketThreeNameParam",
-        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-three"
+        "ParameterKey": "VPCEndpointRestrictedBucketNameParam",
+        "ParameterValue": "jardo72-vpc-endpoint-demo-vpc-endpoint-restricted-bucket"
     },
     {
-        "ParameterKey": "VPCOneCIDRParam",
+        "ParameterKey": "RedVPCCIDRParam",
         "ParameterValue": "10.0.0.0/16"
     },
     {
-        "ParameterKey": "VPCTwoCIDRParam",
+        "ParameterKey": "GreenVPCCIDRParam",
         "ParameterValue": "10.1.0.0/16"
     }
 ]
