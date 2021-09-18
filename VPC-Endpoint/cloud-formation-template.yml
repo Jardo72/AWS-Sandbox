@@ -71,12 +71,44 @@ Resources:
             Condition:
               StringNotEquals:
                 aws:sourceVpc: !Ref VPCOne
+          - Action:
+              - "s3:ListBucket"
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${BucketOneNameParam}"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                aws:sourceVpc: !Ref VPCOne
 
   BucketTwo:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref BucketTwoNameParam
       AccessControl: Private
+
+  BucketTwoPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketTwoNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${BucketTwoNameParam}/*"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                aws:sourceVpce: !Ref VPCEndpointTwo
+          - Action:
+              - "s3:ListBucket"
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${BucketTwoNameParam}"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                aws:sourceVpce: !Ref VPCEndpointTwo
 
   BucketThree:
     Type: AWS::S3::Bucket
