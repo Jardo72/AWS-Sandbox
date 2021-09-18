@@ -1,11 +1,15 @@
 [
     {
         "ParameterKey": "BucketOneNameParam",
-        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-two"
+        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-one"
     },
     {
         "ParameterKey": "BucketTwoNameParam",
-        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-one"
+        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-two"
+    },
+    {
+        "ParameterKey": "BucketThreeNameParam",
+        "ParameterValue": "jardo72-vpc-endpoint-demo-bucket-three"
     },
     {
         "ParameterKey": "VPCOneCIDRParam",

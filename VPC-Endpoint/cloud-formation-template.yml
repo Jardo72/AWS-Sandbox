@@ -30,6 +30,10 @@ Parameters:
     Description: The name of the second S3 bucket
     Type: String
 
+  BucketThreeNameParam:
+    Description: The name of the third S3 bucket
+    Type: String
+
   VPCOneCIDRParam:
     Description: CIDR block for the first of the two VPCs
     Type: String
@@ -52,10 +56,32 @@ Resources:
       BucketName: !Ref BucketOneNameParam
       AccessControl: Private
 
+  BucketOnePolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketOneNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${BucketOneNameParam}/*"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                aws:sourceVpc: !Ref VPCOne
+
   BucketTwo:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref BucketTwoNameParam
+      AccessControl: Private
+
+  BucketThree:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketThreeNameParam
       AccessControl: Private
 
   VPCOne:
@@ -217,3 +243,6 @@ Resources:
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref SecurityGroupTwo
+
+# see
+# - https://www.1strategy.com/blog/2020/06/23/getting-crafty-with-iam-conditions/
