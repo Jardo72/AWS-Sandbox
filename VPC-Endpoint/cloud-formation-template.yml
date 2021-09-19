@@ -107,7 +107,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - "s3:GetObject"
-                  - "s3:ListObject"
+                  - "s3:ListBucket"
                 Resource: 'arn:aws:s3:::*'
 
   EC2InstanceProfile:
