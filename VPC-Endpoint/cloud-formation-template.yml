@@ -86,6 +86,36 @@ Resources:
               StringNotEquals:
                 aws:sourceVpc: !Ref GreenVPC
 
+  S3ReaderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-S3ReaderRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:ListObject"
+                Resource: 'arn:aws:s3:::*'
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+      - !Ref S3ReaderRole
+
   VPCEndpointRestrictedBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -187,6 +217,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       SubnetId: !Ref RedSubnet
+      IamInstanceProfile: !Ref EC2InstanceProfile
       ImageId: !Ref CurrentVersionAMIIdParam
       InstanceType: t2.nano
       SecurityGroupIds:
@@ -266,6 +297,7 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       SubnetId: !Ref GreenSubnet
+      IamInstanceProfile: !Ref EC2InstanceProfile
       ImageId: !Ref CurrentVersionAMIIdParam
       InstanceType: t2.nano
       SecurityGroupIds:
