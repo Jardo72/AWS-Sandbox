@@ -55,12 +55,22 @@ Resources:
     Properties:
       BucketName: !Ref UnrestrictedBucketNameParam
       AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   VPCRestrictedBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref VPCRestrictedBucketNameParam
       AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   VPCRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -71,6 +81,8 @@ Resources:
         Statement:
           - Action:
               - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:DeleteObject"
             Effect: Deny
             Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}/*"
             Principal: "*"
@@ -85,6 +97,43 @@ Resources:
             Condition:
               StringNotEquals:
                 aws:sourceVpc: !Ref GreenVPC
+
+  VPCEndpointRestrictedBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref VPCEndpointRestrictedBucketNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  VPCEndpointRestrictedBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref VPCEndpointRestrictedBucketNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+              - "s3:DeleteObject"
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}/*"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                aws:sourceVpce: !Ref GreenVPCEndpoint
+          - Action:
+              - "s3:ListBucket"
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                aws:sourceVpce: !Ref GreenVPCEndpoint
 
   S3ReaderRole:
     Type: AWS::IAM::Role
@@ -106,45 +155,40 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - "s3:GetObject"
                   - "s3:ListBucket"
-                Resource: 'arn:aws:s3:::*'
+                Resource: !Sub "arn:aws:s3:::${UnrestrictedBucketNameParam}"
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:DeleteObject"
+                Resource: !Sub "arn:aws:s3:::${UnrestrictedBucketNameParam}/*"
+              - Effect: Allow
+                Action:
+                  - "s3:ListBucket"
+                Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}"
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:DeleteObject"
+                Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}/*"
+              - Effect: Allow
+                Action:
+                  - "s3:ListBucket"
+                Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}"
+              - Effect: Allow
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:DeleteObject"
+                Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}/*"
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
       - !Ref S3ReaderRole
-
-  VPCEndpointRestrictedBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref VPCEndpointRestrictedBucketNameParam
-      AccessControl: Private
-
-  VPCEndpointRestrictedBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref VPCEndpointRestrictedBucketNameParam
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - "s3:GetObject"
-            Effect: Deny
-            Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}/*"
-            Principal: "*"
-            Condition:
-              StringNotEquals:
-                aws:sourceVpce: !Ref GreenVPCEndpoint
-          - Action:
-              - "s3:ListBucket"
-            Effect: Deny
-            Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}"
-            Principal: "*"
-            Condition:
-              StringNotEquals:
-                aws:sourceVpce: !Ref GreenVPCEndpoint
 
   RedVPC:
     Type: AWS::EC2::VPC
