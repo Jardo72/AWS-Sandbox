@@ -196,6 +196,9 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: !Ref RedVPCCIDRParam
+      Tags:
+        - Key: Name
+          Value: Red
 
   RedInternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -276,6 +279,9 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: !Ref GreenVPCCIDRParam
+      Tags:
+        - Key: Name
+          Value: Green
 
   GreenInternetGateway:
     Type: AWS::EC2::InternetGateway
