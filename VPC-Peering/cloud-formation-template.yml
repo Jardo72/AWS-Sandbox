@@ -49,6 +49,9 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: !Ref VPCOneCIDRParam
+      Tags:
+        - Key: Name
+          Value: VPC-One
 
   InternetGatewayOne:
     Type: AWS::EC2::InternetGateway
@@ -92,24 +95,15 @@ Resources:
     Properties:
       GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
       VpcId: !Ref VPCOne
-
-  SecurityGroupOneSSHIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref SecurityGroupOne
-      IpProtocol: tcp
-      FromPort: 22
-      ToPort: 22
-      CidrIp: 0.0.0.0/0
-
-  SecurityGroupOneICMPIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref SecurityGroupOne
-      IpProtocol: icmp
-      FromPort: -1
-      ToPort: -1
-      CidrIp: !Ref VPCTwoCIDRParam
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VPCTwoCIDRParam
 
   EC2InstanceOne:
     Type: AWS::EC2::Instance
@@ -122,6 +116,9 @@ Resources:
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref SecurityGroupOne
+      Tags:
+        - Key: Name
+          Value: EC2-One
 
   VPCTwo:
     Type: AWS::EC2::VPC
@@ -129,6 +126,9 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: !Ref VPCTwoCIDRParam
+      Tags:
+        - Key: Name
+          Value: VPC-Two
 
   InternetGatewayTwo:
     Type: AWS::EC2::InternetGateway
@@ -172,24 +172,15 @@ Resources:
     Properties:
       GroupDescription: Allow inbound TCP traffic on port EC2 from the load balancer
       VpcId: !Ref VPCTwo
-
-  SecurityGroupTwoSSHIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref SecurityGroupTwo
-      IpProtocol: tcp
-      FromPort: 22
-      ToPort: 22
-      CidrIp: 0.0.0.0/0
-
-  SecurityGroupTwoICMPIngress:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref SecurityGroupTwo
-      IpProtocol: icmp
-      FromPort: -1
-      ToPort: -1
-      CidrIp: !Ref VPCOneCIDRParam
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VPCOneCIDRParam
 
   EC2InstanceTwo:
     Type: AWS::EC2::Instance
@@ -202,6 +193,9 @@ Resources:
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref SecurityGroupTwo
+      Tags:
+        - Key: Name
+          Value: EC2-Two
 
   VPCPeeringConnection:
     Type: AWS::EC2::VPCPeeringConnection
