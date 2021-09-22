@@ -42,6 +42,11 @@ Resources:
     Properties:
       BucketName: !Ref UploadAreaBucketNameParam
       AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
       # when the notification configuration is created, the stack creation is failing; therefore,
       # custom resource in form of Lambda function using the SDK is used to setup the notification
       # NotificationConfiguration:
