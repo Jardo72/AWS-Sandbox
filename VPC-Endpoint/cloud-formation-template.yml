@@ -135,10 +135,10 @@ Resources:
               StringNotEquals:
                 aws:sourceVpce: !Ref GreenVPCEndpoint
 
-  S3ReaderRole:
+  S3AccessRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${AWS::StackName}-S3ReaderRole"
+      RoleName: !Sub "${AWS::StackName}-S3AccessRole"
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -188,7 +188,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-      - !Ref S3ReaderRole
+      - !Ref S3AccessRole
 
   RedVPC:
     Type: AWS::EC2::VPC

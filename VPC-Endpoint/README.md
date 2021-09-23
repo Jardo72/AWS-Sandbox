@@ -20,3 +20,10 @@ The following command can be used to deploy the setup using the AWS CLI.
 ```
 aws cloudformation create-stack --stack-name VPC-Endpoint-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
+
+The CloudFormation template involves several parameters:
+* The names for the three S3 buckets.
+* The CIDR blocks for the two VPCs. These two parameters have default values.
+* The AMI ID for the EC2 instances. This parameter has a default which ensures that the current AMI ID is taken from the SSM parameter store.
+
+There are no defaults for the names of the S3 buckets, so these three parameters must be specified. The [stack-params.json](./stack-params.json) file contains the names for the three S3 buckets used during my experiments.
