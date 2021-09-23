@@ -352,6 +352,35 @@ Resources:
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref GreenSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          mkdir /s3-data
+          chmod a+rwx /s3-data
+          echo 'Hello world!!!' > /s3-data/hello-world.txt
+          chmod a+rw /s3-data/hello-world.txt
+          echo 'Good bye!!!' > /s3-data/good-bye.txt
+          chmod a+rw /s3-data/good-bye.txt
+          echo 'Good morning!!!' > /s3-data/good-morning.txt
+          chmod a+rw /s3-data/good-morning.txt
+          echo 'Good afternoon!!!' > /s3-data/good-afternoon.txt
+          chmod a+rw /s3-data/good-afternoon.txt
+          echo 'Good evening!!!' > /s3-data/good-evening.txt
+          chmod a+rw /s3-data/good-evening.txt
+          echo 'Good night!!!' > /s3-data/good-night.txt
+          chmod a+rw /s3-data/good-night.txt
+
+          aws s3 cp /s3-data/hello-world.txt s3://${UnrestrictedBucketNameParam}
+          aws s3 cp /s3-data/good-bye.txt s3://${UnrestrictedBucketNameParam}
+          aws s3 cp /s3-data/good-night.txt s3://${UnrestrictedBucketNameParam}
+
+          aws s3 cp /s3-data/good-bye.txt s3://${VPCRestrictedBucketNameParam}
+          aws s3 cp /s3-data/good-afternoon.txt s3://${VPCRestrictedBucketNameParam}
+          aws s3 cp /s3-data/good-evening.txt s3://${VPCRestrictedBucketNameParam}
+
+          aws s3 cp /s3-data/good-morning.txt s3://${VPCEndpointRestrictedBucketNameParam}
+          aws s3 cp /s3-data/good-afternoon.txt s3://${VPCEndpointRestrictedBucketNameParam}
+          aws s3 cp /s3-data/good-night.txt s3://${VPCEndpointRestrictedBucketNameParam}
       Tags:
         - Key: Name
           Value: Green

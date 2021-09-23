@@ -15,6 +15,8 @@ Three S3 buckets with blocked public access:
 
 In addition, the setup also involves two EC2 instances - one in the green VPC (green instance), one in the red VPC (red instance). Both EC2 instances have an IAM instance profile that allows the four above listed operations (GetObject, PutObject, DeleteObject and ListBucket) for all three S3 buckets. Both EC2 instances can perform the above listed operations for the unrestricted bucket. However, due to the bucket policies applied to the restricted S3 buckets, only the green instance can perform the above listed operations for the restricted buckets. The red instance will fail with access denied, despite of the permissions granted by its instance profile (the explicit denies defined in the bucket policies overrule the explicit allows in the instance profile).
 
+The user data for the green instance involves several bash commands that create few files and uploads them to the S3 buckets. In other words, you can immediately start to list or download files. Before deleting the stack, the files should be removed from the S3 buckets. Otherwise, the deletion of the stack will fail.
+
 ## Deployment
 The following command can be used to deploy the setup using the AWS CLI.
 ```
