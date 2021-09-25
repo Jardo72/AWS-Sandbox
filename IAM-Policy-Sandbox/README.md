@@ -5,11 +5,11 @@ Demonstration of [IAM policy evaluation logic](https://docs.aws.amazon.com/IAM/l
 
 | S3 Bucket           | Bucket Policy   | Permissions Boundary   | Identity-Based Policy   | Final Access Decision |
 | ------------------- |:---------------:|:----------------------:|:-----------------------:|:---------------------:|
-| AllowedBucket       | Allow           | No Statement           | No Statement            | <span style="color:green">Allow<span> |
-| DeniedBucket        | Deny            | Allow                  | Allow                   | <span style="color:red">Deny<span> |
-| NoPolicyBucketOne   | N/A             | Allow                  | No Statement            | <span style="color:red">Deny<span> |
-| NoPolicyBucketTwo   | N/A             | No Statement           | Allow                   | <span style="color:red">Deny<span> |
-| NoPolicyBucketThree | N/A             | Allow                  | Allow                   | <span style="color:green">Allow<span> |
+| AllowedBucket       | Allow           | No Statement           | No Statement            | Allow                 |
+| DeniedBucket        | Deny            | Allow                  | Allow                   | Deny                  |
+| NoPolicyBucketOne   | N/A             | Allow                  | No Statement            | Deny                  |
+| NoPolicyBucketTwo   | N/A             | No Statement           | Allow                   | Deny                  |
+| NoPolicyBucketThree | N/A             | Allow                  | Allow                   | Allow                 |
 
 ## Deployment
 

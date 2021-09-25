@@ -156,7 +156,15 @@ Resources:
           - Action:
               - "s3:ListBucket"
             Effect: Allow
-            Resource: !Sub "arn:aws:s3:::${DeniedBucketNameParam}"
+            Resource: !GetAtt DeniedBucket.Arn
+          - Action:
+              - "s3:ListBucket"
+            Effect: Allow
+            Resource: !GetAtt NoPolicyBucketOne.Arn
+          - Action:
+              - "s3:ListBucket"
+            Effect: Allow
+            Resource: !GetAtt NoPolicyBucketThree.Arn
 
   User:
     Type: AWS::IAM::User
@@ -171,4 +179,20 @@ Resources:
               - Action:
                   - "s3:ListBucket"
                 Effect: Allow
-                Resource: !Sub "arn:aws:s3:::${DeniedBucketNameParam}"
+                Resource: !GetAtt DeniedBucket.Arn
+        - PolicyName: NoPolicyBucketTwoPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "s3:ListBucket"
+                Effect: Allow
+                Resource: !GetAtt NoPolicyBucketTwo.Arn
+        - PolicyName: NoPolicyBucketThreePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "s3:ListBucket"
+                Effect: Allow
+                Resource: !GetAtt NoPolicyBucketThree.Arn
