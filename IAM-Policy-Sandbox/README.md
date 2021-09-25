@@ -1,7 +1,7 @@
 # IAM Policy Sandbox
 
 ## Introduction
-Demonstration of [IAM policy evaluation logic](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html). This demo involves an IAM user with permissions boundary and an (inline) identity-based policy, plus several S3 buckets (two of them with bucket policies). The policies control access to the `s3:ListBucket` operation, which is also the underlying operation of the `aws s3 ls` AWS CLI command. The following table summarizes the setup. The rightmost column captures the outcome of the evalutation of the three policies.
+Demonstration of [IAM policy evaluation logic](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html). This demo involves an IAM user with permissions boundary and an (inline) identity-based policy, plus several S3 buckets (two of them with bucket policies). The policies control access to the `s3:ListBucket` operation, which is also the underlying operation of the `aws s3 ls` AWS CLI command. The following table summarizes the setup. For each of the S3 buckets, the rightmost column captures the outcome of the evalutation of the three policies.
 
 | S3 Bucket           | Bucket Policy   | Permissions Boundary   | Identity-Based Policy   | Access   |
 | ------------------- |:---------------:|:----------------------:|:-----------------------:|:--------:|
