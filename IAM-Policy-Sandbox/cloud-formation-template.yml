@@ -163,3 +163,12 @@ Resources:
     Properties:
       UserName: !Ref IAMUserNameParam
       PermissionsBoundary: !Ref PermissionsBoundary
+      Policies:
+        - PolicyName: DeniedBucketPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "s3:ListBucket"
+                Effect: Allow
+                Resource: !Sub "arn:aws:s3:::${DeniedBucketNameParam}"
