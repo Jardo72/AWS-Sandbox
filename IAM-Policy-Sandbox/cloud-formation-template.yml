@@ -67,14 +67,6 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Action:
-              - "s3:GetObject"
-              - "s3:PutObject"
-              - "s3:DeleteObject"
-            Effect: Allow
-            Resource: !Sub "arn:aws:s3:::${AllowedBucketNameParam}/*"
-            Principal:
-              AWS: !GetAtt User.Arn
-          - Action:
               - "s3:ListBucket"
             Effect: Allow
             Resource: !Sub "arn:aws:s3:::${AllowedBucketNameParam}"
@@ -100,12 +92,6 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - Action:
-              - "s3:GetObject"
-            Effect: Deny
-            Resource: !Sub "arn:aws:s3:::${DeniedBucketNameParam}/*"
-            Principal:
-              AWS: !GetAtt User.Arn
           - Action:
               - "s3:ListBucket"
             Effect: Deny
