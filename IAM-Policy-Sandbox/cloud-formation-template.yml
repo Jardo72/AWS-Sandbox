@@ -60,6 +60,7 @@ Resources:
 
   AllowedBucketPolicy:
     Type: AWS::S3::BucketPolicy
+    DependsOn: AllowedBucket
     Properties:
       Bucket: !Ref AllowedBucketNameParam
       PolicyDocument:
@@ -71,12 +72,14 @@ Resources:
               - "s3:DeleteObject"
             Effect: Allow
             Resource: !Sub "arn:aws:s3:::${AllowedBucketNameParam}/*"
-            Principal: "*"
+            Principal:
+              AWS: !GetAtt User.Arn
           - Action:
               - "s3:ListBucket"
             Effect: Allow
             Resource: !Sub "arn:aws:s3:::${AllowedBucketNameParam}"
-            Principal: "*"
+            Principal:
+              AWS: !GetAtt User.Arn
 
   DeniedBucket:
     Type: AWS::S3::Bucket
@@ -91,6 +94,7 @@ Resources:
 
   DeniedBucketPolicy:
     Type: AWS::S3::BucketPolicy
+    DependsOn: DeniedBucket
     Properties:
       Bucket: !Ref DeniedBucketNameParam
       PolicyDocument:
@@ -100,12 +104,14 @@ Resources:
               - "s3:GetObject"
             Effect: Deny
             Resource: !Sub "arn:aws:s3:::${DeniedBucketNameParam}/*"
-            Principal: "*"
+            Principal:
+              AWS: !GetAtt User.Arn
           - Action:
               - "s3:ListBucket"
             Effect: Deny
             Resource: !Sub "arn:aws:s3:::${DeniedBucketNameParam}"
-            Principal: "*"
+            Principal:
+              AWS: !GetAtt User.Arn
 
   NoPolicyBucketOne:
     Type: AWS::S3::Bucket

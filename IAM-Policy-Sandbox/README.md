@@ -2,13 +2,13 @@
 
 ## Introduction
 
-|  S3 Bucket     |  Bucket Policy  |  Permissions Boundary  |  Identity-Based Policy  |  Access Decision   |
-| -------------- |:---------------:|:----------------------:|:-----------------------:|:------------------:|
-| AllowedBucket  | Allow           | No Statement           | No Statement            | Allow              |
-| DeniedBucket   | Deny            | Allow                  | Allow                   | Deny               |
-| TODO           | No Statement    | Allow                  | No Statement            | Deny               |
-| TODO           | No Statement    | No Statement           | Allow                   | Deny               |
-| TODO           | No Statement    | Allow                  | Allow                   | Allow              |
+| S3 Bucket           | Bucket Policy   | Permissions Boundary   | Identity-Based Policy   | Final Access Decision |
+| ------------------- |:---------------:|:----------------------:|:-----------------------:|:---------------------:|
+| AllowedBucket       | Allow           | No Statement           | No Statement            | Allow                 |
+| DeniedBucket        | Deny            | Allow                  | Allow                   | Deny                  |
+| NoPolicyBucketOne   | N/A             | Allow                  | No Statement            | Deny                  |
+| NoPolicyBucketTwo   | N/A             | No Statement           | Allow                   | Deny                  |
+| NoPolicyBucketThree | N/A             | Allow                  | Allow                   | Allow                 |
 
 ## Deployment
 
