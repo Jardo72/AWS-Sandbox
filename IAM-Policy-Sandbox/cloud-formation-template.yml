@@ -1,0 +1,184 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  Demonstration of IAM policies (identity-based & resource-based policies, permissions boundary) and IAM policy evaluation logic.
+
+Parameters:
+  AllowedBucketNameParam:
+    Description: The name of the S3 bucket with bucket policy allowing access to the IAM user
+    Type: String
+
+  DeniedBucketNameParam:
+    Description: The name of the S3 bucket with bucket policy denying access to the IAM user
+    Type: String
+
+  NoPolicyBucketOneNameParam:
+    Description: The name of the first S3 bucket without any bucket policy
+    Type: String
+
+  NoPolicyBucketTwoNameParam:
+    Description: The name of the second S3 bucket without any bucket policy
+    Type: String
+
+  NoPolicyBucketThreeNameParam:
+    Description: The name of the third S3 bucket without any bucket policy
+    Type: String
+
+  IAMUserNameParam:
+    Description: The username of the IAM user.
+    Type: String
+
+Resources:
+  AllowedBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref AllowedBucketNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  AllowedBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: AllowedBucket
+    Properties:
+      Bucket: !Ref AllowedBucketNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "s3:ListBucket"
+            Effect: Allow
+            Resource: !Sub "arn:aws:s3:::${AllowedBucketNameParam}"
+            Principal:
+              AWS: !GetAtt User.Arn
+
+  DeniedBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DeniedBucketNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  DeniedBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: DeniedBucket
+    Properties:
+      Bucket: !Ref DeniedBucketNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "s3:ListBucket"
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${DeniedBucketNameParam}"
+            Principal:
+              AWS: !GetAtt User.Arn
+
+  NoPolicyBucketOne:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref NoPolicyBucketOneNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  NoPolicyBucketTwo:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref NoPolicyBucketTwoNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  NoPolicyBucketThree:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref NoPolicyBucketThreeNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  PermissionsBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-PermissionsBoundary"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "s3:ListBucket"
+            Effect: Allow
+            Resource: !GetAtt DeniedBucket.Arn
+          - Action:
+              - "s3:ListBucket"
+            Effect: Allow
+            Resource: !GetAtt NoPolicyBucketOne.Arn
+          - Action:
+              - "s3:ListBucket"
+            Effect: Allow
+            Resource: !GetAtt NoPolicyBucketThree.Arn
+
+  User:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: !Ref IAMUserNameParam
+      PermissionsBoundary: !Ref PermissionsBoundary
+      Policies:
+        - PolicyName: DeniedBucketPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "s3:ListBucket"
+                Effect: Allow
+                Resource: !GetAtt DeniedBucket.Arn
+        - PolicyName: NoPolicyBucketTwoPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "s3:ListBucket"
+                Effect: Allow
+                Resource: !GetAtt NoPolicyBucketTwo.Arn
+        - PolicyName: NoPolicyBucketThreePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "s3:ListBucket"
+                Effect: Allow
+                Resource: !GetAtt NoPolicyBucketThree.Arn

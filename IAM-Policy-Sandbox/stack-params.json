@@ -1,0 +1,26 @@
+[
+    {
+        "ParameterKey": "AllowedBucketNameParam",
+        "ParameterValue": "jardo72-iam-policy-demo-allowed-bucket"
+    },
+    {
+        "ParameterKey": "DeniedBucketNameParam",
+        "ParameterValue": "jardo72-iam-policy-demo-denied-bucket"
+    },
+    {
+        "ParameterKey": "NoPolicyBucketOneNameParam",
+        "ParameterValue": "jardo72-iam-policy-demo-no-policy-bucket-one"
+    },
+    {
+        "ParameterKey": "NoPolicyBucketTwoNameParam",
+        "ParameterValue": "jardo72-iam-policy-demo-no-policy-bucket-two"
+    },
+    {
+        "ParameterKey": "NoPolicyBucketThreeNameParam",
+        "ParameterValue": "jardo72-iam-policy-demo-no-policy-bucket-three"
+    },
+    {
+        "ParameterKey": "IAMUserNameParam",
+        "ParameterValue": "CrashTestDummy"
+    }
+]
