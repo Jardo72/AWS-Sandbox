@@ -20,11 +20,15 @@
         "ParameterValue": "80"
     },
     {
-        "ParameterKey": "EC2InstanceType",
+        "ParameterKey": "EC2InstanceTypeParam",
         "ParameterValue": "t2.micro"
     },
     {
-        "ParameterKey": "TargetCPUUtilizationThreshold",
+        "ParameterKey": "TargetCPUUtilizationThresholdParam",
         "ParameterValue": "50"
+    },
+    {
+        "ParameterKey": "ALBAccessLogEnabledParam",
+        "ParameterValue": "false"
     }
 ]
