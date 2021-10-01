@@ -30,5 +30,13 @@
     {
         "ParameterKey": "ALBAccessLogEnabledParam",
         "ParameterValue": "false"
+    },
+    {
+        "ParameterKey": "ALBAccessLogS3BucketParam",
+        "ParameterValue": "jardo72-elb-access-logs"
+    },
+    {
+        "ParameterKey": "ALBAccessLogS3PrefixParam",
+        "ParameterValue": "L7-LB-Demo"
     }
 ]

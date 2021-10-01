@@ -68,6 +68,15 @@ Parameters:
       - false
     Default: false
 
+  ALBAccessLogS3BucketParam:
+    Description: The name of the S3 bucket for the ALB access log
+    Type: String
+
+  ALBAccessLogS3PrefixParam:
+    Description: The prefix for the location of the ALB access logs in the S3 bucket
+    Type: String
+    Default: L7-LB-Demo
+
 Mappings:
   AMIMapping:
     eu-central-1:
@@ -76,9 +85,6 @@ Mappings:
       HVM64: ami-02b4e72b17337d6c1
     eu-west-2:
       HVM64: ami-0d26eb3972b7f8c96
-
-Conditions:      
-  ALBAccessLogEnabled: !Equals [true, !Ref ALBAccessLogEnabledParam]
 
 Resources:
   DeploymentArtifactoryReadAccessPolicy:
@@ -243,6 +249,10 @@ Resources:
       LoadBalancerAttributes:
         - Key: access_logs.s3.enabled
           Value: !Ref ALBAccessLogEnabledParam
+        - Key: access_logs.s3.bucket
+          Value: !Ref ALBAccessLogS3BucketParam
+        - Key: access_logs.s3.prefix
+          Value: !Ref ALBAccessLogS3PrefixParam
 
   LoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
