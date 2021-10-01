@@ -70,6 +70,9 @@ Mappings:
     eu-west-2:
       HVM64: ami-0d26eb3972b7f8c96
 
+Conditions:
+  EnableVPCFlowLog: !Equals [Yes, !Ref EnabledVPCFlowLogParam]
+
 Resources:
   DeploymentArtifactoryReaderRole:
     Type: AWS::IAM::Role
@@ -364,6 +367,25 @@ Resources:
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 2
       HealthCheckProtocol: TCP
+
+  VPCFLowLogLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: EnableVPCFlowLog
+    Properties:
+      LogGroupName: !Sub "${AWS::StackName}-VPCFLowLog-LogGroup"
+      RetentionInDays: 3
+
+  VPCFLowLog:
+    Type: AWS::EC2::FlowLog
+    Condition: EnableVPCFlowLog
+    Properties:
+      # TODO:
+      # DeliverLogsPermissionArn: 
+      LogDestination: !GetAtt VPCFLowLogLogGroup.Arn
+      LogDestinationType: cloud-watch-logs
+      ResourceId: !Ref VPC
+      ResourceType: VPC
+      TrafficType: ALL
 
 Outputs:
   LoadBalancerDNSName:
