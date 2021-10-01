@@ -22,5 +22,9 @@
     {
         "ParameterKey": "EC2InstanceTypeParam",
         "ParameterValue": "t2.nano"
+    },
+    {
+        "ParameterKey": "EnableVPCFlowLogParam",
+        "ParameterValue": "Yes"
     }
 ]

@@ -53,13 +53,13 @@ Parameters:
       - t2.micro
     Default: t2.nano
 
-  EnabledVPCFlowLogParam:
+  EnableVPCFlowLogParam:
     Description: Specifies whether VPC flow log is to be configured
     Type: String
     AllowedValues:
-      - Yes
-      - No
-    Default: No
+      - "Yes"
+      - "No"
+    Default: "No"
 
 Mappings:
   AMIMapping:
@@ -71,7 +71,7 @@ Mappings:
       HVM64: ami-0d26eb3972b7f8c96
 
 Conditions:
-  EnableVPCFlowLog: !Equals [Yes, !Ref EnabledVPCFlowLogParam]
+  EnableVPCFlowLog: !Equals ["Yes", !Ref EnableVPCFlowLogParam]
 
 Resources:
   DeploymentArtifactoryReaderRole:
@@ -86,7 +86,7 @@ Resources:
               Service:
                 - ec2.amazonaws.com
             Action:
-              - "sts:AssumeRole"
+              - sts:AssumeRole
       Policies:
         - PolicyName: DeploymentArtifactoryReadAccessPolicy
           PolicyDocument:
@@ -94,7 +94,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - "s3:GetObject"
+                  - s3:GetObject
                 Resource: !Sub "arn:aws:s3:::${DeploymentArtifactoryBucketNameParam}/*"
 
   VPC:
@@ -372,15 +372,38 @@ Resources:
     Type: AWS::Logs::LogGroup
     Condition: EnableVPCFlowLog
     Properties:
-      LogGroupName: !Sub "${AWS::StackName}-VPCFLowLog-LogGroup"
+      LogGroupName: !Sub "${AWS::StackName}-VPCFLowLog"
       RetentionInDays: 3
+
+  LogWriterRole:
+    Type: AWS::IAM::Role
+    Condition: EnableVPCFlowLog
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LogWritePermission
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                Resource: !GetAtt VPCFLowLogLogGroup.Arn
 
   VPCFLowLog:
     Type: AWS::EC2::FlowLog
     Condition: EnableVPCFlowLog
     Properties:
-      # TODO:
-      # DeliverLogsPermissionArn: 
+      DeliverLogsPermissionArn: !GetAtt LogWriterRole.Arn
       LogDestination: !GetAtt VPCFLowLogLogGroup.Arn
       LogDestinationType: cloud-watch-logs
       ResourceId: !Ref VPC
@@ -391,3 +414,6 @@ Outputs:
   LoadBalancerDNSName:
     Description: DNS name of the created network load balancer
     Value: !GetAtt LoadBalancer.DNSName
+
+# see
+# https://github.com/widdix/aws-cf-templates/blob/master/vpc/vpc-flow-logs.yaml
