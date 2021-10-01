@@ -54,6 +54,7 @@ The project involves parametrized CloudFormation template ([cloud-formation-temp
 * Single security group used to proptect the EC2 instances.
 * Launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket. IAM instance profile allowing access to the S3 bucket is also created as part of the stack. The S3 bucket is not part of the stack - it must exist when the creation of the CloudFormation stack is started, and the application JAR file must available in the S3 bucket.
 * EC2 auto scaling group with ELB health checks and constant number of EC2 instances (no scaling policy).
+* Optional VPC flow log (one of the template parameters determines whether the VPC flow log will be created or not).
 
 The template defines mapping for AMI IDs, so the template can be used in various AWS regions. However, the mapping only contains AMI IDs for three regions: eu-central-1, eu-west-1 and eu-west-2. The following AWS CLI command illustrates how to use the CloudFormation template to create the stack.
 ```
