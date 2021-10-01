@@ -18,7 +18,7 @@
 #
 
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
+Description: |
   CloudFormation deployment of the L4 load balancing demo application, with complete stack whose primary
   components are a network load balancer and an auto scaling group with three EC2 instances running the L4
   load balancing server application.
@@ -46,12 +46,20 @@ Parameters:
     Type: Number
     Default: 1234
 
-  EC2InstanceType:
+  EC2InstanceTypeParam:
     Type: String
     AllowedValues:
       - t2.nano
       - t2.micro
     Default: t2.nano
+
+  EnableVPCFlowLogParam:
+    Description: Specifies whether VPC flow log is to be configured
+    Type: String
+    AllowedValues:
+      - "Yes"
+      - "No"
+    Default: "No"
 
 Mappings:
   AMIMapping:
@@ -62,34 +70,32 @@ Mappings:
     eu-west-2:
       HVM64: ami-0d26eb3972b7f8c96
 
-Resources:
-  DeploymentArtifactoryReadAccessPolicy:
-    Type: 'AWS::IAM::ManagedPolicy'
-    Properties:
-      ManagedPolicyName: !Sub "${AWS::StackName}-DeploymentArtifactoryReadAccessPolicy"
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-        - Effect: Allow
-          Action:
-          - 's3:GetObject'
-          Resource: !Join ['', ['arn:aws:s3:::', !Ref DeploymentArtifactoryBucketNameParam, '/*']]
+Conditions:
+  EnableVPCFlowLog: !Equals ["Yes", !Ref EnableVPCFlowLogParam]
 
+Resources:
   DeploymentArtifactoryReaderRole:
-    Type: 'AWS::IAM::Role'
+    Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub "${AWS::StackName}-DeploymentArtifactoryReaderRole"
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - ec2.amazonaws.com
-          Action:
-          - 'sts:AssumeRole'
-      ManagedPolicyArns:
-      - !Ref DeploymentArtifactoryReadAccessPolicy
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: DeploymentArtifactoryReadAccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub "arn:aws:s3:::${DeploymentArtifactoryBucketNameParam}/*"
 
   VPC:
     Type: AWS::EC2::VPC
@@ -97,7 +103,10 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: 10.0.0.0/16
-
+      Tags:
+        - Key: Name
+          Value: L4-LB-Demo
+  
   InternetGateway:
     Type: AWS::EC2::InternetGateway
 
@@ -123,61 +132,61 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   PublicSubnetTwo:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 1
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   PublicSubnetThree:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 2
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   PrivateSubnetOne:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [3, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [3, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   PrivateSubnetTwo:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [4, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [4, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 1
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   PrivateSubnetThree:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [5, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [5, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 2
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   # the public subnets need a route table with default route to the Internet Gateway
   PublicSubnetRouteTable:
@@ -290,7 +299,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-      - !Ref DeploymentArtifactoryReaderRole
+        - !Ref DeploymentArtifactoryReaderRole
 
   ASGLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -298,7 +307,7 @@ Resources:
       LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
       LaunchTemplateData:
         ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
-        InstanceType: !Ref EC2InstanceType
+        InstanceType: !Ref EC2InstanceTypeParam
         IamInstanceProfile:
           Name: !Ref EC2InstanceProfile
         SecurityGroupIds:
@@ -318,13 +327,13 @@ Resources:
       AvailabilityZones:
         - !Select
           - 0
-          - Fn::GetAZs: !Ref 'AWS::Region'
+          - Fn::GetAZs: !Ref "AWS::Region"
         - !Select
           - 1
-          - Fn::GetAZs: !Ref 'AWS::Region'
+          - Fn::GetAZs: !Ref "AWS::Region"
         - !Select
           - 2
-          - Fn::GetAZs: !Ref 'AWS::Region'
+          - Fn::GetAZs: !Ref "AWS::Region"
       VPCZoneIdentifier:
         - !Ref PrivateSubnetOne
         - !Ref PrivateSubnetTwo
@@ -341,6 +350,10 @@ Resources:
         - Granularity: 1Minute
       TargetGroupARNs:
         - !Ref NLBTargetGroup
+      Tags:
+        - Key: Name
+          Value: L4-LB-Demo
+          PropagateAtLaunch: true
 
   NLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -355,7 +368,52 @@ Resources:
       UnhealthyThresholdCount: 2
       HealthCheckProtocol: TCP
 
+  VPCFLowLogLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: EnableVPCFlowLog
+    Properties:
+      LogGroupName: !Sub "${AWS::StackName}-VPCFLowLog"
+      RetentionInDays: 3
+
+  LogWriterRole:
+    Type: AWS::IAM::Role
+    Condition: EnableVPCFlowLog
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LogWritePermission
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                Resource: !GetAtt VPCFLowLogLogGroup.Arn
+
+  VPCFLowLog:
+    Type: AWS::EC2::FlowLog
+    Condition: EnableVPCFlowLog
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt LogWriterRole.Arn
+      LogDestination: !GetAtt VPCFLowLogLogGroup.Arn
+      LogDestinationType: cloud-watch-logs
+      ResourceId: !Ref VPC
+      ResourceType: VPC
+      TrafficType: ALL
+
 Outputs:
   LoadBalancerDNSName:
     Description: DNS name of the created network load balancer
     Value: !GetAtt LoadBalancer.DNSName
+
+# see
+# https://github.com/widdix/aws-cf-templates/blob/master/vpc/vpc-flow-logs.yaml
