@@ -46,12 +46,20 @@ Parameters:
     Type: Number
     Default: 1234
 
-  EC2InstanceType:
+  EC2InstanceTypeParam:
     Type: String
     AllowedValues:
       - t2.nano
       - t2.micro
     Default: t2.nano
+
+  EnabledVPCFlowLogParam:
+    Description: Specifies whether VPC flow log is to be configured
+    Type: String
+    AllowedValues:
+      - Yes
+      - No
+    Default: No
 
 Mappings:
   AMIMapping:
@@ -70,10 +78,10 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Action:
-          - 's3:GetObject'
-          Resource: !Join ['', ['arn:aws:s3:::', !Ref DeploymentArtifactoryBucketNameParam, '/*']]
+          - Effect: Allow
+            Action:
+              - 's3:GetObject'
+            Resource: !Sub "arn:aws:s3:::${DeploymentArtifactoryBucketNameParam}/*"
 
   DeploymentArtifactoryReaderRole:
     Type: 'AWS::IAM::Role'
@@ -82,14 +90,14 @@ Resources:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - ec2.amazonaws.com
-          Action:
-          - 'sts:AssumeRole'
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
       ManagedPolicyArns:
-      - !Ref DeploymentArtifactoryReadAccessPolicy
+        - !Ref DeploymentArtifactoryReadAccessPolicy
 
   VPC:
     Type: AWS::EC2::VPC
@@ -97,7 +105,10 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: 10.0.0.0/16
-
+      Tags:
+        - Key: Name
+          Value: L4-LB-Demo
+  
   InternetGateway:
     Type: AWS::EC2::InternetGateway
 
@@ -123,7 +134,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
@@ -133,7 +144,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 1
@@ -143,7 +154,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 2
@@ -153,7 +164,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [3, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [3, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 0
@@ -163,7 +174,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [4, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [4, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 1
@@ -173,7 +184,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [5, !Cidr [!GetAtt VPC.CidrBlock, 6, 8 ]]
+      CidrBlock: !Select [5, !Cidr [!GetAtt VPC.CidrBlock, 6, 8]]
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select
         - 2
@@ -290,7 +301,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-      - !Ref DeploymentArtifactoryReaderRole
+        - !Ref DeploymentArtifactoryReaderRole
 
   ASGLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -298,7 +309,7 @@ Resources:
       LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
       LaunchTemplateData:
         ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
-        InstanceType: !Ref EC2InstanceType
+        InstanceType: !Ref EC2InstanceTypeParam
         IamInstanceProfile:
           Name: !Ref EC2InstanceProfile
         SecurityGroupIds:
@@ -341,6 +352,10 @@ Resources:
         - Granularity: 1Minute
       TargetGroupARNs:
         - !Ref NLBTargetGroup
+      Tags:
+        - Key: Name
+          Value: L4-LB-Demo
+          PropagateAtLaunch: true
 
   NLBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup

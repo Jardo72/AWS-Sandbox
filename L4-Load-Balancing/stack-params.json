@@ -20,7 +20,7 @@
         "ParameterValue": "1234"
     },
     {
-        "ParameterKey": "EC2InstanceType",
+        "ParameterKey": "EC2InstanceTypeParam",
         "ParameterValue": "t2.nano"
     }
 ]
