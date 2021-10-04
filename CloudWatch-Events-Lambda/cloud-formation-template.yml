@@ -1,0 +1,86 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  Demonstration of CloudWatch EventBridge triggering a Lambda function on a regular (scheduled) basis
+
+Resources:
+  TimerEventHandlerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-TimerEventHandlerExecutionRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: CloudWatchAccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Effect: Allow
+                Resource: "arn:aws:logs:*:*:*"
+
+  TimerEventHandlerFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-TimerEventHandlerFunction"
+      Handler: index.main
+      Runtime: python3.8
+      Role: !GetAtt TimerEventHandlerExecutionRole.Arn
+      Timeout: 5
+      Code:
+        ZipFile: |
+          from uuid import uuid4
+
+          instance_id = str(uuid4())
+          incovation_counter = 0
+
+          def main(event, context):
+              global incovation_counter
+              incovation_counter += 1
+              print(f'Timer event-handler invoked, instance ID = {instance_id}, invocation counter = {incovation_counter}...')
+              return 'Hi there timer event-handler'
+
+  TimerEventHandlerInvocationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt TimerEventHandlerFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt Timer.Arn
+
+  Timer:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: rate(1 minute)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt TimerEventHandlerFunction.Arn
+          Id: TimerEventHandler
