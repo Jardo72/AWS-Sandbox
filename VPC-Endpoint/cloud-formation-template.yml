@@ -59,11 +59,31 @@ Resources:
     Properties:
       BucketName: !Ref S3AccessLogBucketNameParam
       AccessControl: LogDeliveryWrite
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+      # TODO: 
+      # PublicAccessBlockConfiguration:
+      #   BlockPublicAcls: true
+      #   BlockPublicPolicy: true
+      #   IgnorePublicAcls: true
+      #   RestrictPublicBuckets: true
+
+  S3AccessLogBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3AccessLogBucketNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:PutObjectAcl
+              - s3:ListBucket
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:s3:::${S3AccessLogBucketNameParam}/*"
+              - !Sub "arn:aws:s3:::${S3AccessLogBucketNameParam}"
+            Principal:
+              Service: s3.amazonaws.com
 
   UnrestrictedBucket:
     Type: AWS::S3::Bucket
