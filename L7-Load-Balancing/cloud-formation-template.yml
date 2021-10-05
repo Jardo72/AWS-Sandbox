@@ -86,7 +86,64 @@ Mappings:
     eu-west-2:
       HVM64: ami-0d26eb3972b7f8c96
 
+  ELBAccountIdMapping:
+    eu-central-1:
+      ELBAccountID: 054676820928
+    eu-west-1:
+      ELBAccountID: 156460612806
+    eu-west-2:
+      ELBAccountID: 652711504416
+
+Conditions:
+  EnableALBAccessLog: !Equals ["true", !Ref ALBAccessLogEnabledParam]
+
 Resources:
+  ALBAccessLogBucket:
+    Type: AWS::S3::Bucket
+    Condition: EnableALBAccessLog
+    Properties:
+      BucketName: !Ref ALBAccessLogS3BucketParam
+      AccessControl: Private
+      # TODO: remove, or enable?
+      # PublicAccessBlockConfiguration:
+      #   BlockPublicAcls: true
+      #   BlockPublicPolicy: true
+      #   IgnorePublicAcls: true
+      #   RestrictPublicBuckets: true
+
+  ALBAccessLogBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Condition: EnableALBAccessLog
+    DependsOn: ALBAccessLogBucket
+    Properties:
+      Bucket: !Ref ALBAccessLogS3BucketParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - s3:PutObject
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:s3:::${ALBAccessLogS3BucketParam}/*"
+            Principal:
+              AWS: !Join ["", ["arn:aws:iam::", "054676820928", ":root"]]
+                # TODO:
+                # Fn::FindInMap [ELBAccountIdMapping, !Ref "AWS::Region", ELBAccountID]
+          - Action:
+              - s3:PutObject
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:s3:::${ALBAccessLogS3BucketParam}/*"
+            Principal:
+              Service: delivery.logs.amazonaws.com
+          - Action:
+              - s3:GetBucketAcl
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:s3:::${ALBAccessLogS3BucketParam}"
+            Principal:
+              Service: delivery.logs.amazonaws.com
+
   DeploymentArtifactoryReaderRole:
     Type: AWS::IAM::Role
     Properties:
@@ -244,11 +301,10 @@ Resources:
       LoadBalancerAttributes:
         - Key: access_logs.s3.enabled
           Value: !Ref ALBAccessLogEnabledParam
-        # TODO
-        # - Key: access_logs.s3.bucket
-        #   Value: !Ref ALBAccessLogS3BucketParam
-        # - Key: access_logs.s3.prefix
-        #   Value: !Ref ALBAccessLogS3PrefixParam
+        - Key: access_logs.s3.bucket
+          Value: !Ref ALBAccessLogS3BucketParam
+        - Key: access_logs.s3.prefix
+          Value: !Ref ALBAccessLogS3PrefixParam
 
   LoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener

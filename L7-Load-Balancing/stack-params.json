@@ -29,7 +29,7 @@
     },
     {
         "ParameterKey": "ALBAccessLogEnabledParam",
-        "ParameterValue": "false"
+        "ParameterValue": "true"
     },
     {
         "ParameterKey": "ALBAccessLogS3BucketParam",
