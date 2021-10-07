@@ -96,12 +96,11 @@ Resources:
     Properties:
       BucketName: !Ref ALBAccessLogS3BucketParam
       AccessControl: Private
-      # TODO: remove, or enable?
-      # PublicAccessBlockConfiguration:
-      #   BlockPublicAcls: true
-      #   BlockPublicPolicy: true
-      #   IgnorePublicAcls: true
-      #   RestrictPublicBuckets: true
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   ALBAccessLogBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -119,9 +118,9 @@ Resources:
               - !Sub "arn:aws:s3:::${ALBAccessLogS3BucketParam}/*"
             Principal:
               AWS:
-                - "arn:aws:iam::054676820928:root"
-                - "arn:aws:iam::156460612806:root"
-                - "arn:aws:iam::652711504416:root"
+                - arn:aws:iam::054676820928:root
+                - arn:aws:iam::156460612806:root
+                - arn:aws:iam::652711504416:root
           - Action:
               - s3:PutObject
             Effect: Allow
