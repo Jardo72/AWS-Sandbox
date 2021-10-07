@@ -47,7 +47,7 @@ Parameters:
     Type: Number
     Default: 80
 
-  EC2InstanceType:
+  EC2InstanceTypeParam:
     Type: String
     AllowedValues:
       - t2.nano
@@ -55,10 +55,27 @@ Parameters:
       - t2.small
     Default: t2.micro
 
-  TargetCPUUtilizationThreshold:
+  TargetCPUUtilizationThresholdParam:
     Description: Threshold for the aggregate CPU utilization for the autoscaling group. If the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group.
     Type: String
     Default: 50
+
+  ALBAccessLogEnabledParam:
+    Description: Specifies whether access log is to be configured for the ALB
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: false
+
+  ALBAccessLogS3BucketParam:
+    Description: The name of the S3 bucket for the ALB access log
+    Type: String
+
+  ALBAccessLogS3PrefixParam:
+    Description: The prefix for the location of the ALB access logs in the S3 bucket
+    Type: String
+    Default: L7-LB-Demo
 
 Mappings:
   AMIMapping:
@@ -69,34 +86,78 @@ Mappings:
     eu-west-2:
       HVM64: ami-0d26eb3972b7f8c96
 
+Conditions:
+  EnableALBAccessLog: !Equals ["true", !Ref ALBAccessLogEnabledParam]
+
 Resources:
-  DeploymentArtifactoryReadAccessPolicy:
-    Type: 'AWS::IAM::ManagedPolicy'
+  ALBAccessLogBucket:
+    Type: AWS::S3::Bucket
+    Condition: EnableALBAccessLog
     Properties:
-      ManagedPolicyName: !Sub "${AWS::StackName}-DeploymentArtifactoryReadAccessPolicy"
+      BucketName: !Ref ALBAccessLogS3BucketParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  ALBAccessLogBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Condition: EnableALBAccessLog
+    DependsOn: ALBAccessLogBucket
+    Properties:
+      Bucket: !Ref ALBAccessLogS3BucketParam
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Action:
-          - 's3:GetObject'
-          Resource: !Join ['', ['arn:aws:s3:::', !Ref DeploymentArtifactoryBucketNameParam, '/*']]
+          - Action:
+              - s3:PutObject
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:s3:::${ALBAccessLogS3BucketParam}/*"
+            Principal:
+              AWS:
+                - arn:aws:iam::054676820928:root
+                - arn:aws:iam::156460612806:root
+                - arn:aws:iam::652711504416:root
+          - Action:
+              - s3:PutObject
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:s3:::${ALBAccessLogS3BucketParam}/*"
+            Principal:
+              Service: delivery.logs.amazonaws.com
+          - Action:
+              - s3:GetBucketAcl
+            Effect: Allow
+            Resource:
+              - !Sub "arn:aws:s3:::${ALBAccessLogS3BucketParam}"
+            Principal:
+              Service: delivery.logs.amazonaws.com
 
   DeploymentArtifactoryReaderRole:
-    Type: 'AWS::IAM::Role'
+    Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub "${AWS::StackName}-DeploymentArtifactoryReaderRole"
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - ec2.amazonaws.com
-          Action:
-          - 'sts:AssumeRole'
-      ManagedPolicyArns:
-      - !Ref DeploymentArtifactoryReadAccessPolicy
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: DeploymentArtifactoryReadAccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub "arn:aws:s3:::${DeploymentArtifactoryBucketNameParam}/*"
 
   VPC:
     Type: AWS::EC2::VPC
@@ -104,6 +165,9 @@ Resources:
       EnableDnsSupport: true
       EnableDnsHostnames: true
       CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: L7-LB-Demo
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -118,31 +182,31 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 3, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   PublicSubnetTwo:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 3, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 1
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   PublicSubnetThree:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
-      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
+      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 3, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 2
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   # the public subnets need a route table with default route to the Internet Gateway
   PublicSubnetRouteTable:
@@ -226,6 +290,13 @@ Resources:
         - !Ref PublicSubnetTwo
         - !Ref PublicSubnetThree
       Type: application
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: !Ref ALBAccessLogEnabledParam
+        - Key: access_logs.s3.bucket
+          Value: !Ref ALBAccessLogS3BucketParam
+        - Key: access_logs.s3.prefix
+          Value: !Ref ALBAccessLogS3PrefixParam
 
   LoadBalancerListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -241,7 +312,7 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-      - !Ref DeploymentArtifactoryReaderRole
+        - !Ref DeploymentArtifactoryReaderRole
 
   ASGLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -249,7 +320,7 @@ Resources:
       LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
       LaunchTemplateData:
         ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
-        InstanceType: !Ref EC2InstanceType
+        InstanceType: !Ref EC2InstanceTypeParam
         IamInstanceProfile:
           Name: !Ref EC2InstanceProfile
         SecurityGroupIds:
@@ -269,13 +340,13 @@ Resources:
       AvailabilityZones:
         - !Select
           - 0
-          - Fn::GetAZs: !Ref 'AWS::Region'
+          - Fn::GetAZs: !Ref "AWS::Region"
         - !Select
           - 1
-          - Fn::GetAZs: !Ref 'AWS::Region'
+          - Fn::GetAZs: !Ref "AWS::Region"
         - !Select
           - 2
-          - Fn::GetAZs: !Ref 'AWS::Region'
+          - Fn::GetAZs: !Ref "AWS::Region"
       VPCZoneIdentifier:
         - !Ref PublicSubnetOne
         - !Ref PublicSubnetTwo
@@ -292,6 +363,10 @@ Resources:
       HealthCheckType: ELB
       MetricsCollection:
         - Granularity: 1Minute
+      Tags:
+        - Key: Name
+          Value: L7-LB-Demo
+          PropagateAtLaunch: true
 
   ALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -323,7 +398,7 @@ Resources:
         DisableScaleIn: false
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
-        TargetValue: !Ref TargetCPUUtilizationThreshold
+        TargetValue: !Ref TargetCPUUtilizationThresholdParam
 
 Outputs:
   LoadBalancerDNSName:

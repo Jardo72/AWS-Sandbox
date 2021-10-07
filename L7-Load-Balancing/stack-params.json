@@ -20,11 +20,23 @@
         "ParameterValue": "80"
     },
     {
-        "ParameterKey": "EC2InstanceType",
+        "ParameterKey": "EC2InstanceTypeParam",
         "ParameterValue": "t2.micro"
     },
     {
-        "ParameterKey": "TargetCPUUtilizationThreshold",
+        "ParameterKey": "TargetCPUUtilizationThresholdParam",
         "ParameterValue": "50"
+    },
+    {
+        "ParameterKey": "ALBAccessLogEnabledParam",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "ALBAccessLogS3BucketParam",
+        "ParameterValue": "jardo72-elb-access-logs"
+    },
+    {
+        "ParameterKey": "ALBAccessLogS3PrefixParam",
+        "ParameterValue": "L7-LB-Demo"
     }
 ]
