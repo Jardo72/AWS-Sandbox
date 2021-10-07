@@ -190,12 +190,15 @@ The project involves parametrized CloudFormation template ([cloud-formation-temp
 * Two security groups - one protecting the load balancer, the other protecting the EC2 instances.
 * Launch template for the EC2 instances, with user data involving download of the application JAR from an S3 bucket. IAM instance profile allowing access to the S3 bucket is also created as part of the stack. The S3 bucket is not part of the stack - it must exist when the creation of the CloudFormation stack is started, and the application JAR file must available in the S3 bucket.
 * EC2 auto scaling group with ELB health checks and target tracking scaling policy that dynamically adjusts the number of EC2 instances based on the CPU utilization.
+* Optional S3 bucket serving as storage for ALB access log. This is created only if the access log is requested, which is driven by one of the template parameters.
 
 The template defines mapping for AMI IDs, so the template can be used in various AWS regions. However, the mapping only contains AMI IDs for three regions: eu-central-1, eu-west-1 and eu-west-2. The following AWS CLI command illustrates how to use the CloudFormation template to create the stack.
 ```
 aws cloudformation create-stack --stack-name L7-LB-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
 
-The template involves several parameters. For some of them, default values are defined, so the values of these parameters can be omitted when creating the CloudFormation stack. However, some of the parameters require explicit values when creating the stack as there are no default values. The [stack-params.json](./stack-params.json) file contains parameter values used during my experiments.
+The template involves several parameters. For some of them, default values are defined, so the values of these parameters can be omitted when creating the CloudFormation stack. However, some of the parameters require explicit values when creating the stack as there are no default values. The [stack-params.json](./stack-params.json) file contains parameter values used during my experiments. The template expects the application JAR file to be available on an S3 bucket. The name of the S3 bucket must be specified as one of the template parameters.
 
 If the auto scaling group involves three instances of instance type t2.micro, using the [cpu-consumption-client.py](./cpu-consumption-client.py) script with three threads for 15 minutes is sufficient to achieve aggregate CPU utilization over 50%, which is the default threshold for scaling out. In other words, such a load is enough to force the auto scaling group to launch new EC2 instance(s) and thus new application instance(s).
+
+When deleting the stack, the S3 bucket serving as storage for ALB access log will not be deleted if there are some log files. In such case, the deletion of the entire stack will fail. The most simple way to resolve the issue is to retry the removal of the stack and allow CloudFormation to retain the S3 bucket. You can remove the log files and the bucket manually afterwards. 

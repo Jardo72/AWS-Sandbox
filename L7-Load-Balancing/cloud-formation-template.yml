@@ -86,14 +86,6 @@ Mappings:
     eu-west-2:
       HVM64: ami-0d26eb3972b7f8c96
 
-  ELBAccountIdMapping:
-    eu-central-1:
-      ELBAccountID: 054676820928
-    eu-west-1:
-      ELBAccountID: 156460612806
-    eu-west-2:
-      ELBAccountID: 652711504416
-
 Conditions:
   EnableALBAccessLog: !Equals ["true", !Ref ALBAccessLogEnabledParam]
 
@@ -126,9 +118,10 @@ Resources:
             Resource:
               - !Sub "arn:aws:s3:::${ALBAccessLogS3BucketParam}/*"
             Principal:
-              AWS: !Join ["", ["arn:aws:iam::", "054676820928", ":root"]]
-                # TODO:
-                # Fn::FindInMap [ELBAccountIdMapping, !Ref "AWS::Region", ELBAccountID]
+              AWS:
+                - "arn:aws:iam::054676820928:root"
+                - "arn:aws:iam::156460612806:root"
+                - "arn:aws:iam::652711504416:root"
           - Action:
               - s3:PutObject
             Effect: Allow
