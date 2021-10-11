@@ -14,7 +14,7 @@ It is possible to SSH to any of the two EC2 instances and ping the private IP ad
 ## Deployment
 The following command can be used to deploy the setup using the AWS CLI.
 ```
-aws cloudformation create-stack --stack-name VPC-Peering-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
+aws cloudformation create-stack --stack-name VPC-Peering-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --on-failure ROLLBACK
 ```
 
 The CloudFormation template involves two parameters which specify CIDR block for each of the two VPCs. The template also defines default values for both parameters, so the parameter file can be omitted from the AWS CLI command if the defaults are acceptable. The template defines mapping for AMI IDs, so the template can be used in various AWS regions. However, the mapping only contains AMI IDs for three regions: eu-central-1, eu-west-1 and eu-west-2.
