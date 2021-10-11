@@ -33,14 +33,6 @@ Parameters:
     Type: String
     Default: 10.1.0.0/16
 
-  EnableVPCFlowLogsParam:
-    Description: Specifies whether VPC flow logs are to be configured for both VPCs
-    Type: String
-    AllowedValues:
-      - "Yes"
-      - "No"
-    Default: "Yes"
-
 Mappings:
   AMIMapping:
     eu-central-1:
@@ -49,9 +41,6 @@ Mappings:
       HVM64: ami-02b4e72b17337d6c1
     eu-west-2:
       HVM64: ami-0d26eb3972b7f8c96
-
-Conditions:
-  EnableVPCFlowLogs: !Equals ["Yes", !Ref EnableVPCFlowLogsParam]
 
 Resources:
   VPCOne:
@@ -243,87 +232,3 @@ Resources:
       RouteTableId: !Ref RouteTableTwo
       DestinationCidrBlock: !Ref VPCOneCIDRParam
       VpcPeeringConnectionId: !Ref VPCPeeringConnection
-
-  VPCFLowLogLogGroupOne:
-    Type: AWS::Logs::LogGroup
-    Condition: EnableVPCFlowLogs
-    Properties:
-      LogGroupName: !Sub "${AWS::StackName}-VPCFLowLogOne"
-      RetentionInDays: 3
-
-  VPCFLowLogLogGroupTwo:
-    Type: AWS::Logs::LogGroup
-    Condition: EnableVPCFlowLogs
-    Properties:
-      LogGroupName: !Sub "${AWS::StackName}-VPCFLowLogTwo"
-      RetentionInDays: 3
-
-  LogWriterRoleOne:
-    Type: AWS::IAM::Role
-    Condition: EnableVPCFlowLogs
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: vpc-flow-logs.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: LogWritePermission
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                  - logs:DescribeLogGroups
-                  - logs:DescribeLogStreams
-                Resource: !GetAtt VPCFLowLogLogGroupOne.Arn
-
-  LogWriterRoleTwo:
-    Type: AWS::IAM::Role
-    Condition: EnableVPCFlowLogs
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: vpc-flow-logs.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: LogWritePermission
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                  - logs:DescribeLogGroups
-                  - logs:DescribeLogStreams
-                Resource: !GetAtt VPCFLowLogLogGroupTwo.Arn
-
-  VPCFLowLogOne:
-    Type: AWS::EC2::FlowLog
-    Condition: EnableVPCFlowLogs
-    Properties:
-      DeliverLogsPermissionArn: !GetAtt LogWriterRoleOne.Arn
-      LogDestination: !GetAtt VPCFLowLogLogGroupOne.Arn
-      LogDestinationType: cloud-watch-logs
-      ResourceId: !Ref VPCOne
-      ResourceType: VPC
-      TrafficType: ALL
-
-  VPCFLowLogTwo:
-    Type: AWS::EC2::FlowLog
-    Condition: EnableVPCFlowLogs
-    Properties:
-      DeliverLogsPermissionArn: !GetAtt LogWriterRoleTwo.Arn
-      LogDestination: !GetAtt VPCFLowLogLogGroupTwo.Arn
-      LogDestinationType: cloud-watch-logs
-      ResourceId: !Ref VPCTwo
-      ResourceType: VPC
-      TrafficType: ALL
