@@ -18,7 +18,7 @@
 #
 
 AWSTemplateFormatVersion: 2010-09-09
-Description: >-
+Description: |
   Demo with 2 custom VPCs, both in the same region and the same account. VPC peering
   connection between the two VPCs is established.
 
@@ -33,6 +33,14 @@ Parameters:
     Type: String
     Default: 10.1.0.0/16
 
+  EnableVPCFlowLogsParam:
+    Description: Specifies whether VPC flow logs are to be configured for both VPCs
+    Type: String
+    AllowedValues:
+      - "Yes"
+      - "No"
+    Default: "Yes"
+
 Mappings:
   AMIMapping:
     eu-central-1:
@@ -41,6 +49,9 @@ Mappings:
       HVM64: ami-02b4e72b17337d6c1
     eu-west-2:
       HVM64: ami-0d26eb3972b7f8c96
+
+Conditions:
+  EnableVPCFlowLogs: !Equals ["Yes", !Ref EnableVPCFlowLogsParam]
 
 Resources:
   VPCOne:
@@ -66,11 +77,11 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPCOne
-      CidrBlock: !Select [0, !Cidr [!Ref VPCOneCIDRParam, 1, 8 ]]
+      CidrBlock: !Select [0, !Cidr [!Ref VPCOneCIDRParam, 1, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   RouteTableOne:
     Type: AWS::EC2::RouteTable
@@ -110,12 +121,17 @@ Resources:
     Properties:
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref PublicSubnetVPCOne
       ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref SecurityGroupOne
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install nc -y
       Tags:
         - Key: Name
           Value: EC2-One
@@ -143,11 +159,11 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPCTwo
-      CidrBlock: !Select [0, !Cidr [!Ref VPCTwoCIDRParam, 1, 8 ]]
+      CidrBlock: !Select [0, !Cidr [!Ref VPCTwoCIDRParam, 1, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   RouteTableTwo:
     Type: AWS::EC2::RouteTable
@@ -177,6 +193,10 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
         - IpProtocol: icmp
           FromPort: -1
           ToPort: -1
@@ -187,12 +207,17 @@ Resources:
     Properties:
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref PublicSubnetVPCTwo
       ImageId: !FindInMap [AMIMapping, !Ref "AWS::Region", HVM64]
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref SecurityGroupTwo
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install nc -y
       Tags:
         - Key: Name
           Value: EC2-Two
@@ -201,8 +226,8 @@ Resources:
     Type: AWS::EC2::VPCPeeringConnection
     Properties:
       VpcId: !Ref VPCOne
-      PeerOwnerId: !Ref 'AWS::AccountId'
-      PeerRegion: !Ref 'AWS::Region'
+      PeerOwnerId: !Ref "AWS::AccountId"
+      PeerRegion: !Ref "AWS::Region"
       PeerVpcId: !Ref VPCTwo
 
   VPCPeeringConnectionRouteOne:
@@ -218,3 +243,87 @@ Resources:
       RouteTableId: !Ref RouteTableTwo
       DestinationCidrBlock: !Ref VPCOneCIDRParam
       VpcPeeringConnectionId: !Ref VPCPeeringConnection
+
+  VPCFLowLogLogGroupOne:
+    Type: AWS::Logs::LogGroup
+    Condition: EnableVPCFlowLogs
+    Properties:
+      LogGroupName: !Sub "${AWS::StackName}-VPCFLowLogOne"
+      RetentionInDays: 3
+
+  VPCFLowLogLogGroupTwo:
+    Type: AWS::Logs::LogGroup
+    Condition: EnableVPCFlowLogs
+    Properties:
+      LogGroupName: !Sub "${AWS::StackName}-VPCFLowLogTwo"
+      RetentionInDays: 3
+
+  LogWriterRoleOne:
+    Type: AWS::IAM::Role
+    Condition: EnableVPCFlowLogs
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LogWritePermission
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                Resource: !GetAtt VPCFLowLogLogGroupOne.Arn
+
+  LogWriterRoleTwo:
+    Type: AWS::IAM::Role
+    Condition: EnableVPCFlowLogs
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LogWritePermission
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - logs:DescribeLogGroups
+                  - logs:DescribeLogStreams
+                Resource: !GetAtt VPCFLowLogLogGroupTwo.Arn
+
+  VPCFLowLogOne:
+    Type: AWS::EC2::FlowLog
+    Condition: EnableVPCFlowLogs
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt LogWriterRoleOne.Arn
+      LogDestination: !GetAtt VPCFLowLogLogGroupOne.Arn
+      LogDestinationType: cloud-watch-logs
+      ResourceId: !Ref VPCOne
+      ResourceType: VPC
+      TrafficType: ALL
+
+  VPCFLowLogTwo:
+    Type: AWS::EC2::FlowLog
+    Condition: EnableVPCFlowLogs
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt LogWriterRoleTwo.Arn
+      LogDestination: !GetAtt VPCFLowLogLogGroupTwo.Arn
+      LogDestinationType: cloud-watch-logs
+      ResourceId: !Ref VPCTwo
+      ResourceType: VPC
+      TrafficType: ALL
