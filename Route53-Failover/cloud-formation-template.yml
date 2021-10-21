@@ -19,10 +19,10 @@
 
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
-  CloudFormation deployment of the L7 load balancing demo application, with complete stack whose primary
-  components are an application load balancer and an auto scaling group with EC2 instances running the L7
-  load balancing server application. The auto scaling group scales the number of EC2 instances depending
-  on the CPU utilization.
+  CloudFormation deployment of the Route53 failover demo application, with complete stack whose primary
+  components are two EC2 instances running the L7 load balancing server application, and a Route53 failover
+  routing policy which defines an alias for the two EC2 instances. The setup involves a Route53 health check
+  monitoring the health of the application running on the primary EC2 insatnce.
 
 Parameters:
   DeploymentArtifactoryBucketNameParam:
@@ -210,3 +210,41 @@ Resources:
         - Key: Name
           Value: R53-Failover-Demo-Secondary
 
+  # TODO
+  # PrimaryEC2InstanceHealthCheck:
+  #   Type: AWS::Route53::HealthCheck
+  #   Properties:
+  #     HealthCheckConfig:
+  #       FailureThreshold: 2
+  #       HealthThreshold: 2
+  #       IPAddress: !GetAtt PrimaryEC2Instance.PublicIp
+  #       Port: 80
+  #       ResourcePath: /api/health-check
+  #       RequestInterval: 30
+  #       Type: HTTP
+  #     HealthCheckTags:
+  #       - Key: Name
+  #         Value: Route53-Failover-Demo
+
+  # TODO
+  # Route53RecordSet:
+  #   Type: AWS::Route53::RecordSet
+  #   Properties:
+  #     HostedZoneName: TODO
+  #     Name: !Sub "${AWS::StackName}-Route53-RecordSet"
+  #     Type: A
+  #     TTL: 60
+  #     ResourceRecords:
+  #       - !GetAtt PrimaryEC2Instance.PublicIp
+  #       - !GetAtt SecondaryEC2Instance.PublicIp
+  #     Failover: PRIMARY
+  #     HealthCheckId: !Ref PrimaryEC2InstanceHealthCheck
+
+Outputs:
+  PrimaryEC2InstancePublicIP:
+    Description: Public IP address of the primary EC2 instance
+    Value: !GetAtt PrimaryEC2Instance.PublicIp
+
+  SecondaryEC2InstancePublicIP:
+    Description: Public IP address of the secondary EC2 instance
+    Value: !GetAtt SecondaryEC2Instance.PublicIp
