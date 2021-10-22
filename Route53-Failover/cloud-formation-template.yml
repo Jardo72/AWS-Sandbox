@@ -19,10 +19,10 @@
 
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
-  CloudFormation deployment of the Route53 failover demo application, with complete stack whose primary
-  components are two EC2 instances running the L7 load balancing server application, and a Route53 failover
-  routing policy which defines an alias for the two EC2 instances. The setup involves a Route53 health check
-  monitoring the health of the application running on the primary EC2 insatnce.
+  CloudFormation deployment of the Route 53 failover demo application, with complete stack whose primary
+  components are two EC2 instances running the L7 load balancing server application, and a Route 53 failover
+  routing policy which defines an alias for the two EC2 instances. The setup involves a Route 53 health check
+  monitoring the health of the application running on the primary EC2 instance.
 
 Parameters:
   DeploymentArtifactoryBucketNameParam:
@@ -210,21 +210,19 @@ Resources:
         - Key: Name
           Value: R53-Failover-Demo-Secondary
 
-  # TODO
-  # PrimaryEC2InstanceHealthCheck:
-  #   Type: AWS::Route53::HealthCheck
-  #   Properties:
-  #     HealthCheckConfig:
-  #       FailureThreshold: 2
-  #       HealthThreshold: 2
-  #       IPAddress: !GetAtt PrimaryEC2Instance.PublicIp
-  #       Port: 80
-  #       ResourcePath: /api/health-check
-  #       RequestInterval: 30
-  #       Type: HTTP
-  #     HealthCheckTags:
-  #       - Key: Name
-  #         Value: Route53-Failover-Demo
+  PrimaryEC2InstanceHealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      HealthCheckConfig:
+        FailureThreshold: 2
+        IPAddress: !GetAtt PrimaryEC2Instance.PublicIp
+        Port: !Ref EC2PortParam
+        ResourcePath: /api/health-check
+        RequestInterval: 30
+        Type: HTTP
+      HealthCheckTags:
+        - Key: Name
+          Value: Route53-Failover-Demo
 
   # TODO
   # Route53RecordSet:
