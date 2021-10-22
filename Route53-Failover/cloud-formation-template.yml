@@ -51,9 +51,13 @@ Parameters:
     Default: t2.nano
 
   CurrentVersionAMIIdParam:
-    Description: AMI ID for the EC2 instances (this should automatically take the current version).
+    Description: AMI ID for the EC2 instances (this should automatically take the current version)
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+  HostedZoneIdParam:
+    Description: The ID of the Route 53 hosted zone in which the failover record is to be created
+    Type: String
 
 Resources:
   DeploymentArtifactoryReaderRole:
@@ -224,19 +228,30 @@ Resources:
         - Key: Name
           Value: Route53-Failover-Demo
 
-  # TODO
-  # Route53RecordSet:
-  #   Type: AWS::Route53::RecordSet
-  #   Properties:
-  #     HostedZoneName: TODO
-  #     Name: !Sub "${AWS::StackName}-Route53-RecordSet"
-  #     Type: A
-  #     TTL: 60
-  #     ResourceRecords:
-  #       - !GetAtt PrimaryEC2Instance.PublicIp
-  #       - !GetAtt SecondaryEC2Instance.PublicIp
-  #     Failover: PRIMARY
-  #     HealthCheckId: !Ref PrimaryEC2InstanceHealthCheck
+  PrimaryRoute53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneIdParam
+      Name: r53-failover.jardo72.de
+      Type: A
+      TTL: 60
+      ResourceRecords:
+        - !GetAtt PrimaryEC2Instance.PublicIp
+      SetIdentifier: !Sub "${AWS::StackName}-Primary-RecordSet"
+      Failover: PRIMARY
+      HealthCheckId: !Ref PrimaryEC2InstanceHealthCheck
+
+  SecondaryRoute53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneIdParam
+      Name: r53-failover.jardo72.de
+      Type: A
+      TTL: 60
+      ResourceRecords:
+        - !GetAtt SecondaryEC2Instance.PublicIp
+      SetIdentifier: !Sub "${AWS::StackName}-Secondary-RecordSet"
+      Failover: SECONDARY
 
 Outputs:
   PrimaryEC2InstancePublicIP:

@@ -18,5 +18,9 @@
     {
         "ParameterKey": "EC2InstanceTypeParam",
         "ParameterValue": "t2.nano"
+    },
+    {
+        "ParameterKey": "HostedZoneIdParam",
+        "ParameterValue": "Z03331713FQM1D0VCS5TP"
     }
 ]

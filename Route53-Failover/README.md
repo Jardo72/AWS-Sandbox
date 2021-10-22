@@ -1,6 +1,7 @@
 # Route53 Failover Demo
 
 ## Introduction
+Demonstration of Route 53 failover routing policy. Simple deployment of two EC2 instances, each running the [L7 Load Balancing Demo](../L7-Load-Balancing) application. 
 
 ## Deployment
 ```
