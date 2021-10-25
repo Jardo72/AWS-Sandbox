@@ -1,0 +1,263 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  CloudFormation deployment of the Route 53 failover demo application, with complete stack whose primary
+  components are two EC2 instances running the L7 load balancing server application, and a Route 53 failover
+  routing policy which defines an alias for the two EC2 instances. The setup involves a Route 53 health check
+  monitoring the health of the application running on the primary EC2 instance.
+
+Parameters:
+  DeploymentArtifactoryBucketNameParam:
+    Description: The name of the S3 bucket which will serve as the artifactory with JAR files
+    Type: String
+
+  DeploymentArtifactoryPrefixParam:
+    Description: The prefix of the application JAR file within the S3 bucket which will serve as the artifactory with JAR files
+    Type: String
+
+  ApplicationJARFileParam:
+    Description: The name of the application JAR file (fat runnable JAR file is expected)
+    Type: String
+
+  EC2PortParam:
+    Description: TCP port the application instances running on EC2 will use to accept incoming connections
+    Type: Number
+    Default: 80
+
+  EC2InstanceTypeParam:
+    Type: String
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+    Default: t2.nano
+
+  CurrentVersionAMIIdParam:
+    Description: AMI ID for the EC2 instances (this should automatically take the current version)
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+  HostedZoneIdParam:
+    Description: The ID of the Route 53 hosted zone in which the failover record is to be created
+    Type: String
+
+Resources:
+  DeploymentArtifactoryReaderRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-DeploymentArtifactoryReaderRole"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: DeploymentArtifactoryReadAccessPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub "arn:aws:s3:::${DeploymentArtifactoryBucketNameParam}/*"
+
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: Route53-Failover-Demo
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 3, 8]]
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+
+  PublicSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 3, 8]]
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref "AWS::Region"
+
+  # the public subnets need a route table with default route to the Internet Gateway
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetOne
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetTwo
+
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow inbound TCP traffic on EC2 port from anywhere
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: TCP
+          FromPort: !Ref EC2PortParam
+          ToPort: !Ref EC2PortParam
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref DeploymentArtifactoryReaderRole
+
+  EC2LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
+      LaunchTemplateData:
+        ImageId: !Ref CurrentVersionAMIIdParam
+        InstanceType: !Ref EC2InstanceTypeParam
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref EC2InstanceSecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install java-1.8.0-openjdk -y
+            aws s3 cp s3://${DeploymentArtifactoryBucketNameParam}/${DeploymentArtifactoryPrefixParam}/${ApplicationJARFileParam} /tmp/${ApplicationJARFileParam}
+            java -Dserver.port=${EC2PortParam} -jar /tmp/${ApplicationJARFileParam} &
+
+  PrimaryEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetOne
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref EC2LaunchTemplate
+        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: R53-Failover-Demo-Primary
+
+  SecondaryEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetTwo
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref EC2LaunchTemplate
+        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: R53-Failover-Demo-Secondary
+
+  PrimaryEC2InstanceHealthCheck:
+    Type: AWS::Route53::HealthCheck
+    Properties:
+      HealthCheckConfig:
+        FailureThreshold: 2
+        IPAddress: !GetAtt PrimaryEC2Instance.PublicIp
+        Port: !Ref EC2PortParam
+        ResourcePath: /api/health-check
+        RequestInterval: 30
+        Type: HTTP
+      HealthCheckTags:
+        - Key: Name
+          Value: Route53-Failover-Demo
+
+  PrimaryRoute53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneIdParam
+      Name: r53-failover.jardo72.de
+      Type: A
+      TTL: 60
+      ResourceRecords:
+        - !GetAtt PrimaryEC2Instance.PublicIp
+      SetIdentifier: !Sub "${AWS::StackName}-Primary-RecordSet"
+      Failover: PRIMARY
+      HealthCheckId: !Ref PrimaryEC2InstanceHealthCheck
+
+  SecondaryRoute53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneIdParam
+      Name: r53-failover.jardo72.de
+      Type: A
+      TTL: 60
+      ResourceRecords:
+        - !GetAtt SecondaryEC2Instance.PublicIp
+      SetIdentifier: !Sub "${AWS::StackName}-Secondary-RecordSet"
+      Failover: SECONDARY
+
+Outputs:
+  PrimaryEC2InstancePublicIP:
+    Description: Public IP address of the primary EC2 instance
+    Value: !GetAtt PrimaryEC2Instance.PublicIp
+
+  SecondaryEC2InstancePublicIP:
+    Description: Public IP address of the secondary EC2 instance
+    Value: !GetAtt SecondaryEC2Instance.PublicIp
