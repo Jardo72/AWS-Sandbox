@@ -1,0 +1,14 @@
+[
+    {
+        "ParameterKey": "DeploymentArtifactoryBucketNameParam",
+        "ParameterValue": "jardo72-deplyment-artifactory"
+    },
+    {
+        "ParameterKey": "S3AccessLogStoreBucketNameParam",
+        "ParameterValue": "jardo72-s3-access-log-store"
+    },
+    {
+        "ParameterKey": "ELBAccessLogStoreBucketNameParam",
+        "ParameterValue": "jardo72-elb-access-log-store"
+    }
+]
