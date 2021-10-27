@@ -2,7 +2,7 @@
 
 ## Introduction
 Triplet of S3 buckets (with related access policies/roles) serving as common infrastructure for the other applications in this Git repository:
-* Deployment artifactory bucket for installation artifacts like JAR files, ZIP files with Python code for Lambda functions.
+* Deployment artifactory bucket for installation artifacts like JAR files, ZIP files with Python code for Lambda functions etc.
 * Bucket for S3 access logs.
 * Bucket for ELB access logs.
 
