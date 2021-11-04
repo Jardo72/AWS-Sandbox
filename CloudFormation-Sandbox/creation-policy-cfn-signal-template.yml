@@ -19,6 +19,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: |
+  Demonstration of creation policy and cfn-signal
 
 Resources:
   SignalingInstance:
