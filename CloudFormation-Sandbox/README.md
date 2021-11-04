@@ -68,3 +68,19 @@ Deployment via AWS CLI:
 ```
 aws cloudformation create-stack --stack-name CFN-Creation-Policy-Signal --template-body file://creation-policy-cfn-signal-template.yml --on-failure ROLLBACK
 ```
+
+
+## Change-Set Demo
+Demonstration of CloudFormation change-sets.
+
+Source code:
+- [change-set-template-v1.yml](./change-set-template-v1.yml)
+- [change-set-template-v2.yml](./change-set-template-v2.yml)
+- [change-set-template-v3.yml](./change-set-template-v3.yml)
+
+Deployment of template version 1 via AWS CLI:
+```
+aws cloudformation create-stack --stack-name CFN-Change-Set --template-body file://change-set-template-v1.yml --on-failure ROLLBACK
+```
+
+It is better to update the stack (apply version 2 and 3 of the template) via the AWS Management Console where change-sets are presented visually.
