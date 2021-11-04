@@ -84,3 +84,18 @@ aws cloudformation create-stack --stack-name CFN-Change-Set --template-body file
 ```
 
 It is better to update the stack (apply version 2 and 3 of the template) via the AWS Management Console where change-sets are presented visually.
+
+
+## Helper Scripts Demo
+Demonstration of CloudFormation helper scripts (cfn-init, cfn-hup).
+
+Source code:
+- [helper-scripts-template-v1.yml](./helper-scripts-template-v1.yml)
+- [helper-scripts-template-v2.yml](./helper-scripts-template-v2.yml)
+
+Deployment of template version 1 via AWS CLI:
+```
+aws cloudformation create-stack --stack-name CFN-Helper-Scripts --template-body file://helper-scripts-template-v1.yml --on-failure ROLLBACK
+```
+
+It is better to update the stack (apply version 2 of the template) via the AWS Management Console where change-sets are presented visually.
