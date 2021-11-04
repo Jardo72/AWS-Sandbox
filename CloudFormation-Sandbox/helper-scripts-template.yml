@@ -22,6 +22,11 @@ Description: |
   Demonstration of CloudFormation helper scripts - template version 1
 
 Parameters:
+  MessageParam:
+    Description: Message for the index.html file
+    Type: String
+    Default: I am the default message from the template.
+
   CurrentVersionAMIIdParam:
     Description: AMI ID for the EC2 instances (this should automatically take the current version).
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
@@ -85,14 +90,41 @@ Resources:
 
   EC2Instance:
     Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              httpd: []
+          files:
+            /var/www/html/index.html:
+              content: !Sub |
+                <html>
+                <head><title>CloudFormation - cfn-init/cfn-hup Demo</title></head>
+                <body><h1><center>Hi there! ${MessageParam}</center></h1></body>
+                </html>
+          services:
+            sysvinit:
+              httpd:
+                enabled: true
+                ensureRunning: true
+                files:
+                  - /var/www/html/index.html
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT5M
     Properties:
       AvailabilityZone: !Select
         - 0
         - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref Subnet
-      # TODO: remove
-      # IamInstanceProfile: !Ref EC2InstanceProfile
       ImageId: !Ref CurrentVersionAMIIdParam
       InstanceType: t2.nano
       SecurityGroupIds:
         - !Ref SecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region}
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region}
