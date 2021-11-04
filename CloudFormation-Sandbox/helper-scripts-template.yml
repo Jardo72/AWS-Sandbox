@@ -83,10 +83,14 @@ Resources:
       GroupDescription: Allow inbound HTTP traffic
       VpcId: !Ref VPC
       SecurityGroupIngress:
-        IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
 
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -97,6 +101,26 @@ Resources:
             yum:
               httpd: []
           files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackName}
+                region=${AWS::Region}
+                interval=1
+                verbose=true
+              mode: "000400"
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.EC2Instance.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource EC2Instance --region ${AWS::Region}
+                runas=root
+              mode: "000400"
+              owner: root
+              group: root
             /var/www/html/index.html:
               content: !Sub |
                 <html>
@@ -105,6 +129,12 @@ Resources:
                 </html>
           services:
             sysvinit:
+              cfn-hup:
+                enabled: "true"
+                ensureRunning: "true"
+                files:
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
               httpd:
                 enabled: true
                 ensureRunning: true
