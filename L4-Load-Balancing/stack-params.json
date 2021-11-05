@@ -26,5 +26,17 @@
     {
         "ParameterKey": "EnableVPCFlowLogParam",
         "ParameterValue": "Yes"
+    },
+    {
+        "ParameterKey": "DNSAliasEnabledParam",
+        "ParameterValue": "Yes"
+    },
+    {
+        "ParameterKey": "HostedZoneIdParam",
+        "ParameterValue": "Z03331713FQM1D0VCS5TP"
+    },
+    {
+        "ParameterKey": "DNSAliasForNLBParam",
+        "ParameterValue": "nlb-demo.jardo72.de"
     }
 ]

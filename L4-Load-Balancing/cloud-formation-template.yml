@@ -61,6 +61,22 @@ Parameters:
       - "No"
     Default: "No"
 
+  DNSAliasEnabledParam:
+    Description: Specifies whether DNS alias is to be configured for the NLB
+    Type: String
+    AllowedValues:
+      - "Yes"
+      - "No"
+    Default: "Yes"
+  
+  HostedZoneIdParam:
+    Description: The ID of the Route 53 hosted zone in which the DNS alias is to be created
+    Type: String
+
+  DNSAliasForNLBParam:
+    Description: The DNS (Route 53) alias for the NLB
+    Type: String
+
 Mappings:
   AMIMapping:
     eu-central-1:
@@ -72,6 +88,8 @@ Mappings:
 
 Conditions:
   EnableVPCFlowLog: !Equals ["Yes", !Ref EnableVPCFlowLogParam]
+
+  EnableDNSAlias: !Equals ["Yes", !Ref DNSAliasEnabledParam]
 
 Resources:
   DeploymentArtifactoryReaderRole:
@@ -410,10 +428,18 @@ Resources:
       ResourceType: VPC
       TrafficType: ALL
 
+  NLBAlias:
+    Type: AWS::Route53::RecordSet
+    Condition: EnableDNSAlias
+    Properties:
+      HostedZoneId: !Ref HostedZoneIdParam
+      Name: !Ref DNSAliasForNLBParam
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+
 Outputs:
   LoadBalancerDNSName:
     Description: DNS name of the created network load balancer
     Value: !GetAtt LoadBalancer.DNSName
-
-# see
-# https://github.com/widdix/aws-cf-templates/blob/master/vpc/vpc-flow-logs.yaml
