@@ -38,5 +38,17 @@
     {
         "ParameterKey": "ALBAccessLogS3PrefixParam",
         "ParameterValue": "L7-LB-Demo"
+    },
+    {
+        "ParameterKey": "DNSAliasEnabledParam",
+        "ParameterValue": "true"
+    },
+    {
+        "ParameterKey": "HostedZoneIdParam",
+        "ParameterValue": "Z03331713FQM1D0VCS5TP"
+    },
+    {
+        "ParameterKey": "DNSAliasForALBParam",
+        "ParameterValue": "alb-demo.jardo72.de"
     }
 ]

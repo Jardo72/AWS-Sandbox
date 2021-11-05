@@ -77,6 +77,22 @@ Parameters:
     Type: String
     Default: L7-LB-Demo
 
+  DNSAliasEnabledParam:
+    Description: Specifies whether DNS alias is to be configured for the ALB
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: false
+  
+  HostedZoneIdParam:
+    Description: The ID of the Route 53 hosted zone in which the DNS alias is to be created
+    Type: String
+
+  DNSAliasForALBParam:
+    Description: The DNS (Route 53) alias for the ALB
+    Type: String
+
 Mappings:
   AMIMapping:
     eu-central-1:
@@ -88,6 +104,8 @@ Mappings:
 
 Conditions:
   EnableALBAccessLog: !Equals ["true", !Ref ALBAccessLogEnabledParam]
+
+  EnableDNSAlias: !Equals ["true", !Ref DNSAliasEnabledParam]
 
 Resources:
   ALBAccessLogBucket:
@@ -399,6 +417,17 @@ Resources:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
         TargetValue: !Ref TargetCPUUtilizationThresholdParam
+
+  ALBAlias:
+    Type: AWS::Route53::RecordSet
+    Condition: EnableDNSAlias
+    Properties:
+      HostedZoneId: !Ref HostedZoneIdParam
+      Name: !Ref DNSAliasForALBParam
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt LoadBalancer.DNSName
+        HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
 
 Outputs:
   LoadBalancerDNSName:
