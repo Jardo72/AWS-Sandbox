@@ -59,6 +59,10 @@ Parameters:
     Description: The ID of the Route 53 hosted zone in which the failover record is to be created
     Type: String
 
+  EC2InstanceDNSName:
+    Description: The DNS name for the Route 53 failover record
+    Type: String
+
 Resources:
   DeploymentArtifactoryReaderRole:
     Type: AWS::IAM::Role
@@ -232,7 +236,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneIdParam
-      Name: r53-failover.jardo72.de
+      Name: !Ref EC2InstanceDNSName
       Type: A
       TTL: 60
       ResourceRecords:
@@ -245,7 +249,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneIdParam
-      Name: r53-failover.jardo72.de
+      Name: !Ref EC2InstanceDNSName
       Type: A
       TTL: 60
       ResourceRecords:

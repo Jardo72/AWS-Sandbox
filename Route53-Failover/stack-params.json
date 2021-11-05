@@ -22,5 +22,9 @@
     {
         "ParameterKey": "HostedZoneIdParam",
         "ParameterValue": "Z03331713FQM1D0VCS5TP"
+    },
+    {
+        "ParameterKey": "EC2InstanceDNSName",
+        "ParameterValue": "r53-failover.jardo72.de"
     }
 ]
