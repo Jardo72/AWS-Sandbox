@@ -99,13 +99,65 @@ Resources:
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow inbound SSH traffic
+      GroupDescription: Security group for EC2 instances
       VpcId: !Ref VPC
       SecurityGroupIngress:
         IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: 0.0.0.0/0
+
+  EFSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for EFS mount targets
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        IpProtocol: tcp
+        FromPort: 2049
+        ToPort: 2049
+        CidrIp: 0.0.0.0/0
+
+  FileSystem:
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: false
+      PerformanceMode: generalPurpose
+      ThroughputMode: bursting
+      FileSystemTags:
+        - Key: Name
+          Value: EFS-Demo
+
+  BlueMountTarget:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref FileSystem
+      SubnetId: !Ref BlueSubnet
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  GreenMountTarget:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref FileSystem
+      SubnetId: !Ref GreenSubnet
+      SecurityGroups:
+        - !Ref EFSSecurityGroup
+
+  EC2LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
+      LaunchTemplateData:
+        ImageId: !Ref CurrentVersionAMIIdParam
+        InstanceType: t2.nano
+        SecurityGroupIds:
+          - !Ref EC2SecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install amazon-efs-utils -y
 
   BlueEC2Instance:
     Type: AWS::EC2::Instance
@@ -114,8 +166,9 @@ Resources:
         - 0
         - Fn::GetAZs: !Ref 'AWS::Region'
       SubnetId: !Ref BlueSubnet
-      ImageId: !Ref CurrentVersionAMIIdParam
-      InstanceType: t2.nano
+      LaunchTemplate:
+        LaunchTemplateId: !Ref EC2LaunchTemplate
+        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
       SecurityGroupIds:
         - !Ref EC2SecurityGroup
       Tags:
@@ -129,10 +182,26 @@ Resources:
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
       SubnetId: !Ref GreenSubnet
-      ImageId: !Ref CurrentVersionAMIIdParam
-      InstanceType: t2.nano
+      LaunchTemplate:
+        LaunchTemplateId: !Ref EC2LaunchTemplate
+        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
       SecurityGroupIds:
         - !Ref EC2SecurityGroup
       Tags:
         - Key: Name
           Value: EFS-Demo-Green
+
+Outputs:
+  FileSystemID:
+    Description: File system ID
+    Value: !Ref FileSystem
+
+  BlueMountTarget:
+    Description: Mount target ID in the blue subnet
+    Value: !Ref BlueMountTarget
+
+  GreenMountTarget:
+    Description: Mount target ID in the green subnet
+    Value: !Ref GreenMountTarget
+
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/quickref-efs.html
