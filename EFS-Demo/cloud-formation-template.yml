@@ -159,16 +159,15 @@ Resources:
           - !Ref EC2SecurityGroup
         UserData:
           Fn::Base64: !Sub |
-            #!/bin/bash
+            #!/bin/bash -xe
             yum update -y
             yum install amazon-efs-utils -y
-            echo "${FileSystem}" > /EFS-ID.txt
             mkdir /mnt/efs
             mount -t efs ${FileSystem}:/ /mnt/efs
-            echo "Mount result = $?" > /mount-result.txt
 
   BlueEC2Instance:
     Type: AWS::EC2::Instance
+    DependsOn: BlueMountTarget
     Properties:
       AvailabilityZone: !Select
         - 0
@@ -185,6 +184,7 @@ Resources:
 
   GreenEC2Instance:
     Type: AWS::EC2::Instance
+    DependsOn: GreenMountTarget
     Properties:
       AvailabilityZone: !Select
         - 1
@@ -211,5 +211,3 @@ Outputs:
   GreenMountTarget:
     Description: Mount target ID in the green subnet
     Value: !Ref GreenMountTarget
-
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/quickref-efs.html
