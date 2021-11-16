@@ -112,11 +112,15 @@ Resources:
     Properties:
       GroupDescription: Security group for EFS mount targets
       VpcId: !Ref VPC
-      SecurityGroupIngress:
-        IpProtocol: tcp
-        FromPort: 2049
-        ToPort: 2049
-        CidrIp: 0.0.0.0/0
+
+  EFSSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EFSSecurityGroup
+      IpProtocol: tcp
+      FromPort: 2049
+      ToPort: 2049
+      SourceSecurityGroupId: !Ref EC2SecurityGroup
 
   FileSystem:
     Type: AWS::EFS::FileSystem
@@ -158,6 +162,10 @@ Resources:
             #!/bin/bash
             yum update -y
             yum install amazon-efs-utils -y
+            echo "${FileSystem}" > /EFS-ID.txt
+            mkdir /mnt/efs
+            mount -t efs ${FileSystem}:/ /mnt/efs
+            echo "Mount result = $?" > /mount-result.txt
 
   BlueEC2Instance:
     Type: AWS::EC2::Instance
