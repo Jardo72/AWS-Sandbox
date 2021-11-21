@@ -46,6 +46,18 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
+  DeploymentArtifactoryReadAccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${AWS::StackName}-DeploymentArtifactoryReadAccess-Policy"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+            Resource: !Sub "arn:aws:s3:::${DeploymentArtifactoryBucketNameParam}/*"
+
   DeploymentArtifactoryReaderRole:
     Type: AWS::IAM::Role
     Properties:
@@ -59,15 +71,8 @@ Resources:
                 - ec2.amazonaws.com
             Action:
               - sts:AssumeRole
-      Policies:
-        - PolicyName: DeploymentArtifactoryReadAccessPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                Resource: !Sub "arn:aws:s3:::${DeploymentArtifactoryBucketNameParam}/*"
+      ManagedPolicyArns:
+        - !Ref DeploymentArtifactoryReadAccessPolicy
 
   S3AccessLogStoreBucket:
     Type: AWS::S3::Bucket
@@ -158,6 +163,10 @@ Outputs:
   DeploymentArtifactoryBucketName:
     Description: The name of the S3 bucket that will store deployment artifacts like JAR files, ZIP files with Python code etc.
     Value: !Ref DeploymentArtifactoryBucketNameParam
+
+  DeploymentArtifactoryReadAccessPolicyArn:
+    Description: The ARN of the IAM policy allowing read access to the deployment artifactory bucket
+    Value: !Ref DeploymentArtifactoryReadAccessPolicy
 
   S3AccessLogStoreBucketName:
     Description: The name of the S3 bucket that will be used as destination for S3 access logs
