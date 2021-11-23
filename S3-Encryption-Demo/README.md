@@ -28,3 +28,5 @@ aws cloudformation create-stack --stack-name S3-Encryption-Demo --template-body 
 ```
 
 The names of the S3 buckets as well as the ARN of the KMS key for the SSE-KMS encryption must be specified as template parameters. The [stack-params.json](./stack-params.json) file contains parameter values used during my experiments.
+
+Before deleting the stack, delete all files from the S3 buckets. Otherwise, the removal of the stack will fail.
