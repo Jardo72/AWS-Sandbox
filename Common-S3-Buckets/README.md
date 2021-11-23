@@ -6,6 +6,8 @@ Triplet of S3 buckets (with related access policies/roles) serving as common inf
 * Bucket for S3 access logs.
 * Bucket for ELB access logs.
 
+The two buckets for access logs (S3 and ELB) are configured with lifecycle rules that automatically delete files which are 14 days old.
+
 ## Deployment
 The ([CloudFormation template](./cloud-formation-template.yml)) in this directory can be used to create the buckets and the related access policies/roles. The following AWS CLI command illustrates how to use the CloudFormation template to create the stack.
 
