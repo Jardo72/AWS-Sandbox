@@ -1,0 +1,22 @@
+[
+    {
+        "ParameterKey": "DefaultKMSEncryptionBucketNameParam",
+        "ParameterValue": "jardo72-default-sse-kms-encryption-bucket"
+    },
+    {
+        "ParameterKey": "DefaultS3EncryptionBucketNameParam",
+        "ParameterValue": "jardo72-default-sse-s3-encryption-bucket"
+    },
+    {
+        "ParameterKey": "EnforcedKMSEncryptionBucketNameParam",
+        "ParameterValue": "jardo72-enforced-sse-kms-encryption-bucket"
+    },
+    {
+        "ParameterKey": "EnforcedS3EncryptionBucketNameParam",
+        "ParameterValue": "jardo72-enforced-sse-s3-encryption-bucket"
+    },
+    {
+        "ParameterKey": "KMSEncryptionKeyArnParam",
+        "ParameterValue": "arn:aws:kms:eu-central-1:467504711004:key/a48a7295-7b9a-421a-9ba0-c6a78e39f873"
+    }
+]

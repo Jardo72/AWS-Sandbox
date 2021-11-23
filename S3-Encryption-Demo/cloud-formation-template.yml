@@ -1,0 +1,131 @@
+#
+# Copyright 2021 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  Demonstration of default S3 server-side encryption (default encryption plus bucket policies enforcing encryption)
+
+Parameters:
+  DefaultKMSEncryptionBucketNameParam:
+    Description: The name of the S3 bucket with default SSE-KMS encryption
+    Type: String
+
+  DefaultS3EncryptionBucketNameParam:
+    Description: The name of the S3 bucket with default SSE-S3 encryption
+    Type: String
+
+  EnforcedKMSEncryptionBucketNameParam:
+    Description: The name of the S3 bucket with bucket policy enforcing SSE-KMS encryption
+    Type: String
+
+  EnforcedS3EncryptionBucketNameParam:
+    Description: The name of the S3 bucket with bucket policy enforcing SSE-S3 encryption
+    Type: String
+
+  KMSEncryptionKeyArnParam:
+    Description: The ARN of the KMS CMK to be used for the SSE-KMS encryption
+    Type: String
+
+Resources:
+  DefaultKMSEncryptionBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DefaultKMSEncryptionBucketNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !Ref KMSEncryptionKeyArnParam
+
+  DefaultS3EncryptionBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref DefaultS3EncryptionBucketNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  EnforcedKMSEncryptionBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref EnforcedKMSEncryptionBucketNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  EnforcedKMSEncryptionBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref EnforcedKMSEncryptionBucketNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: EnforceSSEKMSEncryption
+            Action:
+              - s3:PutObject
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${EnforcedKMSEncryptionBucketNameParam}/*"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                "s3:x-amz-server-side-encryption": "aws:kms"
+
+  EnforcedS3EncryptionBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref EnforcedS3EncryptionBucketNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  EnforcedS3EncryptionBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref EnforcedS3EncryptionBucketNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: EnforceSSES3Encryption
+            Action:
+              - s3:PutObject
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${EnforcedS3EncryptionBucketNameParam}/*"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                "s3:x-amz-server-side-encryption": AES256
