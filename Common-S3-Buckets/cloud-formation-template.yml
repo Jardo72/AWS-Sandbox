@@ -84,31 +84,11 @@ Resources:
           - Id: AutomaticCleanupRule
             Status: Enabled
             ExpirationInDays: 14
-      # TODO: find out what will work
-      # PublicAccessBlockConfiguration:
-      #   BlockPublicAcls: true
-      #   BlockPublicPolicy: true
-      #   IgnorePublicAcls: true
-      #   RestrictPublicBuckets: true
-
-  S3AccessLogBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3AccessLogStoreBucketNameParam
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - s3:GetObject
-              - s3:PutObject
-              - s3:PutObjectAcl
-              - s3:ListBucket
-            Effect: Allow
-            Resource:
-              - !Sub "arn:aws:s3:::${S3AccessLogStoreBucketNameParam}/*"
-              - !Sub "arn:aws:s3:::${S3AccessLogStoreBucketNameParam}"
-            Principal:
-              Service: s3.amazonaws.com
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
 
   ELBAccessLogStoreBucket:
     Type: AWS::S3::Bucket
