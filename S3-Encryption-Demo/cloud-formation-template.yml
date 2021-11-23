@@ -26,16 +26,20 @@ Parameters:
     Description: The name of the S3 bucket with default SSE-KMS encryption
     Type: String
 
-  KMSEncryptionKeyArnParam:
-    Description: The ARN of the KMS CMK to be used for the SSE-KMS encryption
-    Type: String
-
   DefaultS3EncryptionBucketNameParam:
     Description: The name of the S3 bucket with default SSE-S3 encryption
     Type: String
 
+  EnforcedKMSEncryptionBucketNameParam:
+    Description: The name of the S3 bucket with bucket policy enforcing SSE-KMS encryption
+    Type: String
+
   EnforcedS3EncryptionBucketNameParam:
     Description: The name of the S3 bucket with bucket policy enforcing SSE-S3 encryption
+    Type: String
+
+  KMSEncryptionKeyArnParam:
+    Description: The ARN of the KMS CMK to be used for the SSE-KMS encryption
     Type: String
 
 Resources:
@@ -69,6 +73,34 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+
+  EnforcedKMSEncryptionBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref EnforcedKMSEncryptionBucketNameParam
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  EnforcedKMSEncryptionBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref EnforcedKMSEncryptionBucketNameParam
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: EnforceSSEKMSEncryption
+            Action:
+              - s3:PutObject
+            Effect: Deny
+            Resource: !Sub "arn:aws:s3:::${EnforcedKMSEncryptionBucketNameParam}/*"
+            Principal: "*"
+            Condition:
+              StringNotEquals:
+                "s3:x-amz-server-side-encryption": "aws:kms"
 
   EnforcedS3EncryptionBucket:
     Type: AWS::S3::Bucket
