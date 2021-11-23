@@ -14,6 +14,12 @@ The following table summarizes the setup.
 | EnforcedKMSEncryptionBucket | None               | SSE-KMS                              |
 | EnforcedS3EncryptionBucket  | None               | SSE-S3                               |
 
+The buckets with default encryption allow any uploads:
+* an upload without encryption leads to default encryption being applied
+* an upload with encryption applies the specified encryption method (which can but does not have to be the same as the default)
+
+The buckets with enforced encryption allow only uploads with encryption matching with the bucket policy. Uploads without encryption are rejected with access denied. Similarly, uploads with encryption distinct from the encryption enforced by the bucket policy are rejected with access denied.
+
 ## Deployment
 The project involves a CloudFormation template ([cloud-formation-template.yml](./cloud-formation-template.yml)) that can be used to provision all the AWS resources comprising the above described setup. The following AWS CLI command illustrates how to use the CloudFormation template to create the stack described in the previous section.
 
