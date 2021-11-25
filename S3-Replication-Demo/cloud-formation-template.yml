@@ -38,7 +38,7 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
       ReplicationConfiguration:
-        Role: !Ref ReplicationRole
+        Role: !GetAtt ReplicationRole.Arn
         Rules: 
           - Destination:
               Bucket: !GetAtt DestinationBucket.Arn
@@ -76,4 +76,25 @@ Resources:
                 - s3.amazonaws.com
             Action:
               - sts:AssumeRole
-              
+      Policies:
+        - PolicyName: S3ReplicationPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetReplicationConfiguration
+                Resource: !Sub "arn:aws:s3:::${SourceBucketName}"
+              - Effect: Allow
+                Action:
+                  - s3:GetObjectVersion
+                  - s3:GetObjectVersionAcl
+                  - s3:GetObjectVersionTagging
+                Resource: !Sub "arn:aws:s3:::${SourceBucketName}/*"
+              - Effect: Allow
+                Action:
+                  - s3:ReplicateObject
+                  - s3:ReplicateDelete
+                  - s3:ReplicateTags
+                Resource: !Sub "arn:aws:s3:::${DestinationBucketName}/*"
