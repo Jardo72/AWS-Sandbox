@@ -62,7 +62,7 @@ Resources:
         RestrictPublicBuckets: true
       LoggingConfiguration:
         DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
-        LogFilePrefix: !Sub "${AWS::StackName}/UnrestrictedBucket"
+        LogFilePrefix: !Sub "${AWS::StackName}/UnrestrictedBucket-"
 
   VPCRestrictedBucket:
     Type: AWS::S3::Bucket
@@ -76,7 +76,7 @@ Resources:
         RestrictPublicBuckets: true
       LoggingConfiguration:
         DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
-        LogFilePrefix: !Sub "${AWS::StackName}/VPCRestrictedBucket"
+        LogFilePrefix: !Sub "${AWS::StackName}/VPCRestrictedBucket-"
 
   VPCRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -116,7 +116,7 @@ Resources:
         RestrictPublicBuckets: true
       LoggingConfiguration:
         DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
-        LogFilePrefix: !Sub "${AWS::StackName}/VPCEndpointRestrictedBucket"
+        LogFilePrefix: !Sub "${AWS::StackName}/VPCEndpointRestrictedBucket-"
 
   VPCEndpointRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy
