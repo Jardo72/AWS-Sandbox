@@ -22,10 +22,6 @@ Description: |
   Demonstration of gateway VPC endpoints (S3) and IAM policies with conditions.
 
 Parameters:
-  S3AccessLogBucketNameParam:
-    Description: The name of the S3 bucket used to store the S3 access logs for the other buckets
-    Type: String
-
   UnrestrictedBucketNameParam:
     Description: The name of the S3 bucket without any bucket policy
     Type: String
@@ -54,40 +50,8 @@ Parameters:
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
 
 Resources:
-  S3AccessLogBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref S3AccessLogBucketNameParam
-      AccessControl: LogDeliveryWrite
-      # TODO: 
-      # PublicAccessBlockConfiguration:
-      #   BlockPublicAcls: true
-      #   BlockPublicPolicy: true
-      #   IgnorePublicAcls: true
-      #   RestrictPublicBuckets: true
-
-  S3AccessLogBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3AccessLogBucketNameParam
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Action:
-              - s3:GetObject
-              - s3:PutObject
-              - s3:PutObjectAcl
-              - s3:ListBucket
-            Effect: Allow
-            Resource:
-              - !Sub "arn:aws:s3:::${S3AccessLogBucketNameParam}/*"
-              - !Sub "arn:aws:s3:::${S3AccessLogBucketNameParam}"
-            Principal:
-              Service: s3.amazonaws.com
-
   UnrestrictedBucket:
     Type: AWS::S3::Bucket
-    DependsOn: S3AccessLogBucket
     Properties:
       BucketName: !Ref UnrestrictedBucketNameParam
       AccessControl: Private
@@ -97,8 +61,8 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       LoggingConfiguration:
-        DestinationBucketName: !Ref S3AccessLogBucketNameParam
-        LogFilePrefix: UnrestrictedBucket
+        DestinationBucketName: !Import CommonS3AccessLogBucketName
+        LogFilePrefix: !Sub "${AWS::StackName}/UnrestrictedBucket"
 
   VPCRestrictedBucket:
     Type: AWS::S3::Bucket
@@ -112,8 +76,8 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       LoggingConfiguration:
-        DestinationBucketName: !Ref S3AccessLogBucketNameParam
-        LogFilePrefix: VPCRestrictedBucket
+        DestinationBucketName: !Import CommonS3AccessLogBucketName
+        LogFilePrefix: !Sub "${AWS::StackName}/VPCRestrictedBucket"
 
   VPCRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -152,8 +116,8 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       LoggingConfiguration:
-        DestinationBucketName: !Ref S3AccessLogBucketNameParam
-        LogFilePrefix: VPCEndpointRestrictedBucket
+        DestinationBucketName: !Import CommonS3AccessLogBucketName
+        LogFilePrefix: !Sub "${AWS::StackName}/VPCEndpointRestrictedBucket"
 
   VPCEndpointRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy

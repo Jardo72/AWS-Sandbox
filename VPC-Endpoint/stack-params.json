@@ -1,9 +1,5 @@
 [
     {
-        "ParameterKey": "S3AccessLogBucketNameParam",
-        "ParameterValue": "jardo72-vpc-endpoint-demo-s3-access-log-bucket"
-    },
-    {
         "ParameterKey": "UnrestrictedBucketNameParam",
         "ParameterValue": "jardo72-vpc-endpoint-demo-unrestricted-bucket"
     },
