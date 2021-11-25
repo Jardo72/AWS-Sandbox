@@ -10,7 +10,7 @@ The project involves a CloudFormation template [cloud-formation-template.yml](./
 aws cloudformation create-stack --stack-name S3-Replication-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
 
-The names of the S3 buckets are defined as template parameters - they have to be specified when creating the stack. The [stack-params.json](./stack-params.json) file contains the names for the three S3 buckets used during my experiments.
+The names of the S3 buckets are defined as template parameters - they have to be specified when creating the stack. The [stack-params.json](./stack-params.json) file contains the names for the S3 buckets used during my experiments.
 
 
 Before deleting the stack, do not forget to remove all objects from all buckets. Otherwise, the removal of the stack will fail.
