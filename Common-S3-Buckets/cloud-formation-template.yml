@@ -49,7 +49,7 @@ Resources:
   DeploymentArtifactoryReadAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: !Sub "${AWS::StackName}-DeploymentArtifactoryReadAccess-Policy"
+      ManagedPolicyName: !Sub "${AWS::StackName}-DeploymentArtifactoryReadAccessPolicy"
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -143,15 +143,47 @@ Outputs:
   DeploymentArtifactoryBucketName:
     Description: The name of the S3 bucket that will store deployment artifacts like JAR files, ZIP files with Python code etc.
     Value: !Ref DeploymentArtifactoryBucketNameParam
+    Export:
+      Name: CommonDeploymentArtifactoryBucketName
+
+  DeploymentArtifactoryBucketArn:
+    Description: The ARN of the S3 bucket that will store deployment artifacts like JAR files, ZIP files with Python code etc.
+    Value: !GetAtt DeploymentArtifactoryBucket.Arn
+    Export:
+      Name: CommonDeploymentArtifactoryBucketArn
 
   DeploymentArtifactoryReadAccessPolicyArn:
     Description: The ARN of the IAM policy allowing read access to the deployment artifactory bucket
     Value: !Ref DeploymentArtifactoryReadAccessPolicy
+    Export:
+      Name: CommonDeploymentArtifactoryReadAccessPolicyArn
+
+  DeploymentArtifactoryReaderRoleArn:
+    Description: The ARN of the IAM role allowing read access to the deployment artifactory bucket
+    Value: !GetAtt DeploymentArtifactoryReaderRole.Arn
+    Export:
+      Name: CommonDeploymentArtifactoryReaderRoleArn
 
   S3AccessLogStoreBucketName:
     Description: The name of the S3 bucket that will be used as destination for S3 access logs
     Value: !Ref S3AccessLogStoreBucketNameParam
+    Export:
+      Name: CommonS3AccessLogBucketName
+
+  S3AccessLogStoreBucketArn:
+    Description: The ARN of the S3 bucket that will be used as destination for S3 access logs
+    Value: !GetAtt S3AccessLogStoreBucket.Arn
+    Export:
+      Name: CommonS3AccessLogBucketArn
 
   ELBAccessLogStoreBucketName:
     Description: The name of the S3 bucket that will be used as destination for ELB access logs
     Value: !Ref ELBAccessLogStoreBucketNameParam
+    Export:
+      Name: CommonELBAccessLogBucketName
+
+  ELBAccessLogStoreBucketArn:
+    Description: The ARN of the S3 bucket that will be used as destination for ELB access logs
+    Value: !GetAtt ELBAccessLogStoreBucket.Arn
+    Export:
+      Name: CommonELBAccessLogBucketArn
