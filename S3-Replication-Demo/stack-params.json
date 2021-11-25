@@ -1,0 +1,10 @@
+[
+    {
+        "ParameterKey": "SourceBucketName",
+        "ParameterValue": "jardo72-replication-source-bucket"
+    },
+    {
+        "ParameterKey": "DestinationBucketName",
+        "ParameterValue": "jardo72-replication-destination-bucket"
+    }
+]
