@@ -61,12 +61,11 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       LoggingConfiguration:
-        DestinationBucketName: !Import CommonS3AccessLogBucketName
+        DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
         LogFilePrefix: !Sub "${AWS::StackName}/UnrestrictedBucket"
 
   VPCRestrictedBucket:
     Type: AWS::S3::Bucket
-    DependsOn: S3AccessLogBucket
     Properties:
       BucketName: !Ref VPCRestrictedBucketNameParam
       AccessControl: Private
@@ -76,7 +75,7 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       LoggingConfiguration:
-        DestinationBucketName: !Import CommonS3AccessLogBucketName
+        DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
         LogFilePrefix: !Sub "${AWS::StackName}/VPCRestrictedBucket"
 
   VPCRestrictedBucketPolicy:
@@ -116,7 +115,7 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       LoggingConfiguration:
-        DestinationBucketName: !Import CommonS3AccessLogBucketName
+        DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
         LogFilePrefix: !Sub "${AWS::StackName}/VPCEndpointRestrictedBucket"
 
   VPCEndpointRestrictedBucketPolicy:
@@ -395,5 +394,3 @@ Resources:
         - Key: Name
           Value: Green
 
-# see
-# - https://www.1strategy.com/blog/2020/06/23/getting-crafty-with-iam-conditions/
