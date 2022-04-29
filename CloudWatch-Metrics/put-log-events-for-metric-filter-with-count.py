@@ -51,7 +51,7 @@ class RandomMessageGenerator:
         'Shape is {0} polygon',
     ]
 
-    _colors = ['red', 'green', 'blue']
+    _colors = ['red', 'green', 'blue', 'green', 'blue', 'green', 'blue', 'blue', 'blue']
 
     def next_message() -> str:
         color_index = randint(0, len(RandomMessageGenerator._colors) - 1)
@@ -102,28 +102,14 @@ def create_log_stream(cloud_watch, log_stream_name: str) -> None:
 
 
 def publish_bulk_of_log_entries(cloud_watch, log_stream_name: str, sequence_token: Optional[str]) -> Tuple[int, str]:
-    log_events = [ 
-        {
+    timestamp = current_time_millis()
+    log_events = []
+    for _ in range(0, 100):
+        log_events.append({
             'message': RandomMessageGenerator.next_message(),
-            'timestamp': current_time_millis()
-        },
-        {
-            'message': RandomMessageGenerator.next_message(),
-            'timestamp': current_time_millis()
-        },
-        {
-            'message': RandomMessageGenerator.next_message(),
-            'timestamp': current_time_millis()
-        },
-        {
-            'message': RandomMessageGenerator.next_message(),
-            'timestamp': current_time_millis()
-        },
-        {
-            'message': RandomMessageGenerator.next_message(),
-            'timestamp': current_time_millis()
-        }
-    ]
+            'timestamp': timestamp
+        })
+        timestamp += 3
 
     if sequence_token is None:    
         response = cloud_watch.put_log_events(
@@ -151,7 +137,7 @@ def publish_log_entries(number_of_entries: int) -> Summary:
     while counter < number_of_entries:
         log_event_count, sequence_token = publish_bulk_of_log_entries(cloud_watch, log_stream_name, sequence_token)
         counter += log_event_count
-        sleep(0.5)
+        sleep(0.4)
     end_timestamp = current_timestamp()
 
     return Summary(log_stream_name, start_timestamp, end_timestamp, counter)
