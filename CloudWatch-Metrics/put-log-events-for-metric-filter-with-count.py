@@ -137,7 +137,7 @@ def publish_log_entries(number_of_entries: int) -> Summary:
     while counter < number_of_entries:
         log_event_count, sequence_token = publish_bulk_of_log_entries(cloud_watch, log_stream_name, sequence_token)
         counter += log_event_count
-        sleep(0.4)
+        sleep(0.5)
     end_timestamp = current_timestamp()
 
     return Summary(log_stream_name, start_timestamp, end_timestamp, counter)
