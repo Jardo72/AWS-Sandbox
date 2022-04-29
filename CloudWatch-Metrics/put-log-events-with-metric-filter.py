@@ -49,7 +49,7 @@ class Summary:
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:
-    parser = ArgumentParser(description = "CloudWatch Metrics Generator", formatter_class = RawTextHelpFormatter)
+    parser = ArgumentParser(description = "CloudWatch Log Events Generator", formatter_class = RawTextHelpFormatter)
 
     parser.add_argument('period_sec',
         help='period (i.e. break between two consecutive log entries) in seconds',
