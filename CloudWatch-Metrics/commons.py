@@ -86,3 +86,7 @@ def print_summary(instance_id: str, summary: Summary) -> None:
     print(f'Avg value:      {summary.avg_value}')
     print(f'Min timestamp:  {min_timestamp}')
     print(f'Max timestamp:  {max_timestamp}')
+
+
+def current_timestamp() -> str:
+    return datetime.utcnow().strftime(Constants.timestamp_format())

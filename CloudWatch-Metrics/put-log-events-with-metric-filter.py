@@ -20,13 +20,12 @@
 from argparse import ArgumentParser, RawTextHelpFormatter
 from boto3 import client
 from dataclasses import dataclass
-from datetime import datetime
 from random import randint
 from time import sleep, time
 from typing import Optional, Tuple
 from uuid import uuid4
 
-from commons import Constants
+from commons import Constants, current_timestamp
 
 
 @dataclass(frozen=True)
@@ -50,7 +49,7 @@ class Summary:
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:
-    parser = ArgumentParser(description = "CloudWatch Metrics Generator", formatter_class = RawTextHelpFormatter)
+    parser = ArgumentParser(description = "CloudWatch Log Events Generator", formatter_class = RawTextHelpFormatter)
 
     parser.add_argument('period_sec',
         help='period (i.e. break between two consecutive log entries) in seconds',
@@ -64,6 +63,9 @@ def create_command_line_arguments_parser() -> ArgumentParser:
     parser.add_argument('max',
         help='maximum for the generated metric value',
         type=int)
+    parser.add_argument('--no_filter',
+        help='do not create metric filter (filter is created if this option is not specified)',
+        action='store_true')
 
     return parser
 
@@ -73,13 +75,15 @@ def parse_command_line_arguments():
     return parser.parse_args()
 
 
-def print_parameters(number_of_entries: int, period_sec: int, min: int, max: int) -> None:
+def print_parameters(number_of_entries: int, period_sec: int, min: int, max: int, no_filter: bool) -> None:
+    create_filter = 'No.' if no_filter else 'Yes.'
     print()
     print('--------------')
     print('- Parameters')
     print('--------------')
     print(f'{number_of_entries} samples to be generated, period = {period_sec} sec')
     print(f'Range for the random values = [{min}; {max}]')
+    print(f'Create metric filter? {create_filter}')
     print()
 
 
@@ -97,7 +101,11 @@ def create_log_stream(cloud_watch, log_stream_name: str) -> None:
     print(f'Log stream created (name = {log_stream_name})')
 
 
-def create_metric_filter(cloud_watch) -> None:
+def create_metric_filter(cloud_watch, no_filter: bool) -> None:
+    if no_filter:
+        print('Metric filter not requested')
+        return
+
     metric_transformations = [
         {
             'metricName': Constants.metric_from_log(),
@@ -128,7 +136,7 @@ def publish_single_log_entry(cloud_watch, log_stream_name: str, min: int, max: i
         },
         { 
             'message': f'Dummy event irrelevant for the metric filter (random value = {uuid4()})',
-            'timestamp': timestamp + randint(200, 750)
+            'timestamp': timestamp + randint(230, 750)
         }
     ]
 
@@ -147,13 +155,13 @@ def publish_single_log_entry(cloud_watch, log_stream_name: str, min: int, max: i
     return (value, response['nextSequenceToken'])
 
 
-def publish_log_entries(number_of_entries: int, period_sec: int, min: int, max: int) -> Summary:
+def publish_log_entries(number_of_entries: int, period_sec: int, min: int, max: int, no_filter: bool) -> Summary:
     log_stream_name = str(uuid4())
     cloud_watch = client('logs')
     create_log_stream(cloud_watch, log_stream_name)
-    create_metric_filter(cloud_watch)
+    create_metric_filter(cloud_watch, no_filter)
 
-    start_timestamp = datetime.utcnow().strftime(Constants.timestamp_format())
+    start_timestamp = current_timestamp()
     sequence_token = None
     values = []
     for i in range(0, number_of_entries):
@@ -161,7 +169,7 @@ def publish_log_entries(number_of_entries: int, period_sec: int, min: int, max: 
         values.append(value)
         if i < number_of_entries - 1:
             sleep(period_sec)
-    end_timestamp = datetime.utcnow().strftime(Constants.timestamp_format())
+    end_timestamp = current_timestamp()
 
     return Summary(log_stream_name, tuple(values), start_timestamp, end_timestamp)
 
@@ -182,8 +190,8 @@ def print_summary(summary: Summary) -> None:
 
 def main():
     params = parse_command_line_arguments()
-    print_parameters(params.number_of_entries, params.period_sec, params.min, params.max)
-    summary = publish_log_entries(params.number_of_entries, params.period_sec, params.min, params.max)
+    print_parameters(params.number_of_entries, params.period_sec, params.min, params.max, params.no_filter)
+    summary = publish_log_entries(params.number_of_entries, params.period_sec, params.min, params.max, params.no_filter)
     print_summary(summary)
 
 
