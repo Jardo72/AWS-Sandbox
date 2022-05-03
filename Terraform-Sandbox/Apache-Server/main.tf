@@ -71,13 +71,7 @@ resource "aws_instance" "WebServer" {
     instance_type = "t2.nano"
     subnet_id = aws_subnet.ApachePublicSubnet.id
     vpc_security_group_ids = [aws_security_group.WebServerSG.id]
-    user_data = <<EOF
-#!/bin/bash
-yum update -y
-yum install httpd -y
-service httpd start
-chkconfig httpd on
-EOF
+    user_data = file("user-data.sh")
     tags = {
         Name = "WebServer"
     }
