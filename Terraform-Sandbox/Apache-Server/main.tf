@@ -42,15 +42,19 @@ resource "aws_route_table_association" "PublicRouteTableAssociation" {
 
 resource "aws_security_group" "WebServerSG" {
     name = "Web-Server-SG"
-    description = "Allow inbound HTTP traffic from any origin"
+    description = "Allow inbound HTTP(S) traffic from any origin"
     vpc_id = aws_vpc.ApacheVPC.id
 
-    ingress {
-        protocol = "tcp"
-        from_port = 80
-        to_port = 80
-        cidr_blocks = ["0.0.0.0/0"]
-        ipv6_cidr_blocks = ["::/0"]
+    dynamic "ingress" {
+        for_each = ["80", "443"]
+        content {
+            protocol = "tcp"
+            from_port = ingress.value
+            to_port = ingress.value
+            cidr_blocks = ["0.0.0.0/0"]
+            ipv6_cidr_blocks = ["::/0"]
+            description = "Allow inbound HTTP(S)"
+        }
     }
 
     egress {
@@ -66,6 +70,11 @@ resource "aws_security_group" "WebServerSG" {
     }
 }
 
+resource "aws_eip" "WebServerElasticIP" {
+    instance = aws_instance.WebServer.id
+    vpc = true
+}
+
 resource "aws_instance" "WebServer" {
     ami = "ami-09439f09c55136ecf"
     instance_type = "t2.nano"
@@ -74,5 +83,8 @@ resource "aws_instance" "WebServer" {
     user_data = file("user-data.sh")
     tags = {
         Name = "WebServer"
+    }
+    lifecycle {
+        create_before_destroy = true
     }
 }
