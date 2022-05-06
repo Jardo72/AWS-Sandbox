@@ -4,7 +4,7 @@
 CloudFormation that creates four EC2 instances that can be used for manual experiments with Systems Manager, for instance configuration of patching groups, configuration of maintenance windows etc. The instances are tagged, so the configurations can be based on tags.
 
 | Name (tag)             | Patch Group (tag)  |
-| ---------------------- |:------------------:|
+| ---------------------- | ------------------ |
 | SSM-Sandbox-Instance-1 | Blue               |
 | SSM-Sandbox-Instance-2 | Green              |
 | SSM-Sandbox-Instance-3 | Blue               |
