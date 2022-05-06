@@ -1,0 +1,314 @@
+#
+# Copyright 2022 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  Simple stack with several EC2 instances and resource groups suited for experiments with Systems Manager & AWS Config.
+
+Parameters:
+  CurrentVersionAmazonLinuxAMIIdParam:
+    Description: Amazon Linux 2 AMI ID for the EC2 instances (this should automatically take the current version)
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+  CurrentVersionUbuntuAMIIdParam:
+    Description: Ubuntu AMI ID for the EC2 instances (this should automatically take the current version)
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/canonical/ubuntu/server/focal/stable/current/amd64/hvm/ebs-gp2/ami-id
+
+  EC2InstanceType:
+    Type: String
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+    Default: t2.nano
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      CidrBlock: 10.0.0.0/16
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+      
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [0, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PublicSubnetTwo:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [1, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PublicSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+
+  InternetGatewayRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetOne
+
+  PublicSubnetTwoRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetTwo
+
+  PublicSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetThree
+
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow any outbound TCP traffic from the EC2 instances
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  EC2RoleForSSM:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AWS::StackName}-EC2RoleForSSM"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2RoleForSSM
+
+  AmazonLinuxLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${AWS::StackName}-AmazonLinux-LaunchTemplate"
+      LaunchTemplateData:
+        ImageId: !Ref CurrentVersionAmazonLinuxAMIIdParam
+        InstanceType: !Ref EC2InstanceType
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref EC2InstanceSecurityGroup
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+
+  UbuntuLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${AWS::StackName}-Ubuntu-LaunchTemplate"
+      LaunchTemplateData:
+        ImageId: !Ref CurrentVersionUbuntuAMIIdParam
+        InstanceType: !Ref EC2InstanceType
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref EC2InstanceSecurityGroup
+
+  EC2InstanceOne:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetOne
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref AmazonLinuxLaunchTemplate
+        Version: !GetAtt AmazonLinuxLaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: SSM-Sandbox-Instance-1
+        - Key: Patch Group
+          Value: Blue
+        - Key: Environment
+          Value: Development
+
+  EC2InstanceTwo:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetOne
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref AmazonLinuxLaunchTemplate
+        Version: !GetAtt AmazonLinuxLaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: SSM-Sandbox-Instance-2
+        - Key: Patch Group
+          Value: Green
+        - Key: Environment
+          Value: Production
+
+  EC2InstanceThree:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetTwo
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref AmazonLinuxLaunchTemplate
+        Version: !GetAtt AmazonLinuxLaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: SSM-Sandbox-Instance-3
+        - Key: Patch Group
+          Value: Blue
+        - Key: Environment
+          Value: Production
+
+  EC2InstanceFour:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 1
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetTwo
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref AmazonLinuxLaunchTemplate
+        Version: !GetAtt AmazonLinuxLaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: SSM-Sandbox-Instance-4
+        - Key: Patch Group
+          Value: Green
+        - Key: Environment
+          Value: Production
+
+  EC2InstanceFive:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetThree
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref UbuntuLaunchTemplate
+        Version: !GetAtt UbuntuLaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: SSM-Sandbox-Instance-5
+        - Key: Patch Group
+          Value: Blue
+        - Key: Environment
+          Value: Development
+
+  EC2InstanceSix:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetThree
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref UbuntuLaunchTemplate
+        Version: !GetAtt UbuntuLaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: SSM-Sandbox-Instance-6
+        - Key: Patch Group
+          Value: Green
+        - Key: Environment
+          Value: Production
+
+  DevelopmentResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name: Development-EC2-Instances
+      Description: Group of EC2 instances tagged as development environment
+      ResourceQuery:
+        Type: TAG_FILTERS_1_0
+        Query:
+          ResourceTypeFilters:
+            - AWS::EC2::Instance
+          TagFilters:
+            - Key: Environment
+              Values:
+                - Development
+
+  ProductionResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name: Production-EC2-Instances
+      Description: Group of EC2 instances tagged as production environment
+      ResourceQuery:
+        Type: TAG_FILTERS_1_0
+        Query:
+          ResourceTypeFilters:
+            - AWS::EC2::Instance
+          TagFilters:
+            - Key: Environment
+              Values:
+                - Production
