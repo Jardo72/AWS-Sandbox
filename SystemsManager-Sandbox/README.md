@@ -14,6 +14,8 @@ CloudFormation template that creates six EC2 instances that can be used for manu
 
 Besides the instances, two resource groups are also created. Both resource groups are used to group resources of the type EC2 instance. The first group involves EC2 instance tagged with the Environment tag having the value Development, the other group involves EC2 instance tagged with the Environment tag having the value Production.
 
+An IAM instance profile based on an IAM role with the AWS-managed policy AmazonEC2RoleforSSM is used for The EC2 instances, so they are ready to be used with the Systems Manager. The SSM agent is also installed (preinstalled on the AMI used).
+
 ## Deployment
 The deployment is very simple, there is no need to specify any parameters.
 ```
