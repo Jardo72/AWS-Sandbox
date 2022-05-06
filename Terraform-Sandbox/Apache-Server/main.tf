@@ -1,19 +1,20 @@
+locals {
+    aws_region = "eu-central-1"
+    ssm_parameter_name = "/terraform-sandbox/apache-server/dummy-password"
+    common_tags = {
+        Name = "Apache-Demo",
+        ProvisionedBy = "Terraform"
+    }
+}
+
 provider "aws" {
-    region = "eu-central-1"
+    region = local.aws_region
 }
 
 data "aws_caller_identity" "current" {}
 
 data "aws_ssm_parameter" "CurrentVersionAMIID" {
     name = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
-}
-
-locals {
-    ssm_parameter_name = "/terraform-sandbox/apache-server/dummy-password"
-    common_tags = {
-        Name = "Apache-Demo",
-        ProvisionedBy = "Terraform"
-    }
 }
 
 resource "random_password" "DummyPassword" {
@@ -121,7 +122,7 @@ resource "aws_iam_role" "SSMParameterReaderRole" {
                     Sid: "AllowGetParameter",
                     Action: ["ssm:GetParameter"]
                     Effect: "Allow"
-                    Resource: format("arn:aws:ssm:eu-central-1:%s:parameter%s", data.aws_caller_identity.current.account_id, local.ssm_parameter_name)
+                    Resource: format("arn:aws:ssm:%s:%s:parameter%s", local.aws_region, data.aws_caller_identity.current.account_id, local.ssm_parameter_name)
                 }
             ]
         })
@@ -143,6 +144,7 @@ resource "aws_instance" "WebServer" {
     vpc_security_group_ids = [aws_security_group.WebServerSG.id]
     iam_instance_profile = aws_iam_instance_profile.SSMParameterReaderProfile.name
     user_data = templatefile("user-data.tpl", {
+        aws_region = local.aws_region
         ssm_parameter_name = local.ssm_parameter_name
     })
     tags = local.common_tags

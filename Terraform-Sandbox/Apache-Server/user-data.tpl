@@ -10,6 +10,8 @@ INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
 START_TIME=`date '+%Y-%m-%d %H:%M:%S'`
 SSM_PARAM_DETAILS=`aws ssm get-parameter --name ${ssm_parameter_name} --with-decryption`
 
+export AWS_DEFAULT_REGION=${aws_region}
+
 cat > /var/www/html/index.html <<HTML_EOF
 <html>
 <head>
