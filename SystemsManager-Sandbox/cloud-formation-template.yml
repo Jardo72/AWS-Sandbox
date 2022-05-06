@@ -155,7 +155,7 @@ Resources:
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-1
-        - Key: SSM-Patch-Group
+        - Key: Patch Group
           Value: Blue
 
   EC2InstanceTwo:
@@ -171,7 +171,7 @@ Resources:
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-2
-        - Key: SSM-Patch-Group
+        - Key: Patch Group
           Value: Green
 
   EC2InstanceThree:
@@ -187,7 +187,7 @@ Resources:
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-3
-        - Key: SSM-Patch-Group
+        - Key: Patch Group
           Value: Blue
 
   EC2InstanceFour:
@@ -203,5 +203,5 @@ Resources:
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-4
-        - Key: SSM-Patch-Group
+        - Key: Patch Group
           Value: Green
