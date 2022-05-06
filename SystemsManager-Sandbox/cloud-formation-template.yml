@@ -71,6 +71,16 @@ Resources:
         - 1
         - Fn::GetAZs: !Ref 'AWS::Region'
 
+  PublicSubnetThree:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [2, !Cidr [!GetAtt VPC.CidrBlock, 3, 8 ]]
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref 'AWS::Region'
+
   PublicSubnetRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -94,6 +104,12 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicSubnetRouteTable
       SubnetId: !Ref PublicSubnetTwo
+
+  PublicSubnetThreeRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetThree
 
   EC2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -157,6 +173,8 @@ Resources:
           Value: SSM-Sandbox-Instance-1
         - Key: Patch Group
           Value: Blue
+        - Key: Environment
+          Value: Development
 
   EC2InstanceTwo:
     Type: AWS::EC2::Instance
@@ -173,6 +191,8 @@ Resources:
           Value: SSM-Sandbox-Instance-2
         - Key: Patch Group
           Value: Green
+        - Key: Environment
+          Value: Production
 
   EC2InstanceThree:
     Type: AWS::EC2::Instance
@@ -189,6 +209,8 @@ Resources:
           Value: SSM-Sandbox-Instance-3
         - Key: Patch Group
           Value: Blue
+        - Key: Environment
+          Value: Production
 
   EC2InstanceFour:
     Type: AWS::EC2::Instance
@@ -205,3 +227,71 @@ Resources:
           Value: SSM-Sandbox-Instance-4
         - Key: Patch Group
           Value: Green
+        - Key: Environment
+          Value: Production
+
+  EC2InstanceFive:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetThree
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref EC2LaunchTemplate
+        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: SSM-Sandbox-Instance-5
+        - Key: Patch Group
+          Value: Blue
+        - Key: Environment
+          Value: Development
+
+  EC2InstanceSix:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: !Select
+        - 2
+        - Fn::GetAZs: !Ref "AWS::Region"
+      SubnetId: !Ref PublicSubnetThree
+      LaunchTemplate: 
+        LaunchTemplateId: !Ref EC2LaunchTemplate
+        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+      Tags:
+        - Key: Name
+          Value: SSM-Sandbox-Instance-6
+        - Key: Patch Group
+          Value: Green
+        - Key: Environment
+          Value: Production
+
+  DevelopmentResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name: Development-EC2-Instances
+      Description: Group of EC2 instances tagged as development environment
+      ResourceQuery:
+        Type: TAG_FILTERS_1_0
+        Query:
+          ResourceTypeFilters:
+            - AWS::EC2::Instance
+          TagFilters:
+            - Key: Environment
+              Values:
+                - Development
+
+  ProductionResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name: Production-EC2-Instances
+      Description: Group of EC2 instances tagged as production environment
+      ResourceQuery:
+        Type: TAG_FILTERS_1_0
+        Query:
+          ResourceTypeFilters:
+            - AWS::EC2::Instance
+          TagFilters:
+            - Key: Environment
+              Values:
+                - Production
