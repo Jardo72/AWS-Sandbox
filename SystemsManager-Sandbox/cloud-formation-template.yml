@@ -141,9 +141,6 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash
             yum update -y
-            # TODO: do we need this? the agent should be installed on modern AMIs
-            # systemctl enable amazon-ssm-agent
-            # systemctl start amazon-ssm-agent
 
   EC2InstanceOne:
     Type: AWS::EC2::Instance
