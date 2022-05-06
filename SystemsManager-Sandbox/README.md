@@ -1,7 +1,7 @@
 # Systems Manager Sandbox
 
 ## Introduction
-CloudFormation that creates six EC2 instances that can be used for manual experiments with Systems Manager, for instance configuration of patching groups, configuration of maintenance windows etc. The instances are tagged, so the configurations can be based on tags.
+CloudFormation template that creates six EC2 instances that can be used for manual experiments with Systems Manager, for instance configuration of patching groups, configuration of maintenance windows etc. The instances are tagged (see the table below). Besides the instances, two resource groups are also created. Both resource groups are used to group resources of the type EC2 instance. The first group involves EC2 instance tagged with the Environment tag having the value Development, the other group involves EC2 instance tagged with the Environment tag having the value Production. Because, of the tagging, Systems Manager configurations and the activities performed be based on tags and resource groups.
 
 | Name (tag)             | Patch Group (tag)  | Environment (tag) |
 | ---------------------- | ------------------ | ----------------- |

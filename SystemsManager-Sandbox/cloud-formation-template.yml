@@ -19,7 +19,7 @@
 
 AWSTemplateFormatVersion: 2010-09-09
 Description: |
-  Simple stack with several EC2 instances for experiments with Systems Manager & AWS Config.
+  Simple stack with several EC2 instances and resource groups suited for experiments with Systems Manager & AWS Config.
 
 Parameters:
   CurrentVersionAMIIdParam:
