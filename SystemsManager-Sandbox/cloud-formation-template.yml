@@ -22,10 +22,15 @@ Description: |
   Simple stack with several EC2 instances and resource groups suited for experiments with Systems Manager & AWS Config.
 
 Parameters:
-  CurrentVersionAMIIdParam:
-    Description: AMI ID for the EC2 instances (this should automatically take the current version)
+  CurrentVersionAmazonLinuxAMIIdParam:
+    Description: Amazon Linux 2 AMI ID for the EC2 instances (this should automatically take the current version)
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+
+  CurrentVersionUbuntuAMIIdParam:
+    Description: Ubuntu AMI ID for the EC2 instances (this should automatically take the current version)
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/canonical/ubuntu/server/focal/stable/current/amd64/hvm/ebs-gp2/ami-id
 
   EC2InstanceType:
     Type: String
@@ -142,12 +147,12 @@ Resources:
       Roles:
         - !Ref EC2RoleForSSM
 
-  EC2LaunchTemplate:
+  AmazonLinuxLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
-      LaunchTemplateName: !Sub "${AWS::StackName}-LaunchTemplate"
+      LaunchTemplateName: !Sub "${AWS::StackName}-AmazonLinux-LaunchTemplate"
       LaunchTemplateData:
-        ImageId: !Ref CurrentVersionAMIIdParam
+        ImageId: !Ref CurrentVersionAmazonLinuxAMIIdParam
         InstanceType: !Ref EC2InstanceType
         IamInstanceProfile:
           Name: !Ref EC2InstanceProfile
@@ -158,6 +163,18 @@ Resources:
             #!/bin/bash
             yum update -y
 
+  UbuntuLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${AWS::StackName}-Ubuntu-LaunchTemplate"
+      LaunchTemplateData:
+        ImageId: !Ref CurrentVersionUbuntuAMIIdParam
+        InstanceType: !Ref EC2InstanceType
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          - !Ref EC2InstanceSecurityGroup
+
   EC2InstanceOne:
     Type: AWS::EC2::Instance
     Properties:
@@ -166,8 +183,8 @@ Resources:
         - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref PublicSubnetOne
       LaunchTemplate: 
-        LaunchTemplateId: !Ref EC2LaunchTemplate
-        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref AmazonLinuxLaunchTemplate
+        Version: !GetAtt AmazonLinuxLaunchTemplate.LatestVersionNumber
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-1
@@ -184,8 +201,8 @@ Resources:
         - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref PublicSubnetOne
       LaunchTemplate: 
-        LaunchTemplateId: !Ref EC2LaunchTemplate
-        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref AmazonLinuxLaunchTemplate
+        Version: !GetAtt AmazonLinuxLaunchTemplate.LatestVersionNumber
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-2
@@ -202,8 +219,8 @@ Resources:
         - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref PublicSubnetTwo
       LaunchTemplate: 
-        LaunchTemplateId: !Ref EC2LaunchTemplate
-        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref AmazonLinuxLaunchTemplate
+        Version: !GetAtt AmazonLinuxLaunchTemplate.LatestVersionNumber
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-3
@@ -220,8 +237,8 @@ Resources:
         - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref PublicSubnetTwo
       LaunchTemplate: 
-        LaunchTemplateId: !Ref EC2LaunchTemplate
-        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref AmazonLinuxLaunchTemplate
+        Version: !GetAtt AmazonLinuxLaunchTemplate.LatestVersionNumber
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-4
@@ -238,8 +255,8 @@ Resources:
         - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref PublicSubnetThree
       LaunchTemplate: 
-        LaunchTemplateId: !Ref EC2LaunchTemplate
-        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref UbuntuLaunchTemplate
+        Version: !GetAtt UbuntuLaunchTemplate.LatestVersionNumber
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-5
@@ -256,8 +273,8 @@ Resources:
         - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref PublicSubnetThree
       LaunchTemplate: 
-        LaunchTemplateId: !Ref EC2LaunchTemplate
-        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref UbuntuLaunchTemplate
+        Version: !GetAtt UbuntuLaunchTemplate.LatestVersionNumber
       Tags:
         - Key: Name
           Value: SSM-Sandbox-Instance-6
