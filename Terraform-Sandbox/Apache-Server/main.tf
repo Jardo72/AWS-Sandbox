@@ -13,60 +13,65 @@ provider "aws" {
 
 data "aws_caller_identity" "current" {}
 
-data "aws_ssm_parameter" "CurrentVersionAMIID" {
-    name = "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+data "aws_ami" "latest_amazon_linux_ami" {
+    owners = ["137112412989"]
+    most_recent = true
+    filter {
+        name = "name"
+        values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    }
 }
 
-resource "random_password" "DummyPassword" {
+resource "random_password" "dummy_password" {
     length = 12
     special = true
 }
 
-resource "aws_ssm_parameter" "DummyPassword" {
+resource "aws_ssm_parameter" "dummy_password" {
     description = "Dummy password for no real use"
     type = "SecureString"
     name = local.ssm_parameter_name
-    value = random_password.DummyPassword.result
+    value = random_password.dummy_password.result
     tags = local.common_tags
 }
 
-resource "aws_vpc" "VPC" {
+resource "aws_vpc" "vpc" {
     cidr_block = "10.0.0.0/16"
     instance_tenancy = "default"
     enable_dns_hostnames = true
     tags = local.common_tags
 }
 
-resource "aws_internet_gateway" "IGW" {
-    vpc_id = aws_vpc.VPC.id
+resource "aws_internet_gateway" "internet_gateway" {
+    vpc_id = aws_vpc.vpc.id
     tags = local.common_tags
 }
 
-resource "aws_subnet" "PublicSubnet" {
-    vpc_id = aws_vpc.VPC.id
+resource "aws_subnet" "public_subnet" {
+    vpc_id = aws_vpc.vpc.id
     cidr_block = "10.0.0.0/24"
     map_public_ip_on_launch = true
     tags = local.common_tags
 }
 
-resource "aws_route_table" "PublicRouteTable" {
-    vpc_id = aws_vpc.VPC.id
+resource "aws_route_table" "public_subnet_route_table" {
+    vpc_id = aws_vpc.vpc.id
     route {
         cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internet_gateway.IGW.id
+        gateway_id = aws_internet_gateway.internet_gateway.id
     }
     tags = local.common_tags
 }
 
-resource "aws_route_table_association" "PublicRouteTableAssociation" {
-    subnet_id = aws_subnet.PublicSubnet.id
-    route_table_id = aws_route_table.PublicRouteTable.id
+resource "aws_route_table_association" "public_subnet_route_table_association" {
+    subnet_id = aws_subnet.public_subnet.id
+    route_table_id = aws_route_table.public_subnet_route_table.id
 }
 
-resource "aws_security_group" "WebServerSG" {
+resource "aws_security_group" "web_server_security_group" {
     name = "Apache-Demo"
     description = "Allow inbound HTTP(S) traffic from any origin"
-    vpc_id = aws_vpc.VPC.id
+    vpc_id = aws_vpc.vpc.id
 
     dynamic "ingress" {
         for_each = ["80", "443"]
@@ -91,13 +96,13 @@ resource "aws_security_group" "WebServerSG" {
     tags = local.common_tags
 }
 
-resource "aws_eip" "WebServerElasticIP" {
-    instance = aws_instance.WebServer.id
+resource "aws_eip" "web_server_elastic_ip" {
+    instance = aws_instance.web_server.id
     vpc = true
     tags = local.common_tags
 }
 
-resource "aws_iam_role" "SSMParameterReaderRole" {
+resource "aws_iam_role" "ssm_parameter_reader_role" {
     name = "SSMParameterReaderRole"
     assume_role_policy = jsonencode({
         Version: "2012-10-17",
@@ -131,18 +136,18 @@ resource "aws_iam_role" "SSMParameterReaderRole" {
     tags = local.common_tags
 }
 
-resource "aws_iam_instance_profile" "SSMParameterReaderProfile" {
+resource "aws_iam_instance_profile" "ssm_parameter_reader_profile" {
     name = "SSMParameterReaderProfile"
-    role = aws_iam_role.SSMParameterReaderRole.name
+    role = aws_iam_role.ssm_parameter_reader_role.name
     tags = local.common_tags
 }
 
-resource "aws_instance" "WebServer" {
-    ami = data.aws_ssm_parameter.CurrentVersionAMIID.value
+resource "aws_instance" "web_server" {
+    ami = data.aws_ami.latest_amazon_linux_ami.id
     instance_type = "t2.nano"
-    subnet_id = aws_subnet.PublicSubnet.id
-    vpc_security_group_ids = [aws_security_group.WebServerSG.id]
-    iam_instance_profile = aws_iam_instance_profile.SSMParameterReaderProfile.name
+    subnet_id = aws_subnet.public_subnet.id
+    vpc_security_group_ids = [aws_security_group.web_server_security_group.id]
+    iam_instance_profile = aws_iam_instance_profile.ssm_parameter_reader_profile.name
     user_data = templatefile("user-data.tpl", {
         aws_region = local.aws_region
         ssm_parameter_name = local.ssm_parameter_name
@@ -151,21 +156,22 @@ resource "aws_instance" "WebServer" {
     lifecycle {
         create_before_destroy = true
     }
-    depends_on = [aws_ssm_parameter.DummyPassword]
+    depends_on = [aws_ssm_parameter.dummy_password]
 }
 
-output "AWSAccountID" {
+output "aws_account_id" {
     value = data.aws_caller_identity.current.account_id
 }
 
-output "CurrentVersionAMIID" {
-    value = nonsensitive(data.aws_ssm_parameter.CurrentVersionAMIID.value)
+
+output "latest_amazon_linux_ami" {
+    value = data.aws_ami.latest_amazon_linux_ami.id
 }
 
-output "WebServerElasticIP" {
-    value = aws_eip.WebServerElasticIP.public_ip
+output "web_server_elastic_ip" {
+    value = aws_eip.web_server_elastic_ip.public_ip
 }
 
-output "WebServerElasticDNSName" {
-    value = aws_eip.WebServerElasticIP.public_dns
+output "web_server_elastic_dns_name" {
+    value = aws_eip.web_server_elastic_ip.public_dns
 }
