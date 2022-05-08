@@ -11,7 +11,7 @@ provider "aws" {
   region = local.aws_region
 }
 
-data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current_account" {}
 
 data "aws_ami" "latest_amazon_linux_ami" {
   owners      = ["137112412989"]
@@ -127,11 +127,16 @@ resource "aws_iam_role" "ssm_parameter_reader_role" {
           Sid : "AllowGetParameter",
           Action : ["ssm:GetParameter"]
           Effect : "Allow"
-          Resource : format("arn:aws:ssm:%s:%s:parameter%s", local.aws_region, data.aws_caller_identity.current.account_id, local.ssm_parameter_name)
+          Resource : format("arn:aws:ssm:%s:%s:parameter%s", local.aws_region, data.aws_caller_identity.current_account.account_id, local.ssm_parameter_name)
         }
       ]
     })
   }
+
+  # needed in order to be able to connect to the instance via the Session Manager
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+  ]
 
   tags = local.common_tags
 }
@@ -160,9 +165,8 @@ resource "aws_instance" "web_server" {
 }
 
 output "aws_account_id" {
-  value = data.aws_caller_identity.current.account_id
+  value = data.aws_caller_identity.current_account.account_id
 }
-
 
 output "latest_amazon_linux_ami" {
   value = data.aws_ami.latest_amazon_linux_ami.id
