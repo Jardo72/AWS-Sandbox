@@ -179,3 +179,7 @@ output "web_server_elastic_ip" {
 output "web_server_elastic_dns_name" {
   value = aws_eip.web_server_elastic_ip.public_dns
 }
+
+output "generated_random_password" {
+  value = nonsensitive(random_password.dummy_password.result)
+}
