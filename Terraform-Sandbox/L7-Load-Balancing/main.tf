@@ -19,24 +19,25 @@ resource "aws_vpc" "vpc" {
   tags                 = local.common_tags
 }
 
-/*
-resource "aws_subnet" "public_subnet_one" {
-  availability_zone = data.aws_availability_zones.available.names[0]
-  cidr_block = "10.0.0.0/24"
-  vpc_id = aws_vpc.vpc.id
-  tags = common_tags
-}
-
-resource "aws_subnet" "public_subnet_two" {
-  availability_zone = data.aws_availability_zones.available.names[1]
-  cidr_block = "10.0.0.1/24"
-  vpc_id = aws_vpc.vpc.id
-  tags = common_tags
-} */
-
 resource "aws_internet_gateway" "internet_gateway" {
   vpc_id = aws_vpc.vpc.id
   tags   = local.common_tags
+}
+
+resource "aws_subnet" "public_subnet_one" {
+  vpc_id                  = aws_vpc.vpc.id
+  availability_zone       = data.aws_availability_zones.available.names[0]
+  cidr_block              = "10.0.0.0/24"
+  map_public_ip_on_launch = true
+  tags                    = local.common_tags
+}
+
+resource "aws_subnet" "public_subnet_two" {
+  vpc_id                  = aws_vpc.vpc.id
+  availability_zone       = data.aws_availability_zones.available.names[1]
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  tags                    = local.common_tags
 }
 
 resource "aws_eip" "nat_gateway_elastic_ip" {
@@ -51,6 +52,16 @@ resource "aws_route_table" "public_subnets_route_table" {
     gateway_id = aws_internet_gateway.internet_gateway.id
   }
   tags = local.common_tags
+}
+
+resource "aws_route_table_association" "public_subnet_one_route_table_association" {
+  subnet_id      = aws_subnet.public_subnet_one.id
+  route_table_id = aws_route_table.public_subnets_route_table.id
+}
+
+resource "aws_route_table_association" "public_subnet_two_route_table_association" {
+  subnet_id      = aws_subnet.public_subnet_two.id
+  route_table_id = aws_route_table.public_subnets_route_table.id
 }
 
 /*
