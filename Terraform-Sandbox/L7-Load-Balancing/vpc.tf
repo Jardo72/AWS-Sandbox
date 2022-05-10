@@ -110,38 +110,40 @@ resource "aws_security_group" "alb_security_group" {
   name        = "ALB-Security-Group"
   description = "Security group for the ALB"
   vpc_id      = aws_vpc.vpc.id
-
-  ingress {
-    protocol         = "tcp"
-    from_port        = 80
-    to_port          = 80
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-    description      = "Allow inbound HTTP from anywhere"
-  }
-
-  egress {
-    protocol         = "-1"
-    from_port        = 0
-    to_port          = 0
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-    description = "Allow outbound traffic to the EC2 instances"
-  }
-
   tags = local.common_tags
+}
+
+resource "aws_security_group_rule" "alb_security_group_ingress_rule" {
+  type              = "ingress"
+  security_group_id = aws_security_group.alb_security_group.id
+  protocol          = "tcp"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = ["0.0.0.0/0"]
+  ipv6_cidr_blocks  = ["::/0"]
+  description       = "Allow inbound HTTP from anywhere"
+}
+
+resource "aws_security_group_rule" "alb_security_group_egress_rule" {
+  type                     = "egress"
+  security_group_id        = aws_security_group.alb_security_group.id
+  protocol                 = "-1"
+  from_port                = 0
+  to_port                  = 0
+  source_security_group_id = aws_security_group.ec2_security_group.id
+  description              = "Allow outbound traffic to the EC2 instances"
 }
 
 resource "aws_security_group" "ec2_security_group" {
   name        = "EC2-Security-Group"
   description = "Allow inbound HTTP traffic from the ALB for the EC2 instances"
   vpc_id      = aws_vpc.vpc.id
-  
+
   ingress {
-    protocol         = "tcp"
-    from_port        = 80
-    to_port          = 80
-    security_groups = [ aws_security_group.alb_security_group.id ]
-    description      = "Allow inbound HTTP"
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
+    security_groups = [aws_security_group.alb_security_group.id]
+    description     = "Allow inbound HTTP"
   }
 }
