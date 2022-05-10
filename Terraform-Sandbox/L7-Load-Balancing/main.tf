@@ -45,6 +45,13 @@ resource "aws_eip" "nat_gateway_elastic_ip" {
   tags = local.common_tags
 }
 
+# https://dev.betterdoc.org/infrastructure/2020/02/04/setting-up-a-nat-gateway-on-aws-using-terraform.html
+resource "aws_nat_gateway" "nat_gateway" {
+  allocation_id = aws_eip.nat_gateway_elastic_ip.id
+  subnet_id = aws_subnet.public_subnet_one.id
+  tags = local.common_tags
+}
+
 resource "aws_route_table" "public_subnets_route_table" {
   vpc_id = aws_vpc.vpc.id
   route {
@@ -63,10 +70,3 @@ resource "aws_route_table_association" "public_subnet_two_route_table_associatio
   subnet_id      = aws_subnet.public_subnet_two.id
   route_table_id = aws_route_table.public_subnets_route_table.id
 }
-
-/*
-https://dev.betterdoc.org/infrastructure/2020/02/04/setting-up-a-nat-gateway-on-aws-using-terraform.html
-resource "aws_nat_gateway" "nat_gateway" {
-
-  tags = local.common_tags
-} */
