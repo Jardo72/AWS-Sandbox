@@ -36,3 +36,11 @@ output "aws_availability_zones" {
 output "latest_amazon_linux_ami" {
   value = data.aws_ami.latest_amazon_linux_ami.id
 }
+
+output "number_of_az_in_region" {
+  value = "There are ${length(data.aws_availability_zones.availability_zones.names)} AZ(s) in region '${data.aws_region.current_region.name}'"
+}
+
+output "names_of_azs_as_csv" {
+  value = join(", ", data.aws_availability_zones.availability_zones.names)
+}
