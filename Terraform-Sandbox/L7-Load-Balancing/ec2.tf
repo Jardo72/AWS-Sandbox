@@ -1,3 +1,12 @@
+data "aws_ami" "latest_amazon_linux_ami" {
+  owners      = ["137112412989"]
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
 resource "aws_iam_role" "ec2_iam_role" {
   name = "SSMParameterReaderRole"
   assume_role_policy = jsonencode({
@@ -38,8 +47,24 @@ resource "aws_iam_role" "ec2_iam_role" {
   tags = local.common_tags
 }
 
-resource "aws_iam_instance_profile" "ssm_parameter_reader_profile" {
-  name = "SSMParameterReaderProfile"
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "L7-LB-Demo-Launch-IAM-Instance-Profile"
   role = aws_iam_role.ec2_iam_role.name
+  tags = local.common_tags
+}
+
+resource "aws_launch_template" "ec2_launch_template" {
+  name                   = "L7-LB-Demo-Launch-Template"
+  image_id               = data.aws_ami.latest_amazon_linux_ami.id
+  instance_type          = var.ec2_instance_type
+  vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.ec2_instance_profile.arn
+  }
+  update_default_version = true
+  tag_specifications {
+    resource_type = "instance"
+    tags = local.common_tags
+  }
   tags = local.common_tags
 }

@@ -110,7 +110,7 @@ resource "aws_security_group" "alb_security_group" {
   name        = "ALB-Security-Group"
   description = "Security group for the ALB"
   vpc_id      = aws_vpc.vpc.id
-  tags = local.common_tags
+  tags        = local.common_tags
 }
 
 resource "aws_security_group_rule" "alb_security_group_ingress_rule" {
