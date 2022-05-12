@@ -170,3 +170,26 @@ resource "aws_security_group" "ec2_security_group" {
     Name = "${local.name_prefix}-EC2-Security-Group"
   })
 }
+
+resource "aws_lb" "application_load_balancer" {
+  name               = "${local.name_prefix}-ALB"
+  internal           = false
+  load_balancer_type = "application"
+  subnets            = [for subnet in aws_subnet.public_subnet : subnet.id]
+  security_groups    = [aws_security_group.alb_security_group.id]
+  tags               = local.common_tags
+}
+
+resource "aws_lb_listener" "application_load_balancer_listener" {
+  load_balancer_arn = aws_lb.application_load_balancer.arn
+  port              = var.alb_port
+  protocol          = "HTTP"
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Hello world!!! I am ALB."
+      status_code  = 200
+    }
+  }
+}

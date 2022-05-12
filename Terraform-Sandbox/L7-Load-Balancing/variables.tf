@@ -15,3 +15,15 @@ variable "ec2_instance_type" {
   type        = string
   default     = "t2.nano"
 }
+
+variable "alb_port" {
+  description = "TCP port the load balancer will use to accept incoming connections"
+  type        = number
+  default     = 80
+}
+
+variable "ec2_port" {
+  description = "TCP port the application instances running on EC2 will use to accept incoming connections"
+  type        = number
+  default     = 80
+}
