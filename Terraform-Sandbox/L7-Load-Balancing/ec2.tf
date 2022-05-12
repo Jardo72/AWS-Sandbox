@@ -63,13 +63,17 @@ resource "aws_iam_role" "ec2_iam_role" {
     "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
   ]
 
-  tags = local.common_tags
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-EC2-IAM-Role"
+  })
 }
 
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "${local.name_prefix}-IAM-Instance-Profile"
+  name = "${local.name_prefix}-EC2-Instance-Profile"
   role = aws_iam_role.ec2_iam_role.name
-  tags = local.common_tags
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-EC2-Instance-Profile"
+  })
 }
 
 resource "aws_launch_template" "ec2_launch_template" {
@@ -85,7 +89,9 @@ resource "aws_launch_template" "ec2_launch_template" {
     resource_type = "instance"
     tags          = local.common_tags
   }
-  tags = local.common_tags
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-Launch-Template"
+  })
 }
 
 /*

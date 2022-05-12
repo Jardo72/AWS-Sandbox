@@ -98,7 +98,6 @@ resource "aws_eip" "nat_gateway_elastic_ip" {
   })
 }
 
-# https://dev.betterdoc.org/infrastructure/2020/02/04/setting-up-a-nat-gateway-on-aws-using-terraform.html
 resource "aws_nat_gateway" "nat_gateway" {
   for_each      = local.availability_zones
   allocation_id = aws_eip.nat_gateway_elastic_ip[each.key].id
