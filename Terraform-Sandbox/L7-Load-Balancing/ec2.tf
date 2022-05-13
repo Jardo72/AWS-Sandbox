@@ -94,7 +94,6 @@ resource "aws_launch_template" "ec2_launch_template" {
   })
 }
 
-/*
 resource "aws_autoscaling_group" "ec2_autoscaling_group" {
   name                      = "${local.name_prefix}-Auto-Scaling-Group"
   min_size                  = 3
@@ -102,14 +101,10 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
   desired_capacity          = 3
   health_check_type         = "ELB"
   health_check_grace_period = 150
-  vpc_zone_identifier       = [
-    data.aws_availability_zones.available.ids[0],
-    data.aws_availability_zones.available.ids[1],
-    data.aws_availability_zones.available.ids[2]
-  ]
+  vpc_zone_identifier       = [for subnet in aws_subnet.private_subnet : subnet.id]
   launch_template {
     id      = aws_launch_template.ec2_launch_template.id
-    version = aws_launch_template.ec2_launch_template.latest_version
+    version = "$Latest"
   }
-  tags = local.common_tags
-} */
+  # tag = local.common_tags
+}

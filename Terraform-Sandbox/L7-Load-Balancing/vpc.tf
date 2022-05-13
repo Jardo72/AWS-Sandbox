@@ -211,3 +211,19 @@ resource "aws_lb_listener" "application_load_balancer_listener" {
     }
   }
 }
+
+resource "aws_lb_target_group" "alb_target_group" {
+  name     = "${local.name_prefix}-ALBTargetGroup"
+  vpc_id   = aws_vpc.vpc.id
+  port     = var.ec2_port
+  protocol = "HTTP"
+  health_check {
+    enabled             = true
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
+    interval            = 20
+    timeout             = 10
+    path                = "/api/health-check"
+    # matcher             = "200"
+  }
+}
