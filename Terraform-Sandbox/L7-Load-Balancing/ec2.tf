@@ -106,5 +106,8 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
     id      = aws_launch_template.ec2_launch_template.id
     version = "$Latest"
   }
+  target_group_arns = [aws_lb_target_group.alb_target_group.arn]
   # tag = local.common_tags
 }
+
+# https://skillmix.io/terraform/lab-multi-resource-terraform-project/

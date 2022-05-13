@@ -224,6 +224,6 @@ resource "aws_lb_target_group" "alb_target_group" {
     interval            = 20
     timeout             = 10
     path                = "/api/health-check"
-    # matcher             = "200"
+    matcher             = "200"
   }
 }
