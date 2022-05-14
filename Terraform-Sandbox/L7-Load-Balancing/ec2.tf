@@ -101,7 +101,7 @@ resource "aws_launch_template" "ec2_launch_template" {
     resource_type = "instance"
     tags          = local.common_tags
   }
-  user_data = "${base64encode(data.template_file.ec2_user_data.rendered)}"
+  user_data = base64encode(data.template_file.ec2_user_data.rendered)
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-Launch-Template"
   })
