@@ -123,6 +123,19 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
   # tag = local.common_tags
 }
 
+resource "aws_autoscaling_policy" "ec2_scaling_policy" {
+  name                   = "${local.name_prefix}-Scaling-Policy"
+  autoscaling_group_name = aws_autoscaling_group.ec2_autoscaling_group.name
+  policy_type            = "TargetTrackingScaling"
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+    target_value = var.target_cpu_utilization_threshold
+    disable_scale_in = false
+  }
+}
+
 # https://skillmix.io/terraform/lab-multi-resource-terraform-project/
 # https://blog.imfiny.com/imfiny-aws-terraform-2019-01-18-aws-launch-templates-html/
 
