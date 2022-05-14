@@ -17,6 +17,27 @@
 # limitations under the License.
 #
 
+# TODO: it does not make that much sense to have a default here
+variable "deplyment_artifactory_bucket_name" {
+  description = "The name of the S3 bucket which will serve as the artifactory with JAR files"
+  type        = string
+  default     = "jardo72-ec2-installation-repo"
+}
+
+# TODO: it does not make that much sense to have a default here
+variable "deployment_artifactory_prefix" {
+  description = "The prefix of the application JAR file within the S3 bucket which will serve as the artifactory with JAR files"
+  type        = string
+  default     = "L7-LB-DEMO"
+}
+
+# TODO: it does not make that much sense to have a default here
+variable "application_jar_file" {
+  description = "The name of the application JAR file (fat runnable JAR file is expected)"
+  type        = string
+  default     = "aws-sandbox-application-load-balancing-server-1.0.jar"
+}
+
 variable "aws_region" {
   description = "The AWS region where the resources are to be provisioned"
   type        = string

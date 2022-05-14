@@ -26,6 +26,10 @@ data "aws_ami" "latest_amazon_linux_ami" {
   }
 }
 
+data "aws_s3_bucket" "deplyment_artifactory_bucket" {
+  bucket = var.deplyment_artifactory_bucket_name
+}
+
 resource "aws_iam_role" "ec2_iam_role" {
   name = "${local.name_prefix}-EC2-IAM-Role"
   assume_role_policy = jsonencode({
@@ -42,23 +46,22 @@ resource "aws_iam_role" "ec2_iam_role" {
     ]
   })
 
-  /* TODO: remove or adapt to what is really needed
   inline_policy {
-    name = "SSMParameterValueReadAccess"
+    name = "DeploymentArtifactoryReadAccess"
     policy = jsonencode({
       Version : "2012-10-17",
       Statement : [
         {
-          Sid : "AllowGetParameter",
-          Action : ["ssm:GetParameter"]
+          Sid : "AllowGetObject",
+          Action : ["s3:GetObject"]
           Effect : "Allow"
-          Resource : format("arn:aws:ssm:%s:%s:parameter%s", local.aws_region, data.aws_caller_identity.current_account.account_id, local.ssm_parameter_name)
+          Resource : format("%s/%s", data.aws_s3_bucket.deplyment_artifactory_bucket.arn, "*")
         }
       ]
     })
-  } */
+  }
 
-  # needed in order to be able to connect to the instance via the Session Manager
+  # needed in order to be able to connect to the instances via the SSM Session Manager
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
   ]
