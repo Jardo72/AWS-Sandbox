@@ -36,6 +36,10 @@ data "aws_ami" "latest_amazon_linux_ami" {
   }
 }
 
+data "aws_s3_bucket" "deplyment_artifactory_bucket" {
+  bucket = "jardo72-deplyment-artifactory"
+}
+
 output "aws_account_id" {
   value = data.aws_caller_identity.current_account.account_id
 }
@@ -62,4 +66,8 @@ output "number_of_az_in_region" {
 
 output "names_of_azs_as_csv" {
   value = join(", ", data.aws_availability_zones.availability_zones.names)
+}
+
+output "deplyment_artifactory_bucket_arn" {
+  value = data.aws_s3_bucket.deplyment_artifactory_bucket.arn
 }
