@@ -30,6 +30,15 @@ data "aws_s3_bucket" "deplyment_artifactory_bucket" {
   bucket = var.deplyment_artifactory_bucket_name
 }
 
+data "template_file" "ec2_user_data" {
+  template = templatefile("user-data.tpl", {
+    deployment_artifactory_bucket = var.deplyment_artifactory_bucket_name,
+    deployment_artifactory_prefix = var.deployment_artifactory_prefix,
+    application_jar_file = var.application_jar_file,
+    ec2_port = var.ec2_port
+  })
+}
+
 resource "aws_iam_role" "ec2_iam_role" {
   name = "${local.name_prefix}-EC2-IAM-Role"
   assume_role_policy = jsonencode({
@@ -92,6 +101,7 @@ resource "aws_launch_template" "ec2_launch_template" {
     resource_type = "instance"
     tags          = local.common_tags
   }
+  user_data = "${base64encode(data.template_file.ec2_user_data.rendered)}"
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-Launch-Template"
   })
@@ -114,3 +124,5 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
 }
 
 # https://skillmix.io/terraform/lab-multi-resource-terraform-project/
+# https://blog.imfiny.com/imfiny-aws-terraform-2019-01-18-aws-launch-templates-html/
+
