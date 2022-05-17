@@ -167,11 +167,12 @@ resource "aws_iam_instance_profile" "ssm_parameter_reader_profile" {
 }
 
 resource "aws_instance" "web_server" {
-  ami                    = data.aws_ami.latest_amazon_linux_ami.id
-  instance_type          = "t2.nano"
-  subnet_id              = aws_subnet.public_subnet.id
-  vpc_security_group_ids = [aws_security_group.web_server_security_group.id]
-  iam_instance_profile   = aws_iam_instance_profile.ssm_parameter_reader_profile.name
+  ami                         = data.aws_ami.latest_amazon_linux_ami.id
+  instance_type               = "t2.nano"
+  subnet_id                   = aws_subnet.public_subnet.id
+  vpc_security_group_ids      = [aws_security_group.web_server_security_group.id]
+  iam_instance_profile        = aws_iam_instance_profile.ssm_parameter_reader_profile.name
+  user_data_replace_on_change = true
   user_data = templatefile("user-data.tpl", {
     aws_region         = local.aws_region
     ssm_parameter_name = local.ssm_parameter_name
