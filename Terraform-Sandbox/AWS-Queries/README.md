@@ -1,2 +1,2 @@
 # AWS Queries
-Simple Terraform configuration which queries AWS for various information like current AWS region details, current AWS account details, availability zones in the current AWS region, AMI ID of the latest version of Amazon Linux 2 AMI.
+Simple Terraform configuration which queries AWS for various information like current AWS region details, current AWS account details, availability zones in the current AWS region, AMI ID of the latest version of Amazon Linux 2 AMI etc. In other words, this configuration does not provision any resources - it just involves data sources and outputs.

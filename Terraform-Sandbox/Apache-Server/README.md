@@ -1,9 +1,10 @@
-# Terraform Deployment of Apache Server
+# Terraform Deployment of Apache Web Server
+Simple Terraform configuration which provisions the following set of resources:
+- random password which is also stored as secure string in SSM parameter store
+- VPC with Internet gateway, single public subnet and route table
+- single EC2 instance with an elastic IP address attached
+- security group protecting the EC2 instance, allowing ingress HTTP traffic (port 80) from anywhere
 
-## Introduction
+The EC2 instance is running the Apache web server, which is installed and started via EC2 user data. During the bootstrapping, index.html file is generated. It provides various information about the EC2 instance, plus the details of the SSM parameter storing the generated radnom password (including the decrypted value of the secure string). The IAM role used as instance profile has the AWS managed policy `arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM` attached, so you can use the Systems Manager/Session Manager to connect to the EC2 instance. The EC2 instance is configured so that a modification of the user data leads to replacement of the EC2 instance. In order to minimize the downtime during the replacement, the lifecycle of the EC2 instance is configured so that the replacement EC2 instance is started before the original EC2 instance is terminated. Becauce of the elastic IP address, there is a constant IP address which does not change in case of replacement.
 
-## Redeployment with Replacement
-
-```
-terraform apply -replace="aws_instance.web_server"
-```
+The user data script for the EC2 instance is generated using the `templatefile` function. As outlined above, when you modify the template file and apply the Terraform configuration again, the EC2 instance will be replaced by a new one reflecting the modified user data. In other words, the index.html file for new EC2 instance will reflect the modified user data.
