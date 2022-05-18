@@ -34,8 +34,8 @@ data "template_file" "ec2_user_data" {
   template = templatefile("user-data.tpl", {
     deployment_artifactory_bucket = var.deplyment_artifactory_bucket_name,
     deployment_artifactory_prefix = var.deployment_artifactory_prefix,
-    application_jar_file = var.application_jar_file,
-    ec2_port = var.ec2_port
+    application_jar_file          = var.application_jar_file,
+    ec2_port                      = var.ec2_port
   })
 }
 
@@ -114,7 +114,7 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
   desired_capacity          = 3
   health_check_type         = "ELB"
   health_check_grace_period = 150
-  vpc_zone_identifier       = [for subnet in aws_subnet.private_subnet : subnet.id]
+  vpc_zone_identifier       = [for subnet in aws_subnet.public_subnet : subnet.id]
   launch_template {
     id      = aws_launch_template.ec2_launch_template.id
     version = "$Latest"
@@ -131,7 +131,7 @@ resource "aws_autoscaling_policy" "ec2_scaling_policy" {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
-    target_value = var.target_cpu_utilization_threshold
+    target_value     = var.target_cpu_utilization_threshold
     disable_scale_in = false
   }
 }

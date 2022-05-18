@@ -34,19 +34,16 @@ data "aws_availability_zones" "available" {}
 locals {
   availability_zones = {
     "AZ-1" = {
-      name                      = data.aws_availability_zones.available.names[0],
-      public_subnet_cidr_block  = "10.0.0.0/24",
-      private_subnet_cidr_block = "10.0.10.0/24",
+      name                     = data.aws_availability_zones.available.names[0],
+      public_subnet_cidr_block = "10.0.0.0/24"
     },
     "AZ-2" = {
-      name                      = data.aws_availability_zones.available.names[1],
-      public_subnet_cidr_block  = "10.0.1.0/24",
-      private_subnet_cidr_block = "10.0.11.0/24",
+      name                     = data.aws_availability_zones.available.names[1],
+      public_subnet_cidr_block = "10.0.1.0/24"
     },
     "AZ-3" = {
-      name                      = data.aws_availability_zones.available.names[2],
-      public_subnet_cidr_block  = "10.0.2.0/24",
-      private_subnet_cidr_block = "10.0.12.0/24",
+      name                     = data.aws_availability_zones.available.names[2],
+      public_subnet_cidr_block = "10.0.2.0/24"
     },
   }
 }
@@ -79,34 +76,6 @@ resource "aws_subnet" "public_subnet" {
   })
 }
 
-resource "aws_subnet" "private_subnet" {
-  for_each                = local.availability_zones
-  vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = each.value.name
-  cidr_block              = each.value.private_subnet_cidr_block
-  map_public_ip_on_launch = false
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-Private-Subnet-${each.key}"
-  })
-}
-
-resource "aws_eip" "nat_gateway_elastic_ip" {
-  for_each = local.availability_zones
-  vpc      = true
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-Elastic-IP-${each.key}"
-  })
-}
-
-resource "aws_nat_gateway" "nat_gateway" {
-  for_each      = local.availability_zones
-  allocation_id = aws_eip.nat_gateway_elastic_ip[each.key].id
-  subnet_id     = aws_subnet.public_subnet[each.key].id
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-NAT-GW-${each.key}"
-  })
-}
-
 resource "aws_route_table" "public_subnets_route_table" {
   vpc_id = aws_vpc.vpc.id
   route {
@@ -122,24 +91,6 @@ resource "aws_route_table_association" "public_subnet_route_table_association" {
   for_each       = local.availability_zones
   subnet_id      = aws_subnet.public_subnet[each.key].id
   route_table_id = aws_route_table.public_subnets_route_table.id
-}
-
-resource "aws_route_table" "private_subnet_route_table" {
-  for_each = local.availability_zones
-  vpc_id   = aws_vpc.vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.nat_gateway[each.key].id
-  }
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-Private-Route-Table-${each.key}"
-  })
-}
-
-resource "aws_route_table_association" "private_subnet_route_table_association" {
-  for_each       = local.availability_zones
-  subnet_id      = aws_subnet.private_subnet[each.key].id
-  route_table_id = aws_route_table.private_subnet_route_table[each.key].id
 }
 
 resource "aws_security_group" "alb_security_group" {
@@ -178,11 +129,19 @@ resource "aws_security_group" "ec2_security_group" {
   vpc_id      = aws_vpc.vpc.id
 
   ingress {
-    protocol        = "tcp"
-    from_port       = 80
-    to_port         = 80
-    security_groups = [aws_security_group.alb_security_group.id]
-    description     = "Allow inbound HTTP"
+    protocol         = "tcp"
+    from_port        = 80
+    to_port          = 80
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    description      = "Allow inbound HTTP"
+  }
+  egress {
+    protocol         = "-1"
+    from_port        = 0
+    to_port          = 0
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-EC2-Security-Group"
@@ -203,7 +162,7 @@ resource "aws_lb_listener" "application_load_balancer_listener" {
   port              = var.alb_port
   protocol          = "HTTP"
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.alb_target_group.arn
   }
 }
