@@ -17,6 +17,10 @@
 # limitations under the License.
 #
 
+provider "aws" {
+  region = local.aws_region
+}
+
 locals {
   aws_region         = "eu-central-1"
   ssm_parameter_name = "/terraform-sandbox/apache-server/dummy-password"
@@ -24,10 +28,6 @@ locals {
     Name          = "Apache-Demo",
     ProvisionedBy = "Terraform"
   }
-}
-
-provider "aws" {
-  region = local.aws_region
 }
 
 data "aws_caller_identity" "current_account" {}
@@ -184,6 +184,13 @@ resource "aws_instance" "web_server" {
   depends_on = [aws_ssm_parameter.dummy_password]
 }
 
+resource "null_resource" "web_server_status_ok" {
+  provisioner "local-exec" {
+    command = "aws ec2 wait instance-status-ok --instance-ids ${aws_instance.web_server.id}"
+  }
+  depends_on = [aws_instance.web_server]
+}
+
 output "aws_account_id" {
   value = data.aws_caller_identity.current_account.account_id
 }
@@ -198,6 +205,10 @@ output "web_server_elastic_ip" {
 
 output "web_server_elastic_dns_name" {
   value = aws_eip.web_server_elastic_ip.public_dns
+}
+
+output "web_server_instance_id" {
+  value = aws_instance.web_server.id
 }
 
 output "generated_random_password" {
