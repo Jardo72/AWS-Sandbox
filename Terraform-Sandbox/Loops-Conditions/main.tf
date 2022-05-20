@@ -21,6 +21,16 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+variable "dummy_map" {
+  description = "Dummy map with default value used to demonstrate for loop"
+  type = map(string)
+  default = {
+    "color" = "blue"
+    "size" = "XXL"
+    "brand" = "Adidas"
+  }
+}
+
 resource "aws_iam_user" "count_user" {
   count         = 3
   name          = "CNT-USER-${count.index + 1}"
@@ -60,4 +70,8 @@ output "iam_for_each_user_arns" {
 
 output "iam_count_user_names_as_csv" {
   value = join(", ", [for iam_user in aws_iam_user.count_user[*] : iam_user.name])
+}
+
+output "map_key_value_string" {
+  value = join("; ", [for k, v in var.dummy_map: "${k} = ${v}"])
 }
