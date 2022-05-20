@@ -21,6 +21,11 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+provider "aws" {
+  region = "us-east-1"
+  alias = "us_east"
+}
+
 data "aws_caller_identity" "current_account" {}
 
 data "aws_region" "current_region" {}
@@ -28,6 +33,16 @@ data "aws_region" "current_region" {}
 data "aws_availability_zones" "availability_zones" {}
 
 data "aws_ami" "latest_amazon_linux_ami" {
+  owners      = ["137112412989"]
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
+data "aws_ami" "latest_amazon_linux_ami_us_east" {
+  provider = aws.us_east
   owners      = ["137112412989"]
   most_recent = true
   filter {
@@ -58,6 +73,10 @@ output "aws_availability_zones" {
 
 output "latest_amazon_linux_ami" {
   value = data.aws_ami.latest_amazon_linux_ami.id
+}
+
+output "latest_amazon_linux_ami_us_east" {
+  value = data.aws_ami.latest_amazon_linux_ami_us_east.id
 }
 
 output "number_of_az_in_region" {
