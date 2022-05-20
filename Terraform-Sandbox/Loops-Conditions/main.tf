@@ -41,3 +41,23 @@ resource "aws_iam_user" "for_each_user" {
     ProvisionedBy = "Terraform"
   }
 }
+
+output "iam_count_user_names" {
+  value = aws_iam_user.count_user[*].name
+}
+
+output "iam_count_user_arns" {
+  value = aws_iam_user.count_user[*].arn
+}
+
+output "iam_for_each_user_names" {
+  value = values(aws_iam_user.for_each_user)[*].name
+}
+
+output "iam_for_each_user_arns" {
+  value = values(aws_iam_user.for_each_user)[*].arn
+}
+
+output "iam_count_user_names_as_csv" {
+  value = join(", ", [for iam_user in aws_iam_user.count_user[*] : iam_user.name])
+}
