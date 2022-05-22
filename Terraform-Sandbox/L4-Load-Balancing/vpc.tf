@@ -31,22 +31,30 @@ locals {
 
 data "aws_availability_zones" "available" {}
 
+data "aws_cloudformation_export" "deployment_artifactory_bucket_name" {
+  name = "CommonDeploymentArtifactoryBucketName"
+}
+
+data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn" {
+  name = "CommonDeploymentArtifactoryReadAccessPolicyArn"
+}
+
 locals {
   availability_zones = {
     "AZ-1" = {
       name                      = data.aws_availability_zones.available.names[0],
-      public_subnet_cidr_block  = "10.0.0.0/24",
-      private_subnet_cidr_block = "10.0.10.0/24",
+      public_subnet_cidr_block  = cidrsubnet(var.vpc_cidr_block, 8, 0)
+      private_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 10),
     },
     "AZ-2" = {
       name                      = data.aws_availability_zones.available.names[1],
-      public_subnet_cidr_block  = "10.0.1.0/24",
-      private_subnet_cidr_block = "10.0.11.0/24",
+      public_subnet_cidr_block  = cidrsubnet(var.vpc_cidr_block, 8, 1),
+      private_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 11),
     },
     "AZ-3" = {
       name                      = data.aws_availability_zones.available.names[2],
-      public_subnet_cidr_block  = "10.0.2.0/24",
-      private_subnet_cidr_block = "10.0.12.0/24",
+      public_subnet_cidr_block  = cidrsubnet(var.vpc_cidr_block, 8, 2),
+      private_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 12),
     },
   }
 }

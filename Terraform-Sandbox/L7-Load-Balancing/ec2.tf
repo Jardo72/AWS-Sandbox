@@ -51,8 +51,8 @@ resource "aws_iam_role" "ec2_iam_role" {
     ]
   })
 
-  # needed in order to be able to connect to the instances via the SSM Session Manager
   managed_policy_arns = [
+    # needed in order to be able to connect to the EC2 instances via the SSM Session Manager
     "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
     data.aws_cloudformation_export.deployment_artifactory_read_access_policy_arn.value
   ]

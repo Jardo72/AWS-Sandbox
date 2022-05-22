@@ -26,13 +26,9 @@ data "aws_ami" "latest_amazon_linux_ami" {
   }
 }
 
-data "aws_s3_bucket" "deplyment_artifactory_bucket" {
-  bucket = var.deplyment_artifactory_bucket_name
-}
-
 data "template_file" "ec2_user_data" {
   template = templatefile("user-data.tpl", {
-    deployment_artifactory_bucket = var.deplyment_artifactory_bucket_name,
+    deployment_artifactory_bucket = data.aws_cloudformation_export.deployment_artifactory_bucket_name.value
     deployment_artifactory_prefix = var.deployment_artifactory_prefix,
     application_jar_file          = var.application_jar_file,
     ec2_port                      = var.ec2_port
@@ -55,24 +51,10 @@ resource "aws_iam_role" "ec2_iam_role" {
     ]
   })
 
-  inline_policy {
-    name = "DeploymentArtifactoryReadAccess"
-    policy = jsonencode({
-      Version : "2012-10-17",
-      Statement : [
-        {
-          Sid : "AllowGetObject",
-          Action : ["s3:GetObject"]
-          Effect : "Allow"
-          Resource : format("%s/%s", data.aws_s3_bucket.deplyment_artifactory_bucket.arn, "*")
-        }
-      ]
-    })
-  }
-
-  # needed in order to be able to connect to the instances via the SSM Session Manager
   managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+    # needed in order to be able to connect to the EC2 instances via the SSM Session Manager
+    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+    data.aws_cloudformation_export.deployment_artifactory_read_access_policy_arn.value
   ]
 
   tags = merge(local.common_tags, {
