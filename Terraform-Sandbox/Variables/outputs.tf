@@ -44,3 +44,11 @@ output "dummy_object_value" {
 output "dummy_map_value" {
   value = var.dummy_map
 }
+
+output "dummy_tuple_value" {
+  value = var.dummy_tuple
+}
+
+output "dummy_set_value" {
+  value = var.dummy_set
+}

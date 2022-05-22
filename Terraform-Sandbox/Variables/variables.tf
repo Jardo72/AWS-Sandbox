@@ -54,3 +54,14 @@ variable "dummy_map" {
   description = "Dummy variable of type map"
   type = map(any)
 }
+
+variable "dummy_tuple" {
+  description = "Dummy variable of type tuple"
+  type = tuple([string, number, bool])
+}
+
+variable "dummy_set" {
+  description = "Dummy variable of type set of string(s)"
+  type = set(string)
+  default = [ "red", "green", "blue", "black" ]
+}

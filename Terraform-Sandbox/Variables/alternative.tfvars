@@ -34,3 +34,7 @@ dummy_map = {
   number_value = 4321,
   bool_value = true
 }
+
+dummy_tuple = ["bye", 4321, false]
+
+dummy_set = ["red", "green", "blue", "red", "blue"]

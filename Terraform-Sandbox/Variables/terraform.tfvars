@@ -32,5 +32,9 @@ dummy_object = {
 dummy_map = {
   string_value = "dummy string",
   number_value = 1234,
-  bool_value = false
+  bool_value: false
 }
+
+dummy_tuple = ["hello", 1234, true]
+
+dummy_set = ["red", "green", "blue", "green"]
