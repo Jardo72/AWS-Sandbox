@@ -31,19 +31,27 @@ locals {
 
 data "aws_availability_zones" "available" {}
 
+data "aws_cloudformation_export" "deployment_artifactory_bucket_name" {
+  name = "CommonDeploymentArtifactoryBucketName"
+}
+
+data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn" {
+  name = "CommonDeploymentArtifactoryReadAccessPolicyArn"
+}
+
 locals {
   availability_zones = {
     "AZ-1" = {
       name                     = data.aws_availability_zones.available.names[0],
-      public_subnet_cidr_block = "10.0.0.0/24"
+      public_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 0)
     },
     "AZ-2" = {
       name                     = data.aws_availability_zones.available.names[1],
-      public_subnet_cidr_block = "10.0.1.0/24"
+      public_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 1)
     },
     "AZ-3" = {
       name                     = data.aws_availability_zones.available.names[2],
-      public_subnet_cidr_block = "10.0.2.0/24"
+      public_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 2)
     },
   }
 }
@@ -114,13 +122,20 @@ resource "aws_security_group_rule" "alb_security_group_ingress_rule" {
 }
 
 resource "aws_security_group_rule" "alb_security_group_egress_rule" {
-  type                     = "egress"
-  security_group_id        = aws_security_group.alb_security_group.id
-  protocol                 = "-1"
-  from_port                = 0
-  to_port                  = 0
-  source_security_group_id = aws_security_group.ec2_security_group.id
-  description              = "Allow outbound traffic to the EC2 instances"
+  type              = "egress"
+  security_group_id = aws_security_group.alb_security_group.id
+  protocol          = "-1"
+  from_port         = 0
+  to_port           = 0
+
+  // TODO: remove?
+  // - the reference to EC2 security group does not seem to work
+  // - this is a workaround allowing to proceed until the final solution will be found
+  cidr_blocks      = ["0.0.0.0/0"]
+  ipv6_cidr_blocks = ["::/0"]
+  // source_security_group_id = aws_security_group.ec2_security_group.id
+
+  description = "Allow outbound traffic to the EC2 instances"
 }
 
 resource "aws_security_group" "ec2_security_group" {
