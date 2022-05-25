@@ -28,7 +28,7 @@ variable "deployment_artifactory_prefix" {
 variable "application_jar_file" {
   description = "The name of the application JAR file (fat runnable JAR file is expected)"
   type        = string
-  default     = "aws-sandbox-application-load-balancing-server-1.0.jar"
+  default     = "aws-sandbox-network-load-balancing-server-1.0.jar"
 }
 
 variable "aws_region" {
