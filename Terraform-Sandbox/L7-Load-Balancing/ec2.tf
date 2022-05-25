@@ -90,7 +90,7 @@ resource "aws_launch_template" "ec2_launch_template" {
 }
 
 resource "aws_autoscaling_group" "ec2_autoscaling_group" {
-  name                      = "${local.name_prefix}-Auto-Scaling-Group"
+  name                      = "${local.name_prefix}-ASG"
   min_size                  = 3
   max_size                  = 6
   desired_capacity          = 3

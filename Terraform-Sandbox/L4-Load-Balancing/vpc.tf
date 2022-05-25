@@ -151,17 +151,22 @@ resource "aws_route_table_association" "private_subnet_route_table_association" 
 }
 
 resource "aws_security_group" "ec2_security_group" {
-  name        = "${local.name_prefix}-EC2-Security-Group"
+  name        = "${local.name_prefix}-EC2-SG"
   description = "Allow inbound HTTP traffic from the ALB for the EC2 instances"
   vpc_id      = aws_vpc.vpc.id
-
   ingress {
     protocol         = "tcp"
-    from_port        = 80
-    to_port          = 80
+    from_port        = var.ec2_port
+    to_port          = var.ec2_port
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
-    description      = "Allow inbound HTTP"
+  }
+  egress {
+    protocol         = "-1"
+    from_port        = 0
+    to_port          = 0
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-EC2-Security-Group"
