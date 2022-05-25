@@ -168,7 +168,6 @@ resource "aws_security_group" "ec2_security_group" {
   })
 }
 
-/* TODO:
 resource "aws_lb" "network_load_balancer" {
   name               = "${local.name_prefix}-ALB"
   internal           = false
@@ -191,15 +190,13 @@ resource "aws_lb_target_group" "nlb_target_group" {
   name     = "${local.name_prefix}-NLBTargetGroup"
   vpc_id   = aws_vpc.vpc.id
   port     = var.ec2_port
-  protocol = "HTTP"
+  protocol = "TCP"
   health_check {
     enabled             = true
-    healthy_threshold   = 3
-    unhealthy_threshold = 3
-    interval            = 20
-    timeout             = 10
-    path                = "/api/health-check"
-    matcher             = "200"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    /* TODO: this seems to cause troubles, but it works with CloudFormation
+    interval            = 30
+    timeout             = 10 */
   }
 }
-*/

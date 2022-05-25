@@ -89,7 +89,6 @@ resource "aws_launch_template" "ec2_launch_template" {
   })
 }
 
-/* TODO:
 resource "aws_autoscaling_group" "ec2_autoscaling_group" {
   name                      = "${local.name_prefix}-Auto-Scaling-Group"
   min_size                  = 3
@@ -105,4 +104,3 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
   target_group_arns = [aws_lb_target_group.nlb_target_group.arn]
   # tag = local.common_tags
 }
-*/
