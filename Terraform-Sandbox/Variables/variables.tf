@@ -72,3 +72,12 @@ variable "dummy_sensitive_string" {
   default     = "My name is Bond. James Bond."
   sensitive   = true
 }
+
+variable "dummy_validated_number" {
+  description = "Dummy string variable with validation"
+  type        = number
+  validation {
+    condition     = (0 <= var.dummy_validated_number) && (var.dummy_validated_number <= 10) && can(parseint(tostring(var.dummy_validated_number), 10))
+    error_message = "The value of the dummy_validated_number variable must be an integer between 0 and 10."
+  }
+}

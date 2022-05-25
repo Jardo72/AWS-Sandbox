@@ -38,3 +38,5 @@ dummy_map = {
 dummy_tuple = ["hello", 1234, true]
 
 dummy_set = ["red", "green", "blue", "green"]
+
+dummy_validated_number = 7

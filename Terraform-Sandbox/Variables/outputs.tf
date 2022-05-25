@@ -61,3 +61,7 @@ output "dummy_sensitive_value" {
 output "dummy_sensitive_value_revealed" {
   value = nonsensitive(var.dummy_sensitive_string)
 }
+
+output "dummy_validated_integer" {
+  value = var.dummy_validated_number
+}
