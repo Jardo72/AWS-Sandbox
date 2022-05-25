@@ -173,7 +173,7 @@ resource "aws_lb" "network_load_balancer" {
   internal           = false
   load_balancer_type = "network"
   subnets            = [for subnet in aws_subnet.public_subnet : subnet.id]
-  tags = local.common_tags
+  tags               = local.common_tags
 }
 
 resource "aws_lb_listener" "network_load_balancer_listener" {
