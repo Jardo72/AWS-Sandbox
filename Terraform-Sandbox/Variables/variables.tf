@@ -19,49 +19,56 @@
 
 variable "dummy_string" {
   description = "Dummy variable of type string"
-  type = string
+  type        = string
 }
 
 variable "dummy_number" {
   description = "Dummy variable of type number"
-  type = number
+  type        = number
 }
 
 variable "dummy_bool" {
   description = "Dummy variable of type bool"
-  type = bool
+  type        = bool
 }
 
 variable "dummy_string_list" {
   description = "Dummy variable of type list of string(s)"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "dummy_number_list" {
   description = "Dummy variable of type list of number(s)"
-  type = list(number)
+  type        = list(number)
 }
 
 variable "dummy_object" {
   description = "Dummy variable of type object"
   type = object({
-    cidr = string
+    cidr     = string
     az_index = number
   })
 }
 
 variable "dummy_map" {
   description = "Dummy variable of type map"
-  type = map(any)
+  type        = map(any)
 }
 
 variable "dummy_tuple" {
   description = "Dummy variable of type tuple"
-  type = tuple([string, number, bool])
+  type        = tuple([string, number, bool])
 }
 
 variable "dummy_set" {
   description = "Dummy variable of type set of string(s)"
-  type = set(string)
-  default = [ "red", "green", "blue", "black" ]
+  type        = set(string)
+  default     = ["red", "green", "blue", "black"]
+}
+
+variable "dummy_sensitive_string" {
+  description = "Dummy string variable marked as sensitive"
+  type        = string
+  default     = "My name is Bond. James Bond."
+  sensitive   = true
 }

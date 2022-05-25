@@ -52,3 +52,12 @@ output "dummy_tuple_value" {
 output "dummy_set_value" {
   value = var.dummy_set
 }
+
+output "dummy_sensitive_value" {
+  value     = var.dummy_sensitive_string
+  sensitive = true
+}
+
+output "dummy_sensitive_value_revealed" {
+  value = nonsensitive(var.dummy_sensitive_string)
+}

@@ -19,20 +19,20 @@
 
 dummy_string = "Good morning Terraform"
 dummy_number = 4321
-dummy_bool = false
+dummy_bool   = false
 
 dummy_string_list = ["S", "M", "L"]
 dummy_number_list = [1, 3, 5, 7, 11, 13]
 
 dummy_object = {
-  cidr = "192.168.1.0/24"
+  cidr     = "192.168.1.0/24"
   az_index = 0
 }
 
 dummy_map = {
   string_value = "alternative string",
   number_value = 4321,
-  bool_value = true
+  bool_value   = true
 }
 
 dummy_tuple = ["bye", 4321, false]
