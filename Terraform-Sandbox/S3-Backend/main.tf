@@ -23,8 +23,8 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = "jardo72-terraform-backend"
-    key    = "terraform-sandbox/"
+    bucket = "jardo72-terraform-state"
+    key    = "terraform-sandbox/s3-backend"
     region = "eu-central-1"
   }
 }
@@ -50,5 +50,5 @@ resource "aws_iam_group" "demo_iam_group" {
 resource "aws_iam_group_membership" "name" {
   name  = "TF-DEMO-GROUP-MEMBERSHIP"
   users = aws_iam_user.demo_iam_user[*].name
-  group = aws_iam_group.demo_iam_group
+  group = aws_iam_group.demo_iam_group.name
 }
