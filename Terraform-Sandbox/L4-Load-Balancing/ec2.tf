@@ -102,5 +102,6 @@ resource "aws_autoscaling_group" "ec2_autoscaling_group" {
     version = "$Latest"
   }
   target_group_arns = [aws_lb_target_group.nlb_target_group.arn]
+  depends_on        = [aws_nat_gateway.nat_gateway]
   # tag = local.common_tags
 }
