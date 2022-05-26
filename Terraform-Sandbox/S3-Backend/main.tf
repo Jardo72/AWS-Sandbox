@@ -52,3 +52,10 @@ resource "aws_iam_group_membership" "name" {
   users = aws_iam_user.demo_iam_user[*].name
   group = aws_iam_group.demo_iam_group.name
 }
+
+resource "aws_iam_user" "extra_iam_user" {
+  count         = var.create_extra_iam_user ? 1 : 0
+  name          = "TF-EXTRA-USER"
+  force_destroy = true
+  tags          = local.common_tags
+}

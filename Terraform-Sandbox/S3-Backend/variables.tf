@@ -22,3 +22,9 @@ variable "aws_region" {
   type        = string
   default     = "eu-central-1"
 }
+
+variable "create_extra_iam_user" {
+  description = "Flag indicating whether an extra IAM user is to be created"
+  type        = bool
+  default     = true
+}
