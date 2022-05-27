@@ -68,10 +68,11 @@ data "aws_iam_policy_document" "demo_permission_boundary" {
 }
 
 resource "aws_iam_user" "demo_iam_user" {
-  count         = 3
-  name          = "TF-DEMO-USER-${count.index + 1}"
-  force_destroy = true
-  tags          = local.common_tags
+  count                = 3
+  name                 = "TF-DEMO-USER-${count.index + 1}"
+  force_destroy        = true
+  tags                 = local.common_tags
+  permissions_boundary = aws_iam_policy.demo_permission_boundary.arn
 }
 
 resource "aws_iam_group" "demo_iam_group" {
