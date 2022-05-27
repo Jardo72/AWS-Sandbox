@@ -1,7 +1,7 @@
 # Terraform Cloud Demo
 
 ## Introduction
-Simple Tarraform configuration supposed to be applied by Tarraform Cloud using CLI. The only resources provision in AWS are few parameters in the SSM Parameter Store.
+Simple Terraform configuration supposed to be applied by Tarraform Cloud using CLI. The only resources provisioned in AWS are few parameters in the SSM Parameter Store.
 
 ## AWS IAM Permission Boundary for IAM User
 In order to minimize the permissions granted to the AWS IAM user whose access key will be provided to Terraform Cloud, I use an IAM user with the following permissions boundary:
