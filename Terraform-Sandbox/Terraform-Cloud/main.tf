@@ -17,6 +17,22 @@
 # limitations under the License.
 #
 
+terraform {
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "pre-cert-sandbox"
+    workspaces {
+      name = "sandbox-01"
+    }
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">=4.00.0"
+    }
+  }
+}
+
 provider "aws" {
   region = "eu-central-1"
 }
@@ -30,8 +46,6 @@ locals {
   }
 }
 
-data "aws_caller_identity" "current_account" {}
-
 resource "aws_ssm_parameter" "demo_standalone_parameter" {
   description = "Demo parameter with value from Terraform variable"
   type        = "String"
@@ -44,7 +58,7 @@ resource "aws_ssm_parameter" "demo_map_driven_parameter" {
   for_each    = var.parameter_definition
   description = each.value.description
   type        = each.value.type
-  name        = "${local.parameter_name_prefix}/${each.value.short_name}"
+  name        = "${local.parameter_name_prefix}/${each.key}"
   value       = each.value.value
   tags        = merge(local.common_tags, {
       DefinitionKey = each.key

@@ -1,20 +1,19 @@
+standalone_parameter_value = "Standalone parameter value"
+
 parameter_definition = {
   "PARAM-01" = {
     description = "Dummy description",
-    short_name  = "",
-    value       = "dummy value",
+    value       = "Dummy value from Terraform variable",
     type        = "String"
   },
   "PARAM-02" = {
     description = "Useless description",
-    short_name  = "",
-    value       = "useless value",
+    value       = "Useless value from Terraform variable",
     type        = "String"
   },
   "PARAM-03" = {
     description = "Purposeless description",
-    short_name  = "",
-    value       = "purposeless value",
+    value       = "Purposeless value from Terraform variable",
     type        = "String"
   }
 }

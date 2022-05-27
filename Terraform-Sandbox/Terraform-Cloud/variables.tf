@@ -26,7 +26,6 @@ variable "parameter_definition" {
   description = "Definitions for map-driven parameters"
   type = map(object({
     description = string
-    short_name  = string
     value       = string
     type        = string
   }))
