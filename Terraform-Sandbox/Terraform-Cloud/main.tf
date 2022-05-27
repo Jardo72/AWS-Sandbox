@@ -19,7 +19,7 @@
 
 terraform {
   backend "remote" {
-    hostname = "app.terraform.io"
+    hostname     = "app.terraform.io"
     organization = "pre-cert-sandbox"
     workspaces {
       name = "sandbox-01"
@@ -60,7 +60,7 @@ resource "aws_ssm_parameter" "demo_map_driven_parameter" {
   type        = each.value.type
   name        = "${local.parameter_name_prefix}/${each.key}"
   value       = each.value.value
-  tags        = merge(local.common_tags, {
-      DefinitionKey = each.key
+  tags = merge(local.common_tags, {
+    DefinitionKey = each.key
   })
 }
