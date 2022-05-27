@@ -11,6 +11,7 @@ In order to minimize the permissions granted to the AWS IAM user whose access ke
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "AllowLimitedSSMInEUCentral1",
             "Action": [
                 "ssm:DescribeParameters",
                 "ssm:GetParameter",
@@ -19,7 +20,9 @@ In order to minimize the permissions granted to the AWS IAM user whose access ke
                 "ssm:GetParametersByPath",
                 "ssm:PutParameter",
                 "ssm:DeleteParameter",
-                "ssm:DeleteParameters"
+                "ssm:DeleteParameters",
+                "ssm:ListTagsForResource",
+                "ssm:AddTagsToResource"
             ],
             "Condition": {
                 "StringEquals": {
@@ -27,9 +30,34 @@ In order to minimize the permissions granted to the AWS IAM user whose access ke
                 }
             },
             "Effect": "Allow",
-            "Resource": "*",
-            "Sid": "AllowLimitedEC2InEUCentral1"
+            "Resource": "*"
         }
     ]
+}
+```
+This limits the access to just few SSM Parameter Store operations, and those operations can only be performed in the EU Central-1 AWS region.
+
+## Values for the Terraform Variables
+The following snippet illustrates possible values for the Tarraform variables. These have to be configured in Terraform Cloud.
+
+```hcl
+standalone_parameter_value = "Standalone parameter value"
+
+parameter_definition = {
+  "PARAM-01" = {
+    description = "Dummy description",
+    value       = "Dummy value from Terraform variable",
+    type        = "String"
+  },
+  "PARAM-02" = {
+    description = "Useless description",
+    value       = "Useless value from Terraform variable",
+    type        = "String"
+  },
+  "PARAM-03" = {
+    description = "Purposeless description",
+    value       = "Purposeless value from Terraform variable",
+    type        = "String"
+  }
 }
 ```
