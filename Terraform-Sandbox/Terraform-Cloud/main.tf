@@ -36,7 +36,7 @@ resource "aws_ssm_parameter" "demo_standalone_parameter" {
   description = "Demo parameter with value from Terraform variable"
   type        = "String"
   name        = "${local.parameter_name_prefix}/standalone-param"
-  value       = var.standalone_parameter_value.value
+  value       = var.standalone_parameter_value
   tags        = local.common_tags
 }
 
