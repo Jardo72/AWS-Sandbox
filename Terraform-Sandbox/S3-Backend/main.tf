@@ -24,7 +24,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket = "jardo72-terraform-state"
-    key    = "terraform-sandbox/s3-backend"
+    key    = "terraform-sandbox/s3-backend/terraform.tfstate"
     region = "eu-central-1"
   }
 }
@@ -33,6 +33,37 @@ locals {
   common_tags = {
     Stack         = "S3-Backend-Demo",
     ProvisionedBy = "Terraform"
+  }
+}
+
+data "aws_iam_policy_document" "demo_permission_boundary" {
+  statement {
+    sid = "AllowLimitedEC2InEUCentral1"
+    actions = [
+      "ec2:Describe*",
+      "ec2:Get*",
+      "ec2:StartInstances",
+      "ec2:StopInstances",
+      "ec2:TerminateInstances"
+    ]
+    resources = [
+      "arn:aws:ec2:::*"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestedRegion"
+      values = [
+        "eu-central-1"
+      ]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "ec2:InstanceType"
+      values = [
+        "t2.nano",
+        "t2.micro"
+      ]
+    }
   }
 }
 
@@ -58,4 +89,10 @@ resource "aws_iam_user" "extra_iam_user" {
   name          = "TF-EXTRA-USER"
   force_destroy = true
   tags          = local.common_tags
+}
+
+resource "aws_iam_policy" "demo_permission_boundary" {
+  name   = "TF-DEMO-POLICY"
+  policy = data.aws_iam_policy_document.demo_permission_boundary.json
+  tags   = local.common_tags
 }
