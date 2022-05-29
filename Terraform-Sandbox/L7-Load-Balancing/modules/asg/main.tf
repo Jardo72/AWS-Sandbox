@@ -74,7 +74,7 @@ resource "aws_launch_template" "ec2_launch_template" {
   name                   = "${var.resource_name_prefix}-Launch-Template"
   image_id               = data.aws_ami.latest_amazon_linux_ami.id
   instance_type          = var.ec2_instance_type
-  vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
+  vpc_security_group_ids = [aws_security_group.security_group.id]
   iam_instance_profile {
     arn = aws_iam_instance_profile.ec2_instance_profile.arn
   }

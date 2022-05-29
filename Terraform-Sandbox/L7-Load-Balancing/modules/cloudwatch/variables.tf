@@ -16,3 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+variable "resource_name_prefix" {
+  description = "Prefix for the names to be applied to the provisioned resources"
+  type        = string
+}
+
+variable "tags" {
+  description = "Common tags to be applied to the provisioned resources"
+  type        = map(string)
+}

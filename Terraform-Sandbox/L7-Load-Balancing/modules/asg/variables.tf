@@ -52,6 +52,11 @@ variable "target_group_arn" {
   type        = string
 }
 
+variable "target_cpu_utilization_threshold" {
+  description = "Threshold for the aggregate CPU utilization for the autoscaling group; if the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group"
+  type        = number
+}
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string
