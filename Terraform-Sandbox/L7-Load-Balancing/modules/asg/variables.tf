@@ -17,6 +17,41 @@
 # limitations under the License.
 #
 
+variable "application_installation" {
+  description = "Settings for the installation of the application"
+  type        = object({
+    deployment_artifactory_bucket_name = string
+    deployment_artifactory_prefix      = string
+    application_jar_file               = string
+  })
+}
+
+variable "ec2_instance_type" {
+  description = "Instance type for the EC2 instances comprising the auto-scaling group"
+  type        = string
+  default     = "t2.nano"
+}
+
+variable "ec2_port" {
+  description = "TCP port for the application"
+  type        = number
+}
+
+variable vpc_id {
+  description = "VPC ID of the VPC hosting the application"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "IDs of the subnets to be used by the auto-scaling group"
+  type        = list(string)
+}
+
+variable "target_group_arn" {
+  description = "ARN of the target group "
+  type        = string
+}
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string

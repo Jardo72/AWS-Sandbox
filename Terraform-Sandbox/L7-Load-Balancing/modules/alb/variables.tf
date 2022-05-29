@@ -23,7 +23,7 @@ variable vpc_id {
 }
 
 variable "subnet_ids" {
-  description = ""
+  description = "IDs of the subnets to be used by the load balancer"
   type        = list(string)
 }
 
