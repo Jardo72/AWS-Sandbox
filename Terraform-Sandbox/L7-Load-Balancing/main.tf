@@ -22,23 +22,23 @@ provider "aws" {
 }
 
 module "vpc" {
-  source         = "./modules/vpc"
-  vpc_cidr_block = var.vpc_cidr_block
+  source               = "./modules/vpc"
+  vpc_cidr_block       = var.vpc_cidr_block
   availability_zones   = var.availability_zones
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
 }
 
 module "alb" {
-  source                = "./modules/alb"
-  vpc_id                = module.vpc.vpc_details.id
-  subnet_ids            = values(module.vpc.subnets)[*].subnet_id
+  source     = "./modules/alb"
+  vpc_id     = module.vpc.vpc_details.id
+  subnet_ids = values(module.vpc.subnets)[*].subnet_id
   alb_listener_settings = {
     port     = 80 # TODO: take this from a variable
     protocol = "HTTP"
   }
   target_ec2_settings = {
-    port                  = 80 # TODO: take this  from a variable
+    port                  = 80 # TODO: take this from a variable
     protocol              = "HTTP"
     healthy_threshold     = 3
     unhealthy_threshold   = 3
@@ -47,19 +47,28 @@ module "alb" {
     health_check_path     = "/api/health-check"
     health_check_matcher  = "200"
   }
-  resource_name_prefix  = var.resource_name_prefix
-  tags                  = var.tags
-}
-
-/* TODO:
-module "asg" {
-  source               = "./modules/asg"
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
-} */
+}
+
+module "asg" {
+  source                           = "./modules/asg"
+  vpc_id                           = module.vpc.vpc_details.id
+  subnet_ids                       = values(module.vpc.subnets)[*].subnet_id
+  ec2_port                         = 80 # TODO: take this from a variable
+  target_group_arn                 = module.alb.target_group_arn
+  target_cpu_utilization_threshold = 50 # TODO: take this from a variable
+  application_installation = {
+    deployment_artifactory_bucket_name = ""
+    deployment_artifactory_prefix      = ""
+    application_jar_file               = ""
+  }
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
+}
 
 module "cloudwatch" {
-  source = "./modules/cloudwatch"
+  source               = "./modules/cloudwatch"
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
 }

@@ -32,8 +32,8 @@ variable "vpc_cidr_block" {
 variable "availability_zones" {
   description = "Definition of subnets for particular availability zones"
   type = map(object({
-    az_name            = string
-    subnet_cidr_block  = string
+    az_name           = string
+    subnet_cidr_block = string
   }))
 }
 
