@@ -29,13 +29,29 @@ module "vpc" {
   tags                 = var.tags
 }
 
-/* TODO:
 module "alb" {
-  source               = "./modules/alb"
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+  source                = "./modules/alb"
+  vpc_id                = module.vpc.vpc_details.id
+  subnet_ids            = values(module.vpc.subnets)[*].subnet_id
+  alb_listener_settings = {
+    port     = 80 # TODO: take this from a variable
+    protocol = "HTTP"
+  }
+  target_ec2_settings = {
+    port                  = 80 # TODO: take this  from a variable
+    protocol              = "HTTP"
+    healthy_threshold     = 3
+    unhealthy_threshold   = 3
+    health_check_interval = 20
+    health_check_timeout  = 10
+    health_check_path     = "/api/health-check"
+    health_check_matcher  = "200"
+  }
+  resource_name_prefix  = var.resource_name_prefix
+  tags                  = var.tags
 }
 
+/* TODO:
 module "asg" {
   source               = "./modules/asg"
   resource_name_prefix = var.resource_name_prefix

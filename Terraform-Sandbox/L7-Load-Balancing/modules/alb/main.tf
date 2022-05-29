@@ -20,7 +20,7 @@
 resource "aws_security_group" "security_group" {
   name        = "${var.resource_name_prefix}-ALB-SG"
   description = "Security group for the ALB"
-  vpc_id      = aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-ALB-SG"
   })
@@ -30,8 +30,8 @@ resource "aws_security_group_rule" "security_group_ingress_rule" {
   type              = "ingress"
   security_group_id = aws_security_group.security_group.id
   protocol          = "tcp"
-  from_port         = var.listener_port
-  to_port           = var.listener_port
+  from_port         = var.alb_listener_settings.port
+  to_port           = var.alb_listener_settings.port
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
   description       = "Allow inbound traffic from anywhere"
@@ -85,6 +85,6 @@ resource "aws_lb_target_group" "target_group" {
     interval            = var.target_ec2_settings.health_check_interval
     timeout             = var.target_ec2_settings.health_check_timeout
     path                = var.target_ec2_settings.health_check_path
-    matcher             = var.target_ec2_settings.healh_check_matcher
+    matcher             = var.target_ec2_settings.health_check_matcher
   }
 }
