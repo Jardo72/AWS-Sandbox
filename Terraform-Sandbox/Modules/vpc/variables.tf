@@ -17,14 +17,26 @@
 # limitations under the License.
 #
 
-provider "aws" {
-  region = "eu-central-1"
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC"
+  type        = string
 }
 
-module "vpc" {
-  source               = "./vpc"
-  vpc_cidr_block       = var.vpc_cidr_block
-  availability_zones   = var.availability_zones
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+variable "availability_zones" {
+  description = "Definition of subnets for particular availability zones"
+  type = map(object({
+    az_name                   = string
+    public_subnet_cidr_block  = string
+    private_subnet_cidr_block = string
+  }))
+}
+
+variable "resource_name_prefix" {
+  description = "Prefix for the names to be applied to the provisioned resources"
+  type        = string
+}
+
+variable "tags" {
+  description = "Common tags to be applied to the provisioned resources"
+  type        = map(string)
 }

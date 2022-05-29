@@ -17,14 +17,17 @@
 # limitations under the License.
 #
 
-provider "aws" {
-  region = "eu-central-1"
+output "vpc_details" {
+  value = {
+    id  = aws_vpc.vpc.id,
+    arn = aws_vpc.vpc.arn
+  }
 }
 
-module "vpc" {
-  source               = "./vpc"
-  vpc_cidr_block       = var.vpc_cidr_block
-  availability_zones   = var.availability_zones
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+output "public_subnets" {
+  value = { for az, subnet in aws_subnet.public_subnet : az => { az = var.availability_zones[az].az_name, subnet_id = subnet.id, subnet_arn = subnet.arn } }
+}
+
+output "private_subnets" {
+  value = { for az, subnet in aws_subnet.private_subnet : az => { az = var.availability_zones[az].az_name, subnet_id = subnet.id, subnet_arn = subnet.arn } }
 }

@@ -18,16 +18,13 @@
 #
 
 output "vpc" {
-  value = {
-    id  = aws_vpc.vpc.id,
-    arn = aws_vpc.vpc.arn
-  }
+  value = module.vpc.vpc_details
 }
 
 output "public_subnets" {
-  value = { for az, subnet in aws_subnet.public_subnet : az => { az = var.availability_zones[az].az_name, subnet_id = subnet.id, subnet_arn = subnet.arn } }
+  value = module.vpc.public_subnets
 }
 
 output "private_subnets" {
-  value = { for az, subnet in aws_subnet.private_subnet : az => { az = var.availability_zones[az].az_name, subnet_id = subnet.id, subnet_arn = subnet.arn } }
+  value = module.vpc.private_subnets
 }
