@@ -17,10 +17,17 @@
 # limitations under the License.
 #
 
-output "vpc_id" {
-  value = aws_vpc.vpc.id
+output "vpc" {
+  value = {
+    id  = aws_vpc.vpc.id,
+    arn = aws_vpc.vpc.arn
+  }
 }
 
-output "vpc_arn" {
-  value = aws_vpc.vpc.arn
+output "public_subnets" {
+  value = { for az, subnet in aws_subnet.public_subnet : az => { az = var.availability_zones[az].az_name, subnet_id = subnet.id, subnet_arn = subnet.arn } }
+}
+
+output "private_subnets" {
+  value = { for az, subnet in aws_subnet.private_subnet : az => { az = var.availability_zones[az].az_name, subnet_id = subnet.id, subnet_arn = subnet.arn } }
 }

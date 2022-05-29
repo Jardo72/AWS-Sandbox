@@ -105,3 +105,9 @@ resource "aws_route_table" "private_subnet_route_table" {
     Name = "${var.resource_name_prefix}-Private-Route-Table-${each.key}"
   })
 }
+
+resource "aws_route_table_association" "private_subnet_route_table_association" {
+  for_each       = var.availability_zones
+  subnet_id      = aws_subnet.private_subnet[each.key].id
+  route_table_id = aws_route_table.private_subnet_route_table[each.key].id
+}
