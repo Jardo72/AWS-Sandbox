@@ -16,3 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "auto_scaling_group_details" {
+  value = {
+    id  = aws_autoscaling_group.autoscaling_group.id
+    arn = aws_autoscaling_group.autoscaling_group.arn
+  }
+}

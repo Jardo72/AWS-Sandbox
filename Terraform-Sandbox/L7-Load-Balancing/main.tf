@@ -21,6 +21,14 @@ provider "aws" {
   region = var.aws_region
 }
 
+data "aws_cloudformation_export" "deployment_artifactory_bucket_name" {
+  name = "CommonDeploymentArtifactoryBucketName"
+}
+
+data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn" {
+  name = "CommonDeploymentArtifactoryReadAccessPolicyArn"
+}
+
 module "vpc" {
   source               = "./modules/vpc"
   vpc_cidr_block       = var.vpc_cidr_block
@@ -52,19 +60,23 @@ module "alb" {
 }
 
 module "asg" {
-  source                           = "./modules/asg"
-  vpc_id                           = module.vpc.vpc_details.id
-  subnet_ids                       = values(module.vpc.subnets)[*].subnet_id
-  ec2_port                         = 80 # TODO: take this from a variable
-  target_group_arn                 = module.alb.target_group_arn
-  target_cpu_utilization_threshold = 50 # TODO: take this from a variable
+  source           = "./modules/asg"
+  vpc_id           = module.vpc.vpc_details.id
+  subnet_ids       = values(module.vpc.subnets)[*].subnet_id
+  target_group_arn = module.alb.target_group_arn
   application_installation = {
-    deployment_artifactory_bucket_name = ""
-    deployment_artifactory_prefix      = ""
-    application_jar_file               = ""
+    deployment_artifactory_bucket_name     = ""
+    deployment_artifactory_prefix          = ""
+    application_jar_file                   = ""
+    deployment_artifactory_access_role_arn = ""
   }
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+  ec2_instance = {
+    instance_type = "t2.nano"
+    port          = 80
+  }
+  target_cpu_utilization_threshold = 50 # TODO: take this from a variable
+  resource_name_prefix             = var.resource_name_prefix
+  tags                             = var.tags
 }
 
 module "cloudwatch" {
