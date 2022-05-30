@@ -138,7 +138,7 @@ resource "aws_autoscaling_policy" "scaling_policy" {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
-    target_value     = var.target_cpu_utilization_threshold
+    target_value     = var.autoscaling_group.target_cpu_utilization_threshold
     disable_scale_in = false
   }
 }

@@ -38,9 +38,10 @@ variable "ec2_instance" {
 variable "autoscaling_group" {
   description = "Settings for the auto-scaling group"
   type        = object({
-    min_size         = number
-    max_size         = number
-    desired_capacity = number
+    min_size                         = number
+    max_size                         = number
+    desired_capacity                 = number
+    target_cpu_utilization_threshold = number
   })
 }
 
@@ -57,11 +58,6 @@ variable "subnet_ids" {
 variable "target_group_arn" {
   description = "ARN of the target group "
   type        = string
-}
-
-variable "target_cpu_utilization_threshold" {
-  description = "Threshold for the aggregate CPU utilization for the autoscaling group; if the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group"
-  type        = number
 }
 
 variable "resource_name_prefix" {

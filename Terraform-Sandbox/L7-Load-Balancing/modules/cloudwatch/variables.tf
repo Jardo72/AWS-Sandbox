@@ -17,12 +17,7 @@
 # limitations under the License.
 #
 
-variable "resource_name_prefix" {
-  description = "Prefix for the names to be applied to the provisioned resources"
+variable "dashboard_name" {
+  description = "The name of the dashboard"
   type        = string
-}
-
-variable "tags" {
-  description = "Common tags to be applied to the provisioned resources"
-  type        = map(string)
 }
