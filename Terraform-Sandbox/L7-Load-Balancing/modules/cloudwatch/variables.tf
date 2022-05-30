@@ -17,7 +17,17 @@
 # limitations under the License.
 #
 
+variable "aws_region" {
+  description = "The name of the AWS region where the application is running"
+  type        = string
+}
+
 variable "dashboard_name" {
   description = "The name of the dashboard"
+  type        = string
+}
+
+variable "autoscaling_group_name" {
+  description = "The name of the autoscaling group"
   type        = string
 }

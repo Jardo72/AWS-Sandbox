@@ -83,11 +83,13 @@ module "asg" {
     desired_capacity                 = 3
     target_cpu_utilization_threshold = 50
   }
-  resource_name_prefix             = var.resource_name_prefix
-  tags                             = var.tags
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
 }
 
 module "cloudwatch" {
-  source         = "./modules/cloudwatch"
-  dashboard_name = var.resource_name_prefix
+  source                 = "./modules/cloudwatch"
+  aws_region             = var.aws_region
+  dashboard_name         = var.resource_name_prefix
+  autoscaling_group_name = module.asg.autoscaling_group_details.name
 }

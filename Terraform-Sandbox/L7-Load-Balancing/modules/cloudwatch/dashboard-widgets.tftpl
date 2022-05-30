@@ -1,3 +1,20 @@
 {
-    "widgets": []
+    "widgets": [
+        {
+            "height": 8,
+            "width": 8,
+            "y": 0,
+            "x": 0,
+            "type": "metric",
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${autoscaling_group_name}" ]
+                ],
+                "region": "${aws_region}",
+                "title": "ASG CPUUtilization"
+            }
+        }        
+    ]
 }
