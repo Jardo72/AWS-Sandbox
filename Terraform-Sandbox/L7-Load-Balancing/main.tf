@@ -65,14 +65,23 @@ module "asg" {
   subnet_ids       = values(module.vpc.subnets)[*].subnet_id
   target_group_arn = module.alb.target_group_arn
   application_installation = {
+    # TODO: take the settings from variables or data sources
     deployment_artifactory_bucket_name     = ""
     deployment_artifactory_prefix          = ""
     application_jar_file                   = ""
     deployment_artifactory_access_role_arn = ""
   }
   ec2_instance = {
+    # TODO: take the settings from variables
+    min_size         = 3
     instance_type = "t2.nano"
     port          = 80
+  }
+  autoscaling_group = {
+    # TODO: take the settings from variables
+    min_size         = 3
+    max_size         = 6
+    desired_capacity = 3
   }
   target_cpu_utilization_threshold = 50 # TODO: take this from a variable
   resource_name_prefix             = var.resource_name_prefix

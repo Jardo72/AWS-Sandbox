@@ -28,10 +28,19 @@ variable "application_installation" {
 }
 
 variable "ec2_instance" {
-  description = "Settings for the EC2 instances"
+  description = "Settings for the EC2 instances comprising the auto-scaling group"
   type        = object({
     instance_type = string
     port          = number
+  })
+}
+
+variable "autoscaling_group" {
+  description = "Settings for the auto-scaling group"
+  type        = object({
+    min_size         = number
+    max_size         = number
+    desired_capacity = number
   })
 }
 
