@@ -9,6 +9,7 @@
             "type": "metric",
             "properties": {
                 "view": "timeSeries",
+                "liveData": true,
                 "stacked": false,
                 "metrics": [
                     [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${autoscaling_group_name}" ]
@@ -31,6 +32,7 @@
                 ],
                 "sparkline": false,
                 "view": "singleValue",
+                "liveData": true,
                 "region": "${aws_region}",
                 "stat": "Average",
                 "period": 60,
@@ -45,11 +47,12 @@
             "type": "metric",
             "properties": {
                 "metrics": [
-                    [ "AWS/ApplicationELB", "HealthyHostCount", "LoadBalancer", "${load_balancer_arn}", "TargetGroup", "${target_group_arn}" ],
-                    [ ".", "UnHealthyHostCount", ".", ".", ".", "." ]
+                    [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${load_balancer_arn}", "TargetGroup", "${target_group_arn}" ],
+                    [ ".", "RequestCountPerTarget", ".", ".", ".", "." ]
                 ],
                 "sparkline": false,
                 "view": "singleValue",
+                "liveData": true,
                 "region": "${aws_region}",
                 "stat": "Average",
                 "period": 60,
