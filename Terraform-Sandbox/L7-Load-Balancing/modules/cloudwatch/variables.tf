@@ -31,3 +31,13 @@ variable "autoscaling_group_name" {
   description = "The name of the autoscaling group"
   type        = string
 }
+
+variable "load_balancer_arn" {
+  description = "The ARN of the ALB"
+  type        = string
+}
+
+variable "target_group_arn" {
+  description = "The ARN of the ALB target group"
+  type        = string
+}

@@ -1,4 +1,5 @@
 {
+    "start": "-PT1H",
     "widgets": [
         {
             "height": 6,
@@ -13,6 +14,7 @@
                     [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${autoscaling_group_name}" ]
                 ],
                 "region": "${aws_region}",
+                "period": 60,
                 "title": "ASG"
             }
         },
@@ -31,10 +33,28 @@
                 "view": "singleValue",
                 "region": "${aws_region}",
                 "stat": "Average",
-                "period": 300,
+                "period": 60,
                 "title": "ASG"
             }
+        },
+        {
+            "height": 3,
+            "width": 8,
+            "y": 3,
+            "x": 8,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [ "AWS/ApplicationELB", "HealthyHostCount", "LoadBalancer", "${load_balancer_arn}", "TargetGroup", "${target_group_arn}" ],
+                    [ ".", "UnHealthyHostCount", ".", ".", ".", "." ]
+                ],
+                "sparkline": false,
+                "view": "singleValue",
+                "region": "${aws_region}",
+                "stat": "Average",
+                "period": 60,
+                "title": "ALB"
+            }
         }
-
     ]
 }

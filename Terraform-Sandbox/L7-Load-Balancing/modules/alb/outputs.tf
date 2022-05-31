@@ -17,10 +17,15 @@
 # limitations under the License.
 #
 
-output "load_balancer_dns_name" {
-  value = aws_lb.load_balancer.dns_name
+output "load_balancer_details" {
+  value = {
+    dns_name = aws_lb.load_balancer.dns_name
+    arn      = aws_lb.load_balancer.arn
+  }
 }
 
-output "target_group_arn" {
-  value = aws_lb_target_group.target_group.arn
+output "target_group_details" {
+  value = {
+    arn = aws_lb_target_group.target_group.arn
+  }
 }

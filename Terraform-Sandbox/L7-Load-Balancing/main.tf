@@ -63,7 +63,7 @@ module "asg" {
   source           = "./modules/asg"
   vpc_id           = module.vpc.vpc_details.id
   subnet_ids       = values(module.vpc.subnets)[*].subnet_id
-  target_group_arn = module.alb.target_group_arn
+  target_group_arn = module.alb.target_group_details.arn
   application_installation = {
     # TODO: take the hardcoded values from variables
     deployment_artifactory_bucket_name     = data.aws_cloudformation_export.deployment_artifactory_bucket_name.value
@@ -92,4 +92,6 @@ module "cloudwatch" {
   aws_region             = var.aws_region
   dashboard_name         = var.resource_name_prefix
   autoscaling_group_name = module.asg.autoscaling_group_details.name
+  load_balancer_arn      = module.alb.load_balancer_details.arn
+  target_group_arn       = module.alb.target_group_details.arn
 }

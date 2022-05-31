@@ -21,6 +21,8 @@ resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
   dashboard_name = var.dashboard_name
   dashboard_body = templatefile("${path.module}/dashboard-widgets.tftpl", {
     aws_region             = var.aws_region,
+    load_balancer_arn      = var.load_balancer_arn,
+    target_group_arn       = var.target_group_arn,
     autoscaling_group_name = var.autoscaling_group_name
   })
 }
