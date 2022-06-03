@@ -37,6 +37,17 @@ variable "availability_zones" {
   }))
 }
 
+variable "application_installation" {
+  description = "Settings for the installation of the application"
+  type = object({
+    // TODO:
+    // deployment_artifactory_bucket_name     = string
+    // deployment_artifactory_access_role_arn = string
+    deployment_artifactory_prefix = string
+    application_jar_file          = string
+  })
+}
+
 # TODO: it does not make that much sense to have a default here
 variable "deployment_artifactory_prefix" {
   description = "The prefix of the application JAR file within the S3 bucket which will serve as the artifactory with JAR files"

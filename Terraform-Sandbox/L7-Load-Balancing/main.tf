@@ -80,10 +80,9 @@ module "asg" {
   subnet_ids       = values(module.vpc.subnets)[*].subnet_id
   target_group_arn = module.alb.target_group_details.arn
   application_installation = {
-    # TODO: take the hardcoded values from variables
     deployment_artifactory_bucket_name     = data.aws_cloudformation_export.deployment_artifactory_bucket_name.value
-    deployment_artifactory_prefix          = "L7-LB-DEMO"
-    application_jar_file                   = "aws-sandbox-application-load-balancing-server-1.0.jar"
+    deployment_artifactory_prefix          = var.application_installation.deployment_artifactory_prefix
+    application_jar_file                   = var.application_installation.application_jar_file
     deployment_artifactory_access_role_arn = data.aws_cloudformation_export.deployment_artifactory_read_access_policy_arn.value
   }
   ec2_instance = {
@@ -105,7 +104,7 @@ module "route53" {
   load_balancer_dns_name = module.alb.load_balancer_details.dns_name
   load_balancer_zone_id  = module.alb.load_balancer_details.zone_id
   alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id
-  alias_fqdn = var.route53_alias_settings.alias_fqdn
+  alias_fqdn             = var.route53_alias_settings.alias_fqdn
 }
 
 module "cloudwatch" {
