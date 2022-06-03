@@ -37,7 +37,7 @@ resource "aws_internet_gateway" "internet_gateway" {
 resource "aws_subnet" "subnet" {
   for_each                = var.availability_zones
   vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = each.value.name
+  availability_zone       = each.value.az_name
   cidr_block              = each.value.subnet_cidr_block
   map_public_ip_on_launch = true
   tags = merge(var.tags, {
@@ -57,7 +57,7 @@ resource "aws_route_table" "route_table" {
 }
 
 resource "aws_route_table_association" "route_table_association" {
-  for_each       = local.availability_zones
+  for_each       = var.availability_zones
   subnet_id      = aws_subnet.subnet[each.key].id
   route_table_id = aws_route_table.route_table.id
 }

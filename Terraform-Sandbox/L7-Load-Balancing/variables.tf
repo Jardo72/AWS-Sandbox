@@ -17,6 +17,26 @@
 # limitations under the License.
 #
 
+variable "aws_region" {
+  description = "The AWS region where the resources are to be provisioned"
+  type        = string
+  default     = "eu-central-1"
+}
+
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC (default = 10.0.0.0/16)"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "availability_zones" {
+  description = "Definition of subnets for particular availability zones"
+  type = map(object({
+    az_name           = string
+    subnet_cidr_block = string
+  }))
+}
+
 # TODO: it does not make that much sense to have a default here
 variable "deployment_artifactory_prefix" {
   description = "The prefix of the application JAR file within the S3 bucket which will serve as the artifactory with JAR files"
@@ -29,18 +49,6 @@ variable "application_jar_file" {
   description = "The name of the application JAR file (fat runnable JAR file is expected)"
   type        = string
   default     = "aws-sandbox-application-load-balancing-server-1.0.jar"
-}
-
-variable "aws_region" {
-  description = "The AWS region where the resources are to be provisioned"
-  type        = string
-  default     = "eu-central-1"
-}
-
-variable "vpc_cidr_block" {
-  description = "CIDR block for the VPC (default = 10.0.0.0/16)"
-  type        = string
-  default     = "10.0.0.0/16"
 }
 
 variable "ec2_instance_type" {
@@ -65,4 +73,14 @@ variable "target_cpu_utilization_threshold" {
   description = "Threshold for the aggregate CPU utilization for the autoscaling group; if the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group"
   type        = number
   default     = 50
+}
+
+variable "resource_name_prefix" {
+  description = "Prefix for the names to be applied to the provisioned resources"
+  type        = string
+}
+
+variable "tags" {
+  description = "Common tags to be applied to the provisioned resources"
+  type        = map(string)
 }

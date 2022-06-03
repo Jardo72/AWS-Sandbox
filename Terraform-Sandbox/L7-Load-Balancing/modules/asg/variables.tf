@@ -19,25 +19,33 @@
 
 variable "application_installation" {
   description = "Settings for the installation of the application"
-  type        = object({
-    deployment_artifactory_bucket_name = string
-    deployment_artifactory_prefix      = string
-    application_jar_file               = string
+  type = object({
+    deployment_artifactory_bucket_name     = string
+    deployment_artifactory_prefix          = string
+    application_jar_file                   = string
+    deployment_artifactory_access_role_arn = string
   })
 }
 
-variable "ec2_instance_type" {
-  description = "Instance type for the EC2 instances comprising the auto-scaling group"
-  type        = string
-  default     = "t2.nano"
+variable "ec2_instance" {
+  description = "Settings for the EC2 instances comprising the auto-scaling group"
+  type = object({
+    instance_type = string
+    port          = number
+  })
 }
 
-variable "ec2_port" {
-  description = "TCP port for the application"
-  type        = number
+variable "autoscaling_group" {
+  description = "Settings for the auto-scaling group"
+  type = object({
+    min_size                         = number
+    max_size                         = number
+    desired_capacity                 = number
+    target_cpu_utilization_threshold = number
+  })
 }
 
-variable vpc_id {
+variable "vpc_id" {
   description = "VPC ID of the VPC hosting the application"
   type        = string
 }

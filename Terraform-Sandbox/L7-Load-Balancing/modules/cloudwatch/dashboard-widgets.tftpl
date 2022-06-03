@@ -1,0 +1,99 @@
+{
+    "start": "-PT1H",
+    "widgets": [
+        {
+            "height": 6,
+            "width": 8,
+            "y": 0,
+            "x": 0,
+            "type": "metric",
+            "properties": {
+                "view": "timeSeries",
+                "liveData": true,
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${autoscaling_group_name}" ]
+                ],
+                "region": "${aws_region}",
+                "period": 60,
+                "title": "ASG"
+            }
+        },
+        {
+            "height": 3,
+            "width": 8,
+            "y": 0,
+            "x": 8,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [ "AWS/AutoScaling", "GroupDesiredCapacity", "AutoScalingGroupName", "${autoscaling_group_name}" ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "liveData": true,
+                "region": "${aws_region}",
+                "stat": "Average",
+                "period": 60,
+                "title": "ASG"
+            }
+        },
+        {
+            "height": 3,
+            "width": 8,
+            "y": 0,
+            "x": 16,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [ "AWS/AutoScaling", "GroupInServiceInstances", "AutoScalingGroupName", "${autoscaling_group_name}" ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "liveData": true,
+                "region": "${aws_region}",
+                "stat": "Average",
+                "period": 60,
+                "title": "ASG"
+            }
+        },
+        {
+            "height": 3,
+            "width": 8,
+            "y": 3,
+            "x": 8,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [ "AWS/ApplicationELB", "TargetResponseTime", "LoadBalancer", "${load_balancer_arn}", "TargetGroup", "${target_group_arn}" ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "liveData": true,
+                "region": "${aws_region}",
+                "stat": "Average",
+                "period": 60,
+                "title": "ALB"
+            }
+        },
+        {
+            "height": 3,
+            "width": 8,
+            "y": 3,
+            "x": 16,
+            "type": "metric",
+            "properties": {
+                "metrics": [
+                    [ "AWS/ApplicationELB", "RequestCountPerTarget", "LoadBalancer", "${load_balancer_arn}", "TargetGroup", "${target_group_arn}" ]
+                ],
+                "sparkline": true,
+                "view": "singleValue",
+                "liveData": true,
+                "region": "${aws_region}",
+                "stat": "Average",
+                "period": 60,
+                "title": "ALB"
+            }
+        }
+    ]
+}

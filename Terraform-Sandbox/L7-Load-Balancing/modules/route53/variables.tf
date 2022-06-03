@@ -17,25 +17,22 @@
 # limitations under the License.
 #
 
-variable "vpc_cidr_block" {
-  description = "CIDR block for the VPC"
+variable "load_balancer_dns_name" {
+  description = "AWS-assigned DNS name of the ALB"
   type        = string
 }
 
-variable "availability_zones" {
-  description = "Definition of subnets for particular availability zones"
-  type = map(object({
-    az_name           = string
-    subnet_cidr_block = string
-  }))
-}
-
-variable "resource_name_prefix" {
-  description = "Prefix for the names to be applied to the provisioned resources"
+variable "load_balancer_zone_id" {
+  description = "The zone ID of the AWS-managed hosted zone containing the record with the AWS-assigned DNS name of the ALB"
   type        = string
 }
 
-variable "tags" {
-  description = "Common tags to be applied to the provisioned resources"
-  type        = map(string)
+variable "alias_zone_id" {
+  description = "Zone ID of the hosted zone the alias record is to be added to"
+  type        = string
+}
+
+variable "alias_fqdn" {
+  description = "FQDN for the alias record"
+  type        = string
 }

@@ -17,25 +17,13 @@
 # limitations under the License.
 #
 
-variable "vpc_cidr_block" {
-  description = "CIDR block for the VPC"
-  type        = string
-}
-
-variable "availability_zones" {
-  description = "Definition of subnets for particular availability zones"
-  type = map(object({
-    az_name           = string
-    subnet_cidr_block = string
-  }))
-}
-
-variable "resource_name_prefix" {
-  description = "Prefix for the names to be applied to the provisioned resources"
-  type        = string
-}
-
-variable "tags" {
-  description = "Common tags to be applied to the provisioned resources"
-  type        = map(string)
+resource "aws_route53_record" "load_balancer_alias" {
+  zone_id = var.alias_zone_id
+  name    = var.alias_fqdn
+  type    = "A"
+  alias {
+    name                   = var.load_balancer_dns_name
+    zone_id                = var.load_balancer_zone_id
+    evaluate_target_health = false
+  }
 }
