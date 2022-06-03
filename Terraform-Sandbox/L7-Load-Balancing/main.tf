@@ -32,11 +32,11 @@ provider "aws" {
 }
 
 data "aws_cloudformation_export" "deployment_artifactory_bucket_name" {
-  name = "CommonDeploymentArtifactoryBucketName"
+  name = var.application_installation.deployment_artifactory_bucket_name_export
 }
 
 data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn" {
-  name = "CommonDeploymentArtifactoryReadAccessPolicyArn"
+  name = var.application_installation.deployment_artifactory_access_role_arn_export
 }
 
 data "aws_route53_zone" "alias_hosted_zone" {
