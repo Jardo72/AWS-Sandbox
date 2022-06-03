@@ -18,6 +18,21 @@
 #
 
 variable "load_balancer_dns_name" {
-  description = "DNS name of the ALB"
+  description = "AWS-assigned DNS name of the ALB"
+  type        = string
+}
+
+variable "load_balancer_zone_id" {
+  description = "The zone ID of the AWS-managed hosted zone containing the record with the AWS-assigned DNS name of the ALB"
+  type        = string
+}
+
+variable "alias_zone_id" {
+  description = "Zone ID of the hosted zone the alias record is to be added to"
+  type        = string
+}
+
+variable "alias_fqdn" {
+  description = "FQDN for the alias record"
   type        = string
 }

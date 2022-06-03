@@ -20,3 +20,7 @@
 output "load_balancer_dns_name" {
   value = module.alb.load_balancer_details.dns_name
 }
+
+output "load_balancer_dns_alias" {
+  value = module.route53.load_balancer_dns_alias
+}

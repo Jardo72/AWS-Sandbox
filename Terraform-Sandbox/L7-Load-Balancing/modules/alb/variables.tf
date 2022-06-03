@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-variable vpc_id {
+variable "vpc_id" {
   description = "VPC ID of the VPC hosting the application"
   type        = string
 }
@@ -29,7 +29,7 @@ variable "subnet_ids" {
 
 variable "alb_listener_settings" {
   description = "Protocol and TCP port for the ALB listener"
-  type        = object({
+  type = object({
     port     = number
     protocol = string
   })
@@ -37,7 +37,7 @@ variable "alb_listener_settings" {
 
 variable "target_ec2_settings" {
   description = "Protocol and TCP port for the target EC2 instances"
-  type        = object({
+  type = object({
     port                  = number
     protocol              = string
     healthy_threshold     = number

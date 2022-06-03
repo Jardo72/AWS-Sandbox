@@ -29,6 +29,12 @@ data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn"
   name = "CommonDeploymentArtifactoryReadAccessPolicyArn"
 }
 
+data "aws_route53_zone" "alias_hosted_zone" {
+  # TODO: take the name from a variable
+  name         = "jardo72.de."
+  private_zone = false
+}
+
 module "vpc" {
   source               = "./modules/vpc"
   vpc_cidr_block       = var.vpc_cidr_block
@@ -85,6 +91,15 @@ module "asg" {
   }
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
+}
+
+module "route53" {
+  source                 = "./modules/route53"
+  load_balancer_dns_name = module.alb.load_balancer_details.dns_name
+  load_balancer_zone_id  = module.alb.load_balancer_details.zone_id
+  alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id
+  # TODO: take the settings from variables
+  alias_fqdn = "alb-demo.jardo72.de"
 }
 
 module "cloudwatch" {

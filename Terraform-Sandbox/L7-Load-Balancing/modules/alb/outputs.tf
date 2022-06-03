@@ -21,6 +21,7 @@ output "load_balancer_details" {
   value = {
     dns_name = aws_lb.load_balancer.dns_name
     arn      = aws_lb.load_balancer.arn
+    zone_id  = aws_lb.load_balancer.zone_id
   }
 }
 

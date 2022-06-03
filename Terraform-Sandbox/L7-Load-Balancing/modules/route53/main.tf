@@ -16,3 +16,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+resource "aws_route53_record" "load_balancer_alias" {
+  zone_id = var.alias_zone_id
+  name    = var.alias_fqdn
+  type    = "A"
+  alias {
+    name                   = var.load_balancer_dns_name
+    zone_id                = var.load_balancer_zone_id
+    evaluate_target_health = false
+  }
+}

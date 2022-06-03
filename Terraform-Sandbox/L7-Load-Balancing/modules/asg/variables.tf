@@ -19,7 +19,7 @@
 
 variable "application_installation" {
   description = "Settings for the installation of the application"
-  type        = object({
+  type = object({
     deployment_artifactory_bucket_name     = string
     deployment_artifactory_prefix          = string
     application_jar_file                   = string
@@ -29,7 +29,7 @@ variable "application_installation" {
 
 variable "ec2_instance" {
   description = "Settings for the EC2 instances comprising the auto-scaling group"
-  type        = object({
+  type = object({
     instance_type = string
     port          = number
   })
@@ -37,7 +37,7 @@ variable "ec2_instance" {
 
 variable "autoscaling_group" {
   description = "Settings for the auto-scaling group"
-  type        = object({
+  type = object({
     min_size                         = number
     max_size                         = number
     desired_capacity                 = number
@@ -45,7 +45,7 @@ variable "autoscaling_group" {
   })
 }
 
-variable vpc_id {
+variable "vpc_id" {
   description = "VPC ID of the VPC hosting the application"
   type        = string
 }
