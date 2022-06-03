@@ -21,7 +21,7 @@ terraform {
   required_version = ">=1.1"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~>4.15.0"
     }
   }
@@ -40,8 +40,7 @@ data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn"
 }
 
 data "aws_route53_zone" "alias_hosted_zone" {
-  # TODO: take the name from a variable
-  name         = "jardo72.de."
+  name         = var.route53_alias_settings.alias_hosted_zone_name
   private_zone = false
 }
 
@@ -58,11 +57,11 @@ module "alb" {
   vpc_id     = module.vpc.vpc_details.id
   subnet_ids = values(module.vpc.subnets)[*].subnet_id
   alb_listener_settings = {
-    port     = 80 # TODO: take this from a variable
+    port     = var.alb_port
     protocol = "HTTP"
   }
   target_ec2_settings = {
-    port                  = 80 # TODO: take this from a variable
+    port                  = var.ec2_settings.port
     protocol              = "HTTP"
     healthy_threshold     = 3
     unhealthy_threshold   = 3
@@ -88,16 +87,14 @@ module "asg" {
     deployment_artifactory_access_role_arn = data.aws_cloudformation_export.deployment_artifactory_read_access_policy_arn.value
   }
   ec2_instance = {
-    # TODO: take the settings from variables
-    instance_type = "t2.nano"
-    port          = 80
+    instance_type = var.ec2_settings.instance_type
+    port          = var.ec2_settings.port
   }
   autoscaling_group = {
-    # TODO: take the settings from variables
-    min_size                         = 3
-    max_size                         = 6
-    desired_capacity                 = 3
-    target_cpu_utilization_threshold = 50
+    min_size                         = var.autoscaling_group_settings.min_size
+    max_size                         = var.autoscaling_group_settings.max_size
+    desired_capacity                 = var.autoscaling_group_settings.desired_capacity
+    target_cpu_utilization_threshold = var.autoscaling_group_settings.target_cpu_utilization_threshold
   }
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
@@ -108,8 +105,7 @@ module "route53" {
   load_balancer_dns_name = module.alb.load_balancer_details.dns_name
   load_balancer_zone_id  = module.alb.load_balancer_details.zone_id
   alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id
-  # TODO: take the settings from variables
-  alias_fqdn = "alb-demo.jardo72.de"
+  alias_fqdn = var.route53_alias_settings.alias_fqdn
 }
 
 module "cloudwatch" {

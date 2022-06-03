@@ -51,10 +51,12 @@ variable "application_jar_file" {
   default     = "aws-sandbox-application-load-balancing-server-1.0.jar"
 }
 
-variable "ec2_instance_type" {
-  description = "Instance type for the EC2 instances running the L7 Load-Balancing Demo application"
-  type        = string
-  default     = "t2.nano"
+variable "ec2_settings" {
+  description = "Settings for the EC2 instances comprising the EC2 ASG"
+  type = object({
+    instance_type = string
+    port          = number
+  })
 }
 
 variable "alb_port" {
@@ -63,16 +65,22 @@ variable "alb_port" {
   default     = 80
 }
 
-variable "ec2_port" {
-  description = "TCP port the application instances running on EC2 will use to accept incoming connections"
-  type        = number
-  default     = 80
+variable "autoscaling_group_settings" {
+  description = "Settings for the EC2 ASG"
+  type = object({
+    min_size                         = number
+    max_size                         = number
+    desired_capacity                 = number
+    target_cpu_utilization_threshold = number
+  })
 }
 
-variable "target_cpu_utilization_threshold" {
-  description = "Threshold for the aggregate CPU utilization for the autoscaling group; if the CPU utilization will exceed this value, autoscaling will scale out the autoscaling group"
-  type        = number
-  default     = 50
+variable "route53_alias_settings" {
+  description = "Settings for the Route 53 alias for the ALB"
+  type = object({
+    alias_hosted_zone_name = string
+    alias_fqdn             = string
+  })
 }
 
 variable "resource_name_prefix" {
