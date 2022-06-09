@@ -43,11 +43,17 @@ provider "aws" {
 
 module "source_s3_bucket" {
   source      = "./modules/s3_bucket"
+  providers = {
+    aws = aws.source_bucket_region
+  }
   bucket_name = var.source_bucket_details.bucket_name
 }
 
 module "destination_s3_bucket" {
   source      = "./modules/s3_bucket"
+  providers = {
+    aws = aws.destination_bucket_region
+   }
   bucket_name = var.destination_bucket_details.bucket_name
 }
 

@@ -17,6 +17,16 @@
 # limitations under the License.
 #
 
+terraform {
+  required_version = ">=1.1"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~>4.15.0"
+    }
+  }
+}
+
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
 }
