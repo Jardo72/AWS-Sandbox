@@ -32,11 +32,23 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias = "source_bucket_region"
+  alias  = "source_bucket_region"
   region = var.source_bucket_details.aws_region
 }
 
 provider "aws" {
-  alias = "destination_bucket_region"
+  alias  = "destination_bucket_region"
   region = var.destination_bucket_details.aws_region
+}
+
+module "iam_role" {
+  source = "./modules/iam_role"
+}
+
+module "source_s3_bucket" {
+  source = "./modules/s3_bucket"
+}
+
+module "destination_s3_bucket" {
+  source = "./modules/s3_bucket"
 }

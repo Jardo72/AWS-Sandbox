@@ -18,23 +18,22 @@
 #
 
 variable "aws_region" {
-  description = ""
-  type = string
+  type    = string
   default = "eu-central-1"
 }
 
 variable "source_bucket_details" {
-  description = ""
+  description = "Details of the source S3 bucket from which objects will be replicated"
   type = object({
     bucket_name = string
-    aws_region = string
+    aws_region  = string
   })
 }
 
 variable "destination_bucket_details" {
-  description = ""
+  description = "Details of the destination S3 bucket to which objects will be replicated"
   type = object({
     bucket_name = string
-    aws_region = string
+    aws_region  = string
   })
 }

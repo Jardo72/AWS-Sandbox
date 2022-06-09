@@ -16,19 +16,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-output "source_bucket_details" {
-  value = {
-    aws_region = "TODO"
-    name       = "TODO"
-    arn        = "TODO"
-  }
-}
-
-output "destination_bucket_details" {
-  value = {
-    aws_region = "TODO"
-    name       = "TODO"
-    arn        = "TODO"
-  }
-}
