@@ -17,9 +17,14 @@
 # limitations under the License.
 #
 
-output "replication_role_details" {
-  value = {
-    name = aws_iam_role.replication_role.name
-    arn  = aws_iam_role.replication_role.arn
+resource "aws_s3_bucket_replication_configuration" "replication" {
+  bucket = var.source_bucket_name
+  role   = var.role_arn
+  rule {
+    status = "Enabled"
+    destination {
+      bucket        = var.destination_bucket_arn
+      storage_class = "STANDARD"
+    }
   }
 }

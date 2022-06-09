@@ -37,3 +37,8 @@ variable "destination_bucket_details" {
     aws_region  = string
   })
 }
+
+variable "tags" {
+  description = "Common tags to be applied to the provisioned resources"
+  type        = map(string)
+}

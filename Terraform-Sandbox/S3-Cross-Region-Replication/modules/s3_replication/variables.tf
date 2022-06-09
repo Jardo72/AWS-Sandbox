@@ -17,9 +17,17 @@
 # limitations under the License.
 #
 
-output "replication_role_details" {
-  value = {
-    name = aws_iam_role.replication_role.name
-    arn  = aws_iam_role.replication_role.arn
-  }
+variable "source_bucket_name" {
+  description = "Name of the source bucket"
+  type        = string
+}
+
+variable "destination_bucket_arn" {
+  description = "ARN of the destination bucket"
+  type        = string
+}
+
+variable "role_arn" {
+  description = "ARN of the IAM role for Amazon S3 to assume when replicating the objects"
+  type        = string
 }

@@ -16,3 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+variable "bucket_name" {
+  description = "Name of the S3 bucket to be created"
+  type        = string
+}

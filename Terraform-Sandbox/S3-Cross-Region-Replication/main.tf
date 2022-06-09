@@ -41,14 +41,23 @@ provider "aws" {
   region = var.destination_bucket_details.aws_region
 }
 
+module "source_s3_bucket" {
+  source      = "./modules/s3_bucket"
+  bucket_name = var.source_bucket_details.bucket_name
+}
+
+module "destination_s3_bucket" {
+  source      = "./modules/s3_bucket"
+  bucket_name = var.destination_bucket_details.bucket_name
+}
+
 module "iam_role" {
   source = "./modules/iam_role"
 }
 
-module "source_s3_bucket" {
-  source = "./modules/s3_bucket"
-}
-
-module "destination_s3_bucket" {
-  source = "./modules/s3_bucket"
+module "s3_replication" {
+  source                 = "./modules/s3_replication"
+  source_bucket_name     = module.source_s3_bucket.bucket_details.name
+  destination_bucket_arn = module.destination_s3_bucket.bucket_details.arn
+  role_arn               = module.iam_role.replication_role_details.arn
 }

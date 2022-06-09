@@ -17,9 +17,3 @@
 # limitations under the License.
 #
 
-output "replication_role_details" {
-  value = {
-    name = aws_iam_role.replication_role.name
-    arn  = aws_iam_role.replication_role.arn
-  }
-}

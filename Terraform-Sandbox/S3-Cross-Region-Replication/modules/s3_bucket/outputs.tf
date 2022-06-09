@@ -16,3 +16,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "bucket_details" {
+  value = {
+    name = aws_s3_bucket.bucket.id
+    arn  = aws_s3_bucket.bucket.arn
+  }
+}

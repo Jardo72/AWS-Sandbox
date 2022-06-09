@@ -16,3 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+resource "aws_iam_role" "replication_role" {
+  name = "S3ReplicationRole"
+  assume_role_policy = jsonencode({
+    Version : "2012-10-17",
+    Statement : [
+      {
+        Sid : "AllowS3Assume",
+        Action : "sts:AssumeRole",
+        Principal : {
+          Service : "s3.amazonaws.com"
+        },
+        Effect : "Allow"
+      }
+    ]
+  })
+}
