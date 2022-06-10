@@ -18,11 +18,16 @@
 #
 
 variable "source_bucket_arn" {
-    description = "ARN of the source bucket"
-    type = string
+  description = "ARN of the source bucket"
+  type        = string
 }
 
 variable "destination_bucket_arn" {
-    description = "ARN of the destination bucket"
-    type = string
+  description = "ARN of the destination bucket"
+  type        = string
+}
+
+variable "tags" {
+  description = "Common tags to be applied to the provisioned resources"
+  type        = map(string)
 }

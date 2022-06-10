@@ -69,4 +69,5 @@ resource "aws_iam_role" "replication_role" {
       ]
     })
   }
+  tags = var.tags
 }

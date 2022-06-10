@@ -23,8 +23,7 @@ resource "aws_s3_bucket_replication_configuration" "replication" {
   rule {
     status = "Enabled"
     destination {
-      bucket        = var.destination_bucket_arn
-      storage_class = "STANDARD"
+      bucket = var.destination_bucket_arn
     }
   }
 }

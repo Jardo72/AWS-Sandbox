@@ -21,3 +21,8 @@ variable "bucket_name" {
   description = "Name of the S3 bucket to be created"
   type        = string
 }
+
+variable "tags" {
+  description = "Common tags to be applied to the provisioned resources"
+  type        = map(string)
+}
