@@ -71,4 +71,8 @@ module "s3_replication" {
   source_bucket_name     = module.source_s3_bucket.bucket_details.name
   destination_bucket_arn = module.destination_s3_bucket.bucket_details.arn
   role_arn               = module.iam_role.replication_role_details.arn
+  depends_on = [
+    module.source_s3_bucket,
+    module.destination_s3_bucket
+  ]
 }
