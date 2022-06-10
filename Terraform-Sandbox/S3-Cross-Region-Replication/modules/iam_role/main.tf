@@ -32,4 +32,41 @@ resource "aws_iam_role" "replication_role" {
       }
     ]
   })
+  inline_policy {
+    name = "S3ReplicationPolicy"
+    policy = jsonencode({
+      Version : "2012-10-17",
+      Statement : [
+        {
+          Sid : "SourceBucketAccess",
+          Action : [
+            "s3:ListBucket",
+            "s3:GetReplicationConfiguration"
+          ]
+          Effect : "Allow"
+          Resource : var.source_bucket_arn
+        },
+        {
+          Sid : "SourceObjectAccess",
+          Action : [
+            "s3:GetObjectVersion",
+            "s3:GetObjectVersionAcl",
+            "s3:GetObjectVersionTagging"
+          ]
+          Effect : "Allow"
+          Resource : "${var.source_bucket_arn}/*"
+        },
+        {
+          Sid : "DestinationObjectAccess",
+          Action : [
+            "s3:ReplicateObject",
+            "s3:ReplicateDelete",
+            "s3:ReplicateTags"
+          ]
+          Effect : "Allow"
+          Resource : "${var.destination_bucket_arn}/*"
+        }
+      ]
+    })
+  }
 }

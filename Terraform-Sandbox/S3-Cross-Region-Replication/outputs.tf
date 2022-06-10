@@ -19,16 +19,16 @@
 
 output "source_bucket_details" {
   value = {
-    aws_region = "TODO"
-    name       = "TODO"
-    arn        = "TODO"
+    aws_region = var.source_bucket_details.aws_region,
+    name       = module.source_s3_bucket.bucket_details.name,
+    arn        = module.source_s3_bucket.bucket_details.arn
   }
 }
 
 output "destination_bucket_details" {
   value = {
-    aws_region = "TODO"
-    name       = "TODO"
-    arn        = "TODO"
+    aws_region = var.destination_bucket_details.aws_region,
+    name       = module.destination_s3_bucket.bucket_details.name,
+    arn        = module.destination_s3_bucket.bucket_details.arn
   }
 }

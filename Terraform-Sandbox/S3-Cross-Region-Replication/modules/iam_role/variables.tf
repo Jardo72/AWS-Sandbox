@@ -16,3 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+variable "source_bucket_arn" {
+    description = "ARN of the source bucket"
+    type = string
+}
+
+variable "destination_bucket_arn" {
+    description = "ARN of the destination bucket"
+    type = string
+}

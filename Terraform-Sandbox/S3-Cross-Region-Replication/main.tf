@@ -59,6 +59,8 @@ module "destination_s3_bucket" {
 
 module "iam_role" {
   source = "./modules/iam_role"
+  source_bucket_arn = module.source_s3_bucket.bucket_details.arn
+  destination_bucket_arn = module.destination_s3_bucket.bucket_details.arn
 }
 
 module "s3_replication" {
