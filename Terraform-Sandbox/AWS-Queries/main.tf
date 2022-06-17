@@ -21,7 +21,7 @@ terraform {
   required_version = ">=1.1"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~>4.15.0"
     }
   }
@@ -33,7 +33,7 @@ provider "aws" {
 
 provider "aws" {
   region = "us-east-1"
-  alias = "us_east"
+  alias  = "us_east"
 }
 
 data "aws_caller_identity" "current_account" {}
@@ -52,7 +52,7 @@ data "aws_ami" "latest_amazon_linux_ami" {
 }
 
 data "aws_ami" "latest_amazon_linux_ami_us_east" {
-  provider = aws.us_east
+  provider    = aws.us_east
   owners      = ["137112412989"]
   most_recent = true
   filter {

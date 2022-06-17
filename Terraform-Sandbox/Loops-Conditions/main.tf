@@ -21,7 +21,7 @@ terraform {
   required_version = ">=1.1"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~>4.15.0"
     }
   }
@@ -33,10 +33,10 @@ provider "aws" {
 
 variable "dummy_map" {
   description = "Dummy map with default value used to demonstrate for loop"
-  type = map(string)
+  type        = map(string)
   default = {
     "color" = "blue"
-    "size" = "XXL"
+    "size"  = "XXL"
     "brand" = "Adidas"
   }
 }
@@ -83,5 +83,5 @@ output "iam_count_user_names_as_csv" {
 }
 
 output "map_key_value_string" {
-  value = join("; ", [for k, v in var.dummy_map: "${k} = ${v}"])
+  value = join("; ", [for k, v in var.dummy_map : "${k} = ${v}"])
 }
