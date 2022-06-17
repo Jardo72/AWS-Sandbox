@@ -96,11 +96,11 @@ resource "aws_security_group" "web_server_security_group" {
   dynamic "ingress" {
     for_each = var.ingress_rules
     content {
-      protocol         = ingress.value.protocol
-      from_port        = ingress.value.port
-      to_port          = ingress.value.port
-      cidr_blocks      = ["0.0.0.0/0"]
-      description      = "Rule #${ingress.key + 1}: ${ingress.value.description}"
+      protocol    = ingress.value.protocol
+      from_port   = ingress.value.port
+      to_port     = ingress.value.port
+      cidr_blocks = ["0.0.0.0/0"]
+      description = "Rule #${ingress.key + 1}: ${ingress.value.description}"
     }
   }
 
