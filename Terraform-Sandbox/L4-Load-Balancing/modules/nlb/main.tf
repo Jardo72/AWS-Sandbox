@@ -16,3 +16,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+resource "aws_lb" "load_balancer" {
+  name               = "${var.resource_name_prefix}-NLB"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = var.subnet_ids
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-NLB"
+  })
+}
+
+resource "aws_lb_listener" "load_balancer_listener" {
+  load_balancer_arn = aws_lb.load_balancer.arn
+  port              = var.nlb_port
+  protocol          = "TCP"
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.target_group.arn
+  }
+}
+
+resource "aws_lb_target_group" "target_group" {
+  name     = "${var.resource_name_prefix}-NLBTargetGroup"
+  vpc_id   = aws_vpc.vpc.id
+  port     = var.ec2_port
+  protocol = "TCP"
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    /* TODO: this seems to cause troubles, but it works with CloudFormation
+    interval            = 30
+    timeout             = 10 */
+  }
+}

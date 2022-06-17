@@ -16,3 +16,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+variable "vpc_id" {
+  description = "VPC ID of the VPC hosting the application"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "IDs of the subnets to be used by the load balancer"
+  type        = list(string)
+}
+
+variable "nlb_port" {
+  description = "TCP port the load balancer will use to accept incoming connections"
+  type        = number
+  default     = 1234
+}
+
+variable "resource_name_prefix" {
+  description = "Prefix for the names to be applied to the provisioned resources"
+  type        = string
+}
+
+variable "tags" {
+  description = "Common tags to be applied to the provisioned resources"
+  type        = map(string)
+}
