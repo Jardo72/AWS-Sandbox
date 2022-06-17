@@ -17,20 +17,6 @@
 # limitations under the License.
 #
 
-# TODO: it does not make that much sense to have a default here
-variable "deployment_artifactory_prefix" {
-  description = "The prefix of the application JAR file within the S3 bucket which will serve as the artifactory with JAR files"
-  type        = string
-  default     = "L4-LB-DEMO"
-}
-
-# TODO: it does not make that much sense to have a default here
-variable "application_jar_file" {
-  description = "The name of the application JAR file (fat runnable JAR file is expected)"
-  type        = string
-  default     = "aws-sandbox-network-load-balancing-server-1.0.jar"
-}
-
 variable "aws_region" {
   description = "The AWS region where the resources are to be provisioned"
   type        = string
@@ -43,10 +29,31 @@ variable "vpc_cidr_block" {
   default     = "10.0.0.0/16"
 }
 
-variable "ec2_instance_type" {
-  description = "Instance type for the EC2 instances running the L4 Load-Balancing Demo application"
-  type        = string
-  default     = "t2.nano"
+variable "availability_zones" {
+  description = "Definition of subnets for particular availability zones"
+  type = map(object({
+    az_name                   = string
+    public_subnet_cidr_block  = string
+    private_subnet_cidr_block = string
+  }))
+}
+
+variable "application_installation" {
+  description = "Settings for the installation of the application"
+  type = object({
+    deployment_artifactory_bucket_name_export     = string
+    deployment_artifactory_access_role_arn_export = string
+    deployment_artifactory_prefix                 = string
+    application_jar_file                          = string
+  })
+}
+
+variable "ec2_settings" {
+  description = "Settings for the EC2 instances comprising the EC2 ASG"
+  type = object({
+    instance_type = string
+    port          = number
+  })
 }
 
 variable "nlb_port" {
@@ -55,8 +62,20 @@ variable "nlb_port" {
   default     = 1234
 }
 
-variable "ec2_port" {
-  description = "TCP port the application instances running on EC2 will use to accept incoming connections"
-  type        = number
-  default     = 1234
+variable "route53_alias_settings" {
+  description = "Settings for the Route 53 alias for the ALB"
+  type = object({
+    alias_hosted_zone_name = string
+    alias_fqdn             = string
+  })
+}
+
+variable "resource_name_prefix" {
+  description = "Prefix for the names to be applied to the provisioned resources"
+  type        = string
+}
+
+variable "tags" {
+  description = "Common tags to be applied to the provisioned resources"
+  type        = map(string)
 }

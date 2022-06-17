@@ -59,6 +59,35 @@ locals {
   }
 }
 
+module "vpc" {
+  source               = "./modules/vpc"
+  vpc_cidr_block       = var.vpc_cidr_block
+  availability_zones   = var.availability_zones
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
+}
+
+/* TODO:
+module "nlb" {
+  source               = "./modules/nlb"
+  vpc_id               = module.vpc.vpc_details.id
+  subnet_ids           = values(module.vpc.subnets)[*].subnet_id
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
+}
+
+module "asg" {
+  source = "./modules/asg"
+}
+
+module "route53" {
+  source = "./modules/route53"
+}
+
+module "cloudwatch" {
+  source = "./modules/cloudwatch"
+} */
+
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr_block
   instance_tenancy     = "default"
