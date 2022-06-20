@@ -21,14 +21,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-locals {
-  common_tags = {
-    Stack         = "L4-Load-Balancing-Demo",
-    ProvisionedBy = "Terraform"
-  }
-  name_prefix = "L4-LB-Demo"
-}
-
 data "aws_availability_zones" "available" {}
 
 data "aws_cloudformation_export" "deployment_artifactory_bucket_name" {
@@ -39,24 +31,9 @@ data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn"
   name = "CommonDeploymentArtifactoryReadAccessPolicyArn"
 }
 
-locals {
-  availability_zones = {
-    "AZ-1" = {
-      name                      = data.aws_availability_zones.available.names[0],
-      public_subnet_cidr_block  = cidrsubnet(var.vpc_cidr_block, 8, 0)
-      private_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 10),
-    },
-    "AZ-2" = {
-      name                      = data.aws_availability_zones.available.names[1],
-      public_subnet_cidr_block  = cidrsubnet(var.vpc_cidr_block, 8, 1),
-      private_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 11),
-    },
-    "AZ-3" = {
-      name                      = data.aws_availability_zones.available.names[2],
-      public_subnet_cidr_block  = cidrsubnet(var.vpc_cidr_block, 8, 2),
-      private_subnet_cidr_block = cidrsubnet(var.vpc_cidr_block, 8, 12),
-    },
-  }
+data "aws_route53_zone" "alias_hosted_zone" {
+  name         = var.route53_alias_settings.alias_hosted_zone_name
+  private_zone = false
 }
 
 module "vpc" {
@@ -71,7 +48,7 @@ module "vpc" {
 module "nlb" {
   source               = "./modules/nlb"
   vpc_id               = module.vpc.vpc_details.id
-  subnet_ids           = values(module.vpc.subnets)[*].subnet_id
+  subnet_ids           = values(module.vpc.public_subnets)[*].subnet_id
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
 }
@@ -82,12 +59,17 @@ module "asg" {
 
 module "route53" {
   source = "./modules/route53"
+  load_balancer_dns_name = module.alb.load_balancer_details.dns_name
+  load_balancer_zone_id  = module.alb.load_balancer_details.zone_id
+  alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id
+  alias_fqdn             = var.route53_alias_settings.alias_fqdn
 }
 
 module "cloudwatch" {
   source = "./modules/cloudwatch"
 } */
 
+/* TODO: remove
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr_block
   instance_tenancy     = "default"
@@ -106,7 +88,7 @@ resource "aws_internet_gateway" "internet_gateway" {
 }
 
 resource "aws_subnet" "public_subnet" {
-  for_each                = local.availability_zones
+  for_each                = var.availability_zones
   vpc_id                  = aws_vpc.vpc.id
   availability_zone       = each.value.name
   cidr_block              = each.value.public_subnet_cidr_block
@@ -117,7 +99,7 @@ resource "aws_subnet" "public_subnet" {
 }
 
 resource "aws_subnet" "private_subnet" {
-  for_each                = local.availability_zones
+  for_each                = var.availability_zones
   vpc_id                  = aws_vpc.vpc.id
   availability_zone       = each.value.name
   cidr_block              = each.value.private_subnet_cidr_block
@@ -128,7 +110,7 @@ resource "aws_subnet" "private_subnet" {
 }
 
 resource "aws_eip" "nat_gateway_elastic_ip" {
-  for_each = local.availability_zones
+  for_each = var.availability_zones
   vpc      = true
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-Elastic-IP-${each.key}"
@@ -136,7 +118,7 @@ resource "aws_eip" "nat_gateway_elastic_ip" {
 }
 
 resource "aws_nat_gateway" "nat_gateway" {
-  for_each      = local.availability_zones
+  for_each      = var.availability_zones
   allocation_id = aws_eip.nat_gateway_elastic_ip[each.key].id
   subnet_id     = aws_subnet.public_subnet[each.key].id
   tags = merge(local.common_tags, {
@@ -156,13 +138,13 @@ resource "aws_route_table" "public_subnets_route_table" {
 }
 
 resource "aws_route_table_association" "public_subnet_route_table_association" {
-  for_each       = local.availability_zones
+  for_each       = var.availability_zones
   subnet_id      = aws_subnet.public_subnet[each.key].id
   route_table_id = aws_route_table.public_subnets_route_table.id
 }
 
 resource "aws_route_table" "private_subnet_route_table" {
-  for_each = local.availability_zones
+  for_each = var.availability_zones
   vpc_id   = aws_vpc.vpc.id
   route {
     cidr_block = "0.0.0.0/0"
@@ -174,7 +156,7 @@ resource "aws_route_table" "private_subnet_route_table" {
 }
 
 resource "aws_route_table_association" "private_subnet_route_table_association" {
-  for_each       = local.availability_zones
+  for_each       = var.availability_zones
   subnet_id      = aws_subnet.private_subnet[each.key].id
   route_table_id = aws_route_table.private_subnet_route_table[each.key].id
 }
@@ -229,8 +211,10 @@ resource "aws_lb_target_group" "nlb_target_group" {
     enabled             = true
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    /* TODO: this seems to cause troubles, but it works with CloudFormation
-    interval            = 30
-    timeout             = 10 */
+    // TODO: this seems to cause troubles, but it works with CloudFormation
+    // interval            = 30
+    // timeout             = 10 
   }
 }
+
+*/
