@@ -39,8 +39,8 @@ resource "aws_lb_listener" "load_balancer_listener" {
 
 resource "aws_lb_target_group" "target_group" {
   name     = "${var.resource_name_prefix}-NLBTargetGroup"
-  vpc_id   = aws_vpc.vpc.id
-  port     = var.ec2_port
+  vpc_id   = var.vpc_id
+  port     = var.target_ec2_settings.port
   protocol = "TCP"
   health_check {
     enabled             = true

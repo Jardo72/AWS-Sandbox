@@ -36,7 +36,7 @@ variable "alb_listener_settings" {
 }
 
 variable "target_ec2_settings" {
-  description = "Protocol and TCP port for the target EC2 instances"
+  description = "Protocol, TCP port and other settings for the target EC2 instances"
   type = object({
     port                  = number
     protocol              = string

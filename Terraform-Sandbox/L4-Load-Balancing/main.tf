@@ -58,123 +58,36 @@ module "vpc" {
   tags                 = var.tags
 }
 
-/* TODO:
 module "nlb" {
   source               = "./modules/nlb"
   vpc_id               = module.vpc.vpc_details.id
   subnet_ids           = values(module.vpc.public_subnets)[*].subnet_id
+  target_ec2_settings  = {
+    port = var.ec2_settings.port
+  }
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
 }
 
+/* TODO:
 module "asg" {
   source = "./modules/asg"
-}
+} */
 
 module "route53" {
   source = "./modules/route53"
-  load_balancer_dns_name = module.alb.load_balancer_details.dns_name
-  load_balancer_zone_id  = module.alb.load_balancer_details.zone_id
+  load_balancer_dns_name = module.nlb.load_balancer_details.dns_name
+  load_balancer_zone_id  = module.nlb.load_balancer_details.zone_id
   alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id
   alias_fqdn             = var.route53_alias_settings.alias_fqdn
 }
 
+/* TODO:
 module "cloudwatch" {
   source = "./modules/cloudwatch"
 } */
 
 /* TODO: remove
-resource "aws_vpc" "vpc" {
-  cidr_block           = var.vpc_cidr_block
-  instance_tenancy     = "default"
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-VPC"
-  })
-}
-
-resource "aws_internet_gateway" "internet_gateway" {
-  vpc_id = aws_vpc.vpc.id
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-IGW"
-  })
-}
-
-resource "aws_subnet" "public_subnet" {
-  for_each                = var.availability_zones
-  vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = each.value.name
-  cidr_block              = each.value.public_subnet_cidr_block
-  map_public_ip_on_launch = true
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-Public-Subnet-${each.key}"
-  })
-}
-
-resource "aws_subnet" "private_subnet" {
-  for_each                = var.availability_zones
-  vpc_id                  = aws_vpc.vpc.id
-  availability_zone       = each.value.name
-  cidr_block              = each.value.private_subnet_cidr_block
-  map_public_ip_on_launch = false
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-Private-Subnet-${each.key}"
-  })
-}
-
-resource "aws_eip" "nat_gateway_elastic_ip" {
-  for_each = var.availability_zones
-  vpc      = true
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-Elastic-IP-${each.key}"
-  })
-}
-
-resource "aws_nat_gateway" "nat_gateway" {
-  for_each      = var.availability_zones
-  allocation_id = aws_eip.nat_gateway_elastic_ip[each.key].id
-  subnet_id     = aws_subnet.public_subnet[each.key].id
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-NAT-GW-${each.key}"
-  })
-}
-
-resource "aws_route_table" "public_subnets_route_table" {
-  vpc_id = aws_vpc.vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.internet_gateway.id
-  }
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-Public-Route-Table"
-  })
-}
-
-resource "aws_route_table_association" "public_subnet_route_table_association" {
-  for_each       = var.availability_zones
-  subnet_id      = aws_subnet.public_subnet[each.key].id
-  route_table_id = aws_route_table.public_subnets_route_table.id
-}
-
-resource "aws_route_table" "private_subnet_route_table" {
-  for_each = var.availability_zones
-  vpc_id   = aws_vpc.vpc.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.nat_gateway[each.key].id
-  }
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-Private-Route-Table-${each.key}"
-  })
-}
-
-resource "aws_route_table_association" "private_subnet_route_table_association" {
-  for_each       = var.availability_zones
-  subnet_id      = aws_subnet.private_subnet[each.key].id
-  route_table_id = aws_route_table.private_subnet_route_table[each.key].id
-}
-
 resource "aws_security_group" "ec2_security_group" {
   name        = "${local.name_prefix}-EC2-SG"
   description = "Allow inbound HTTP traffic from the ALB for the EC2 instances"

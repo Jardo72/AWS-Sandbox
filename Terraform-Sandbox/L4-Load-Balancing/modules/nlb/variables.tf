@@ -33,6 +33,22 @@ variable "nlb_port" {
   default     = 1234
 }
 
+variable "target_ec2_settings" {
+  description = "Protocol and TCP port for the target EC2 instances"
+  type = object({
+    port                  = number
+    /* TODO: enable, remove the unneeded stuff
+    protocol              = string
+    healthy_threshold     = number
+    unhealthy_threshold   = number
+    health_check_interval = number
+    health_check_timeout  = number
+    health_check_path     = string
+    health_check_matcher  = string */
+  })
+}
+
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string
