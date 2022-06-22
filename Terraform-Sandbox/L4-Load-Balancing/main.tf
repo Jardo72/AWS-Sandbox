@@ -59,10 +59,10 @@ module "vpc" {
 }
 
 module "nlb" {
-  source               = "./modules/nlb"
-  vpc_id               = module.vpc.vpc_details.id
-  subnet_ids           = values(module.vpc.public_subnets)[*].subnet_id
-  target_ec2_settings  = {
+  source     = "./modules/nlb"
+  vpc_id     = module.vpc.vpc_details.id
+  subnet_ids = values(module.vpc.public_subnets)[*].subnet_id
+  target_ec2_settings = {
     port = var.ec2_settings.port
   }
   resource_name_prefix = var.resource_name_prefix
@@ -71,21 +71,35 @@ module "nlb" {
 
 /* TODO:
 module "asg" {
-  source = "./modules/asg"
+  source           = "./modules/asg"
+  vpc_id           = module.vpc.vpc_details.id
+  subnet_ids       = values(module.vpc.private_subnets)[*].subnet_id
+  target_group_arn = module.nlb.target_group_details.arn
+  application_installation = {
+    deployment_artifactory_bucket_name     = data.aws_cloudformation_export.deployment_artifactory_bucket_name.value
+    deployment_artifactory_prefix          = var.application_installation.deployment_artifactory_prefix
+    application_jar_file                   = var.application_installation.application_jar_file
+    deployment_artifactory_access_role_arn = data.aws_cloudformation_export.deployment_artifactory_read_access_policy_arn.value
+  }
+  ec2_instance = {
+    instance_type = var.ec2_settings.instance_type
+    port          = var.ec2_settings.port
+  }
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
 } */
 
 module "route53" {
-  source = "./modules/route53"
+  source                 = "./modules/route53"
   load_balancer_dns_name = module.nlb.load_balancer_details.dns_name
   load_balancer_zone_id  = module.nlb.load_balancer_details.zone_id
   alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id
   alias_fqdn             = var.route53_alias_settings.alias_fqdn
 }
 
-/* TODO:
 module "cloudwatch" {
   source = "./modules/cloudwatch"
-} */
+}
 
 /* TODO: remove
 resource "aws_security_group" "ec2_security_group" {

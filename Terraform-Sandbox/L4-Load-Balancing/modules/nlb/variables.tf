@@ -36,7 +36,7 @@ variable "nlb_port" {
 variable "target_ec2_settings" {
   description = "Protocol and TCP port for the target EC2 instances"
   type = object({
-    port                  = number
+    port = number
     /* TODO: enable, remove the unneeded stuff
     protocol              = string
     healthy_threshold     = number
