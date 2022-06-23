@@ -69,7 +69,6 @@ module "nlb" {
   tags                 = var.tags
 }
 
-/* TODO:
 module "asg" {
   source           = "./modules/asg"
   vpc_id           = module.vpc.vpc_details.id
@@ -87,7 +86,7 @@ module "asg" {
   }
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
-} */
+}
 
 module "route53" {
   source                 = "./modules/route53"
@@ -98,7 +97,12 @@ module "route53" {
 }
 
 module "cloudwatch" {
-  source = "./modules/cloudwatch"
+  source                 = "./modules/cloudwatch"
+  aws_region             = var.aws_region
+  dashboard_name         = "TODO"
+  autoscaling_group_name = "TODO"
+  load_balancer_arn      = module.nlb.load_balancer_details.arn
+  target_group_arn       = module.nlb.target_group_details.arn
 }
 
 /* TODO: remove

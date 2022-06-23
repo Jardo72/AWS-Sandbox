@@ -70,6 +70,30 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   })
 }
 
+resource "aws_security_group" "security_group" {
+  name        = "${var.resource_name_prefix}-EC2-SG"
+  description = "Allow inbound traffic from the NLB for the EC2 instances"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    protocol         = "tcp"
+    from_port        = var.ec2_instance.port
+    to_port          = var.ec2_instance.port
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  egress {
+    protocol         = "-1"
+    from_port        = 0
+    to_port          = 0
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-EC2-SG"
+  })
+}
+
 resource "aws_launch_template" "launch_template" {
   name                   = "${var.resource_name_prefix}-Launch-Template"
   image_id               = data.aws_ami.latest_amazon_linux_ami.id
@@ -88,4 +112,3 @@ resource "aws_launch_template" "launch_template" {
     Name = "${var.resource_name_prefix}-Launch-Template"
   })
 }
-

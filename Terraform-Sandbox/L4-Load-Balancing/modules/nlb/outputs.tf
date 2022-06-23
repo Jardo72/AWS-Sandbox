@@ -24,3 +24,9 @@ output "load_balancer_details" {
     zone_id  = aws_lb.load_balancer.zone_id
   }
 }
+
+output "target_group_details" {
+  value = {
+    arn = aws_lb_target_group.target_group.arn
+  }
+}
