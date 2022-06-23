@@ -33,23 +33,16 @@ resource "aws_security_group_rule" "security_group_ingress_rule" {
   from_port         = var.alb_listener_settings.port
   to_port           = var.alb_listener_settings.port
   cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
   description       = "Allow inbound traffic from anywhere"
 }
 
 resource "aws_security_group_rule" "security_group_egress_rule" {
   type              = "egress"
   security_group_id = aws_security_group.security_group.id
-  protocol          = "-1"
-  from_port         = 0
-  to_port           = 0
-
-  // TODO: remove?
-  // - the reference to EC2 security group does not seem to work
-  // - this is a workaround allowing to proceed until the final solution will be found
-  cidr_blocks      = ["0.0.0.0/0"]
-  ipv6_cidr_blocks = ["::/0"]
-  // source_security_group_id = aws_security_group.ec2_security_group.id
+  protocol          = "tcp"
+  from_port         = var.target_ec2_settings.port
+  to_port           = var.target_ec2_settings.port
+  cidr_blocks       = [var.vpc_cidr_block]
 }
 
 resource "aws_lb" "load_balancer" {

@@ -57,9 +57,10 @@ module "vpc" {
 }
 
 module "alb" {
-  source     = "./modules/alb"
-  vpc_id     = module.vpc.vpc_details.id
-  subnet_ids = values(module.vpc.subnets)[*].subnet_id
+  source         = "./modules/alb"
+  vpc_id         = module.vpc.vpc_details.id
+  vpc_cidr_block = module.vpc.vpc_details.cidr_block
+  subnet_ids     = values(module.vpc.subnets)[*].subnet_id
   alb_listener_settings = {
     port     = var.alb_port
     protocol = "HTTP"

@@ -22,6 +22,11 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "vpc_cidr_block" {
+  description = "CIDR block of the VPC hosting the application"
+  type        = string
+}
+
 variable "subnet_ids" {
   description = "IDs of the subnets to be used by the load balancer"
   type        = list(string)

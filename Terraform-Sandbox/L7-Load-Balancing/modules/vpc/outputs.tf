@@ -19,8 +19,9 @@
 
 output "vpc_details" {
   value = {
-    id  = aws_vpc.vpc.id,
-    arn = aws_vpc.vpc.arn
+    id         = aws_vpc.vpc.id,
+    arn        = aws_vpc.vpc.arn
+    cidr_block = aws_vpc.vpc.cidr_block
   }
 }
 
