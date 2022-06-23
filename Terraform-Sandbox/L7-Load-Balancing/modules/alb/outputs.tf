@@ -30,3 +30,7 @@ output "target_group_details" {
     arn = aws_lb_target_group.target_group.arn
   }
 }
+
+output "load_balancer_security_group_id" {
+  value = aws_security_group.security_group.id
+}

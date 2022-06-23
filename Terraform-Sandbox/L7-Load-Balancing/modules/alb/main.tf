@@ -21,28 +21,23 @@ resource "aws_security_group" "security_group" {
   name        = "${var.resource_name_prefix}-ALB-SG"
   description = "Security group for the ALB"
   vpc_id      = var.vpc_id
+  ingress {
+    protocol    = "tcp"
+    from_port   = var.alb_listener_settings.port
+    to_port     = var.alb_listener_settings.port
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow inbound traffic from anywhere to the ALB TCP port"
+  }
+  egress {
+    protocol    = "tcp"
+    from_port   = var.target_ec2_settings.port
+    to_port     = var.target_ec2_settings.port
+    cidr_blocks = [var.vpc_cidr_block]
+    description = "Allow outbound traffic within the VPC to the EC2 TCP port"
+  }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-ALB-SG"
   })
-}
-
-resource "aws_security_group_rule" "security_group_ingress_rule" {
-  type              = "ingress"
-  security_group_id = aws_security_group.security_group.id
-  protocol          = "tcp"
-  from_port         = var.alb_listener_settings.port
-  to_port           = var.alb_listener_settings.port
-  cidr_blocks       = ["0.0.0.0/0"]
-  description       = "Allow inbound traffic from anywhere"
-}
-
-resource "aws_security_group_rule" "security_group_egress_rule" {
-  type              = "egress"
-  security_group_id = aws_security_group.security_group.id
-  protocol          = "tcp"
-  from_port         = var.target_ec2_settings.port
-  to_port           = var.target_ec2_settings.port
-  cidr_blocks       = [var.vpc_cidr_block]
 }
 
 resource "aws_lb" "load_balancer" {
