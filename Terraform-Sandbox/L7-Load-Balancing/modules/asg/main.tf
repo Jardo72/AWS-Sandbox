@@ -74,22 +74,29 @@ resource "aws_security_group" "security_group" {
   name        = "${var.resource_name_prefix}-EC2-SG"
   description = "Allow inbound HTTP traffic from the ALB for the EC2 instances"
   vpc_id      = var.vpc_id
-
-  ingress {
-    protocol    = "tcp"
-    from_port   = var.ec2_instance.port
-    to_port     = var.ec2_instance.port
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-SG"
   })
+}
+
+resource "aws_security_group_rule" "security_group_ingress_rule" {
+  type              = "ingress"
+  security_group_id = aws_security_group.security_group.id
+  protocol    = "tcp"
+  from_port   = var.ec2_instance.port
+  to_port     = var.ec2_instance.port
+  cidr_blocks = ["0.0.0.0/0"]
+  // TODO: instead of the CIDR block, use reference to ALB security group
+  // source_security_group_id = aws_security_group.ec2_security_group.id
+}
+
+resource "aws_security_group_rule" "security_group_egress_rule" {
+  type              = "egress"
+  security_group_id = aws_security_group.security_group.id
+  protocol    = "-1"
+  from_port   = 0
+  to_port     = 0
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_launch_template" "launch_template" {
