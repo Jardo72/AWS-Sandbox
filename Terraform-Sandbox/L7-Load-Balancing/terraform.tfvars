@@ -46,6 +46,12 @@ ec2_settings = {
   port          = 80
 }
 
+alb_access_log_settings = {
+  bucket_name_export = "CommonELBAccessLogBucketName"
+  prefix             = "L7-LB-Demo-Terraform"
+  enabled            = true
+}
+
 autoscaling_group_settings = {
   min_size                         = 3
   max_size                         = 6

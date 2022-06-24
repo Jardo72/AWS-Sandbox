@@ -46,6 +46,11 @@ resource "aws_lb" "load_balancer" {
   load_balancer_type = "application"
   subnets            = var.subnet_ids
   security_groups    = [aws_security_group.security_group.id]
+  access_logs {
+    bucket  = var.alb_access_log_settings.bucket_name
+    prefix  = var.alb_access_log_settings.prefix
+    enabled = var.alb_access_log_settings.enabled
+  }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-ALB"
   })

@@ -61,6 +61,15 @@ variable "alb_port" {
   default     = 80
 }
 
+variable "alb_access_log_settings" {
+  description = "Access log settings for the ALB"
+  type = object({
+    bucket_name_export = string
+    prefix             = string
+    enabled            = bool
+  })
+}
+
 variable "autoscaling_group_settings" {
   description = "Settings for the EC2 ASG"
   type = object({

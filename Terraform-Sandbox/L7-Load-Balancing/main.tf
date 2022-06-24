@@ -43,6 +43,10 @@ data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn"
   name = var.application_installation.deployment_artifactory_access_role_arn_export
 }
 
+data "aws_cloudformation_export" "common_elb_access_log_bucket_name" {
+  name = var.alb_access_log_settings.bucket_name_export
+}
+
 data "aws_route53_zone" "alias_hosted_zone" {
   name         = var.route53_alias_settings.alias_hosted_zone_name
   private_zone = false
@@ -64,6 +68,11 @@ module "alb" {
   alb_listener_settings = {
     port     = var.alb_port
     protocol = "HTTP"
+  }
+  alb_access_log_settings = {
+    bucket_name = data.aws_cloudformation_export.common_elb_access_log_bucket_name.value
+    prefix      = var.alb_access_log_settings.prefix
+    enabled     = var.alb_access_log_settings.enabled
   }
   target_ec2_settings = {
     port                  = var.ec2_settings.port

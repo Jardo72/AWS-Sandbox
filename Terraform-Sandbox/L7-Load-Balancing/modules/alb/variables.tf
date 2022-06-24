@@ -40,6 +40,15 @@ variable "alb_listener_settings" {
   })
 }
 
+variable "alb_access_log_settings" {
+  description = "Access log settings for the ALB"
+  type = object({
+    bucket_name = string
+    prefix      = string
+    enabled     = bool
+  })
+}
+
 variable "target_ec2_settings" {
   description = "Protocol, TCP port and other settings for the target EC2 instances"
   type = object({
