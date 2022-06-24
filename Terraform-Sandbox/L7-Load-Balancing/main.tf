@@ -80,10 +80,11 @@ module "alb" {
 }
 
 module "asg" {
-  source           = "./modules/asg"
-  vpc_id           = module.vpc.vpc_details.id
-  subnet_ids       = values(module.vpc.subnets)[*].subnet_id
-  target_group_arn = module.alb.target_group_details.arn
+  source                          = "./modules/asg"
+  vpc_id                          = module.vpc.vpc_details.id
+  subnet_ids                      = values(module.vpc.subnets)[*].subnet_id
+  target_group_arn                = module.alb.target_group_details.arn
+  load_balancer_security_group_id = module.alb.load_balancer_details.security_group_id
   application_installation = {
     deployment_artifactory_bucket_name     = data.aws_cloudformation_export.deployment_artifactory_bucket_name.value
     deployment_artifactory_prefix          = var.application_installation.deployment_artifactory_prefix

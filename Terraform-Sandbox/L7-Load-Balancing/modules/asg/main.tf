@@ -80,23 +80,21 @@ resource "aws_security_group" "security_group" {
 }
 
 resource "aws_security_group_rule" "security_group_ingress_rule" {
-  type              = "ingress"
-  security_group_id = aws_security_group.security_group.id
-  protocol    = "tcp"
-  from_port   = var.ec2_instance.port
-  to_port     = var.ec2_instance.port
-  cidr_blocks = ["0.0.0.0/0"]
-  // TODO: instead of the CIDR block, use reference to ALB security group
-  // source_security_group_id = aws_security_group.ec2_security_group.id
+  type                     = "ingress"
+  security_group_id        = aws_security_group.security_group.id
+  protocol                 = "tcp"
+  from_port                = var.ec2_instance.port
+  to_port                  = var.ec2_instance.port
+  source_security_group_id = var.load_balancer_security_group_id
 }
 
 resource "aws_security_group_rule" "security_group_egress_rule" {
   type              = "egress"
   security_group_id = aws_security_group.security_group.id
-  protocol    = "-1"
-  from_port   = 0
-  to_port     = 0
-  cidr_blocks = ["0.0.0.0/0"]
+  protocol          = "-1"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_launch_template" "launch_template" {
