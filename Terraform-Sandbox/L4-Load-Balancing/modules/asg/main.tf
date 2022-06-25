@@ -76,18 +76,16 @@ resource "aws_security_group" "security_group" {
   vpc_id      = var.vpc_id
 
   ingress {
-    protocol         = "tcp"
-    from_port        = var.ec2_instance.port
-    to_port          = var.ec2_instance.port
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    protocol    = "tcp"
+    from_port   = var.ec2_instance.port
+    to_port     = var.ec2_instance.port
+    cidr_blocks = [var.vpc_cidr_block]
   }
   egress {
-    protocol         = "-1"
-    from_port        = 0
-    to_port          = 0
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
   }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-SG"
@@ -111,4 +109,34 @@ resource "aws_launch_template" "launch_template" {
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-Launch-Template"
   })
+}
+
+resource "aws_autoscaling_group" "autoscaling_group" {
+  name                      = "${var.resource_name_prefix}-ASG"
+  min_size                  = 3
+  max_size                  = 3
+  desired_capacity          = 3
+  health_check_type         = "ELB"
+  health_check_grace_period = 150
+  vpc_zone_identifier       = var.subnet_ids
+  launch_template {
+    id      = aws_launch_template.launch_template.id
+    version = "$Latest"
+  }
+  target_group_arns = [var.target_group_arn]
+  # TODO: do you need this???
+  # depends_on        = [aws_nat_gateway.nat_gateway]
+  tag {
+    key                 = "Name"
+    value               = "${var.resource_name_prefix}-ASG"
+    propagate_at_launch = false
+  }
+  dynamic "tag" {
+    for_each = var.tags
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
 }

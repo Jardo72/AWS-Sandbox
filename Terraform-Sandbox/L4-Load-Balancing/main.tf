@@ -72,6 +72,7 @@ module "nlb" {
 module "asg" {
   source           = "./modules/asg"
   vpc_id           = module.vpc.vpc_details.id
+  vpc_cidr_block   = var.vpc_cidr_block
   subnet_ids       = values(module.vpc.private_subnets)[*].subnet_id
   target_group_arn = module.nlb.target_group_details.arn
   application_installation = {
