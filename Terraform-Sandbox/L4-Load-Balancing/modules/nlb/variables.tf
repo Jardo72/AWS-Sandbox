@@ -42,9 +42,7 @@ variable "target_ec2_settings" {
     healthy_threshold     = number
     unhealthy_threshold   = number
     health_check_interval = number
-    health_check_timeout  = number
-    health_check_path     = string
-    health_check_matcher  = string */
+    health_check_timeout  = number */
   })
 }
 

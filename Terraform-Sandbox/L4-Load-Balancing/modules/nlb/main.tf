@@ -44,10 +44,8 @@ resource "aws_lb_target_group" "target_group" {
   protocol = "TCP"
   health_check {
     enabled             = true
+    protocol            = "TCP"
     healthy_threshold   = 2
     unhealthy_threshold = 2
-    /* TODO: this seems to cause troubles, but it works with CloudFormation
-    interval            = 30
-    timeout             = 10 */
   }
 }
