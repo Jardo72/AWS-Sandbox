@@ -124,8 +124,6 @@ resource "aws_autoscaling_group" "autoscaling_group" {
     version = "$Latest"
   }
   target_group_arns = [var.target_group_arn]
-  # TODO: do you need this???
-  # depends_on        = [aws_nat_gateway.nat_gateway]
   tag {
     key                 = "Name"
     value               = "${var.resource_name_prefix}-ASG"

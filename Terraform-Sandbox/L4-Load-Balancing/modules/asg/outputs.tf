@@ -17,11 +17,10 @@
 # limitations under the License.
 #
 
-/* TODO
 output "autoscaling_group_details" {
   value = {
     id   = aws_autoscaling_group.autoscaling_group.id
     arn  = aws_autoscaling_group.autoscaling_group.arn
     name = aws_autoscaling_group.autoscaling_group.name
   }
-} */
+}
