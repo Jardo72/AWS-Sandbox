@@ -32,6 +32,7 @@ variable "ec2_instance" {
   type = object({
     instance_type = string
     port          = number
+    count         = number
   })
 }
 

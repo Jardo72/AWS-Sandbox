@@ -63,7 +63,9 @@ module "nlb" {
   vpc_id     = module.vpc.vpc_details.id
   subnet_ids = values(module.vpc.public_subnets)[*].subnet_id
   target_ec2_settings = {
-    port = var.ec2_settings.port
+    port                = var.ec2_settings.port
+    healthy_threshold   = var.ec2_settings.healthy_threshold
+    unhealthy_threshold = var.ec2_settings.unhealthy_threshold
   }
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
@@ -85,6 +87,7 @@ module "asg" {
   ec2_instance = {
     instance_type = var.ec2_settings.instance_type
     port          = var.ec2_settings.port
+    count         = length(var.availability_zones)
   }
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
@@ -103,7 +106,7 @@ module "route53" {
 module "cloudwatch" {
   source                 = "./modules/cloudwatch"
   aws_region             = var.aws_region
-  dashboard_name         = "TODO"
+  dashboard_name         = var.resource_name_prefix
   autoscaling_group_name = module.asg.autoscaling_group_details.name
   load_balancer_arn      = module.nlb.load_balancer_details.arn
   target_group_arn       = module.nlb.target_group_details.arn

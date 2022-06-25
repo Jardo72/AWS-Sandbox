@@ -51,8 +51,10 @@ variable "application_installation" {
 variable "ec2_settings" {
   description = "Settings for the EC2 instances comprising the EC2 ASG"
   type = object({
-    instance_type = string
-    port          = number
+    instance_type       = string
+    port                = number
+    healthy_threshold   = number
+    unhealthy_threshold = number
   })
 }
 

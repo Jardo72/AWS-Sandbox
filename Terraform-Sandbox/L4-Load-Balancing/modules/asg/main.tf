@@ -113,9 +113,9 @@ resource "aws_launch_template" "launch_template" {
 
 resource "aws_autoscaling_group" "autoscaling_group" {
   name                      = "${var.resource_name_prefix}-ASG"
-  min_size                  = 3
-  max_size                  = 3
-  desired_capacity          = 3
+  min_size                  = var.ec2_instance.count
+  max_size                  = var.ec2_instance.count
+  desired_capacity          = var.ec2_instance.count
   health_check_type         = "ELB"
   health_check_grace_period = 150
   vpc_zone_identifier       = var.subnet_ids
