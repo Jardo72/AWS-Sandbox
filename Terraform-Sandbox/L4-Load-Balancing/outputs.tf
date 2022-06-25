@@ -24,3 +24,7 @@ output "load_balancer_dns_name" {
 output "load_balancer_dns_alias" {
   value = module.route53.load_balancer_dns_alias
 }
+
+output "autoscaling_group_name" {
+  value = module.asg.autoscaling_group_details.name
+}
