@@ -80,4 +80,7 @@ resource "aws_lb_target_group" "target_group" {
     path                = var.target_ec2_settings.health_check_path
     matcher             = var.target_ec2_settings.health_check_matcher
   }
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-ALB-TG"
+  })
 }

@@ -86,6 +86,7 @@ module "alb" {
   }
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
+  depends_on           = [module.vpc]
 }
 
 module "asg" {
@@ -112,6 +113,7 @@ module "asg" {
   }
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
+  depends_on           = [module.vpc, module.alb]
 }
 
 module "route53" {
@@ -120,6 +122,7 @@ module "route53" {
   load_balancer_zone_id  = module.alb.load_balancer_details.zone_id
   alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id
   alias_fqdn             = var.route53_alias_settings.alias_fqdn
+  depends_on             = [module.alb]
 }
 
 module "cloudwatch" {
@@ -129,4 +132,5 @@ module "cloudwatch" {
   autoscaling_group_name = module.asg.autoscaling_group_details.name
   load_balancer_arn      = module.alb.load_balancer_details.arn
   target_group_arn       = module.alb.target_group_details.arn
+  depends_on             = [module.alb, module.asg]
 }
