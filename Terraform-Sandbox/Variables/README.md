@@ -3,9 +3,9 @@ Simple demonstration of Terraform variables of various data types including coll
 
 ```bash
 # use the default terraform.tfvars file 
-tarraform apply -auto-approve
+terraform apply -auto-approve
 
 # use the alternative alternative.tfvars file
-tarraform apply -auto-approve -var-file=alternative.tfvars
+terraform apply -auto-approve -var-file=alternative.tfvars
 ```
 
