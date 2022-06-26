@@ -1,2 +1,2 @@
 # Demonstration of Terraform Loops and Conditions
-Simple demonstration of Terraform loops and conditions. For the sake of simplicity, this configuration only creates several IAM users.
+Simple demonstration of Terraform loops and conditions. For the sake of simplicity, this configuration only creates several IAM users. This configuration involves only single input variable with default value - it is used to demonstrate the for loop. Therefore, there is not `.tfvars` file. AWS region is also hard-coded in the [main.tf](./main.tf) file. In fact, the significance of the region is minimal for this configuration as IAM resources are global.
