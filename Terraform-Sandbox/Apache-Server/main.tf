@@ -173,7 +173,7 @@ resource "aws_instance" "web_server" {
   vpc_security_group_ids      = [aws_security_group.web_server_security_group.id]
   iam_instance_profile        = aws_iam_instance_profile.ssm_parameter_reader_profile.name
   user_data_replace_on_change = true
-  user_data = templatefile("user-data.tpl", {
+  user_data = templatefile("user-data.tftpl", {
     aws_region         = var.aws_region
     ssm_parameter_name = var.ssm_parameter_name
   })

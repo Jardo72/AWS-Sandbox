@@ -12,3 +12,5 @@ The Web server has no TLS certificate, and it is not configured to listen on TCP
 The user data script for the EC2 instance is generated using the `templatefile` function. As outlined above, when you modify the template file and apply the Terraform configuration again, the EC2 instance will be replaced by a new one reflecting the modified user data. In other words, the index.html file for new EC2 instance will reflect the modified user data.
 
 The Terraform configuration also involves a null_resource with local-exec provisioner which is waiting until the EC2 status checks pass. The local-exec provisioner uses the `aws ec2 wait instance-status-ok` AWS CLI command. Therefore, an attempt to apply this configuration on a host where AWS CLI is not installed will fail. Anyway, this is a nice demonstration of the `local-exec` provisioner.
+
+All input variables have default values, so no `.tfvars` file was needed/used during my experiments.
