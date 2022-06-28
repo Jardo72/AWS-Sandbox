@@ -118,6 +118,7 @@ module "asg" {
 
 module "route53" {
   source                 = "./modules/route53"
+  enabled                = true
   load_balancer_dns_name = module.alb.load_balancer_details.dns_name
   load_balancer_zone_id  = module.alb.load_balancer_details.zone_id
   alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id

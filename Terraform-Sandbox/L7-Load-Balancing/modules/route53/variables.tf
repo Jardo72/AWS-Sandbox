@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+variable "enabled" {
+  description = "Determines whether the Route 53 alias for the ALB is to be created or not"
+  type        = bool
+}
+
 variable "load_balancer_dns_name" {
   description = "AWS-assigned DNS name of the ALB"
   type        = string
