@@ -1,9 +1,9 @@
 # Terraform Module Demo
 
 ## Introduction
-Demonstration of Terraform module which creates a VPC with a pair of subnets (public subnet and private subnet) for each of the specified AZs. In each of the public subnets, NAT gateway is created. The route tables for the private subnets involve a default route to the NAT gateway residing in the same AZ as the private subnet. The VPC has also an Internet Gateway attached, and the route table associated with the public subnets involves a default route to the Internet Gateway.
+Demonstration of Terraform module which creates a VPC with a pair of subnets (public subnet and private subnet) for each of the specified AZs. In each of the public subnets, NAT gateway is created. The route tables for the private subnets involve a default route to the NAT gateway residing in the same AZ as the private subnet. The VPC has also an Internet Gateway attached, and the route table associated with the public subnets involves a default route to the Internet Gateway. Without other resources, the VPC is rather useless. However, the goal of this project is to demonstrate how to create a module and how to call it from the root module.
 
-## Terraform Variables
+The following snippet illustrates the values of variables used during my experiments:
 
 ```hcl
 vpc_cidr_block = "10.0.0.0/16"
