@@ -2,12 +2,13 @@
     "start": "-PT1H",
     "widgets": [
         {
-            "height": 6,
-            "width": 8,
-            "y": 0,
-            "x": 0,
             "type": "metric",
+            "x": 0,
+            "y": 0,
+            "width": 8,
+            "height": 6,
             "properties": {
+                "period": 300,
                 "view": "timeSeries",
                 "liveData": false,
                 "stacked": false,
@@ -15,45 +16,50 @@
                     [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${autoscaling_group_name}" ]
                 ],
                 "region": "${aws_region}",
-                "period": 300,
-                "title": "ASG"
+                "stat": "Average",
+                "title": "ASG",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
             }
         },
         {
-            "height": 3,
-            "width": 8,
-            "y": 0,
-            "x": 8,
             "type": "metric",
+            "x": 8,
+            "y": 0,
+            "width": 8,
+            "height": 3,
             "properties": {
+                "period": 60,
+                "view": "singleValue",
+                "liveData": true,
+                "sparkline": true,
                 "metrics": [
                     [ "AWS/AutoScaling", "GroupDesiredCapacity", "AutoScalingGroupName", "${autoscaling_group_name}" ]
                 ],
-                "sparkline": true,
-                "view": "singleValue",
-                "liveData": true,
                 "region": "${aws_region}",
                 "stat": "Average",
-                "period": 60,
                 "title": "ASG"
             }
         },
         {
-            "height": 3,
-            "width": 8,
-            "y": 3,
-            "x": 8,
             "type": "metric",
+            "x": 8,
+            "y": 3,
+            "width": 8,
+            "height": 3,
             "properties": {
+                "period": 60,
+                "view": "singleValue",
+                "liveData": true,
+                "sparkline": true,
                 "metrics": [
                     [ "AWS/AutoScaling", "GroupInServiceInstances", "AutoScalingGroupName", "${autoscaling_group_name}" ]
                 ],
-                "sparkline": true,
-                "view": "singleValue",
-                "liveData": true,
                 "region": "${aws_region}",
                 "stat": "Average",
-                "period": 60,
                 "title": "ASG"
             }
         }
