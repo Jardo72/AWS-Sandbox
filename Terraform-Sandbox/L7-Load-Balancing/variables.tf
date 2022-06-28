@@ -83,6 +83,7 @@ variable "autoscaling_group_settings" {
 variable "route53_alias_settings" {
   description = "Settings for the Route 53 alias for the ALB"
   type = object({
+    enabled                = bool
     alias_hosted_zone_name = string
     alias_fqdn             = string
   })

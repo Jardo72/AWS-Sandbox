@@ -60,6 +60,7 @@ autoscaling_group_settings = {
 }
 
 route53_alias_settings = {
+  enabled                = true
   alias_hosted_zone_name = "jardo72.de."
   alias_fqdn             = "alb-demo.jardo72.de"
 }
