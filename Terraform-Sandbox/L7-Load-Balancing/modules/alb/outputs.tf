@@ -30,6 +30,5 @@ output "load_balancer_details" {
 output "target_group_details" {
   value = {
     arn = aws_lb_target_group.target_group.arn
-    id  = aws_lb_target_group.target_group.id
   }
 }
