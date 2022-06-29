@@ -10,11 +10,11 @@
             "properties": {
                 "period": 60,
                 "metrics": [
-                    [ "AWS/ApplicationELB", "RequestCount", "TargetGroup", "${target_group_id}", "LoadBalancer", "${load_balancer_id}" ]
+                    [ "AWS/NetworkELB", "ProcessedBytes", "LoadBalancer", "${load_balancer_id}" ]
                 ],
                 "region": "${aws_region}",
                 "stat": "Sum",
-                "title": "ALB Target Group - Request Count",
+                "title": "Load Balancer - Processed Bytes",
                 "yAxis": {
                     "left": {
                         "min": 0
@@ -31,54 +31,16 @@
             "properties": {
                 "period": 60,
                 "metrics": [
-                    [ "AWS/ApplicationELB", "TargetResponseTime", "TargetGroup", "${target_group_id}", "LoadBalancer", "${load_balancer_id}" ]
+                    [ "AWS/NetworkELB", "ProcessedPackets", "LoadBalancer", "${load_balancer_id}" ]
                 ],
                 "region": "${aws_region}",
-                "stat": "Average",
-                "title": "ALB Target Group - Target Response Time",
+                "stat": "Sum",
+                "title": "Load Balancer - Processed Packets",
                 "yAxis": {
                     "left": {
                         "min": 0
                     }
                 }
-            }
-        },
-        {
-            "type": "metric",
-            "x": 16,
-            "y": 0,
-            "width": 8,
-            "height": 3,
-            "properties": {
-                "period": 60,
-                "view": "singleValue",
-                "liveData": true,
-                "sparkline": true,
-                "metrics": [
-                    [ "AWS/ApplicationELB", "HealthyHostCount", "TargetGroup", "${target_group_id}", "LoadBalancer", "${load_balancer_id}" ]
-                ],
-                "region": "${aws_region}",
-                "stat": "Average",
-                "title": "ALB Target Group - Healthy Host Count"
-            }
-        },
-        {
-            "type": "metric",
-            "x": 16,
-            "y": 3,
-            "width": 8,
-            "height": 3,
-            "properties": {
-                "period": 60,
-                "view": "singleValue",
-                "liveData": true,
-                "sparkline": true,
-                "metrics": [
-                    [ "AWS/ApplicationELB", "UnHealthyHostCount", "TargetGroup", "${target_group_id}", "LoadBalancer", "${load_balancer_id}" ]
-                ],
-                "region": "${aws_region}",
-                "stat": "Average",
-                "title": "ALB Target Group - Unhealthy Host Count"
             }
         },
         {
@@ -86,23 +48,37 @@
             "x": 0,
             "y": 6,
             "width": 8,
-            "height": 6,
+            "height": 3,
             "properties": {
-                "period": 300,
-                "view": "timeSeries",
-                "liveData": false,
-                "stacked": false,
+                "period": 60,
+                "view": "singleValue",
+                "liveData": true,
+                "sparkline": true,
                 "metrics": [
-                    [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${autoscaling_group_name}" ]
+                    [ "AWS/NetworkELB", "ActiveFlowCount", "LoadBalancer", "${load_balancer_id}" ]
                 ],
                 "region": "${aws_region}",
                 "stat": "Average",
-                "title": "Auto-Scaling Group - CPU Utilization",
-                "yAxis": {
-                    "left": {
-                        "min": 0
-                    }
-                }
+                "title": "Load Balancer - Active Connections"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 9,
+            "width": 8,
+            "height": 3,
+            "properties": {
+                "period": 60,
+                "view": "singleValue",
+                "liveData": true,
+                "sparkline": true,
+                "metrics": [
+                    [ "AWS/NetworkELB", "NewFlowCount", "LoadBalancer", "${load_balancer_id}" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "Load Balancer - New Connections"
             }
         },
         {
@@ -117,11 +93,11 @@
                 "liveData": true,
                 "sparkline": true,
                 "metrics": [
-                    [ "AWS/AutoScaling", "GroupDesiredCapacity", "AutoScalingGroupName", "${autoscaling_group_name}" ]
+                    [ "AWS/NetworkELB", "HealthyHostCount", "TargetGroup", "${target_group_id}", "LoadBalancer", "${load_balancer_id}" ]
                 ],
                 "region": "${aws_region}",
                 "stat": "Average",
-                "title": "Auto-Scaling Group - Desired Capacity"
+                "title": "NLB Target Group - Healthy Host Count"
             }
         },
         {
@@ -136,11 +112,11 @@
                 "liveData": true,
                 "sparkline": true,
                 "metrics": [
-                    [ "AWS/AutoScaling", "GroupInServiceInstances", "AutoScalingGroupName", "${autoscaling_group_name}" ]
+                    [ "AWS/NetworkELB", "UnHealthyHostCount", "TargetGroup", "${target_group_id}", "LoadBalancer", "${load_balancer_id}" ]
                 ],
                 "region": "${aws_region}",
                 "stat": "Average",
-                "title": "Auto-Scaling Group - In-Service Instances"
+                "title": "NLB Target Group - Unhealthy Host Count"
             }
         }
     ]
