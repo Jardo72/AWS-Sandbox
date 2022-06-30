@@ -18,5 +18,5 @@
 #
 
 output "load_balancer_dns_alias" {
-  value = aws_route53_record.load_balancer_alias.fqdn
+  value = aws_route53_record.load_balancer_alias[0].fqdn
 }
