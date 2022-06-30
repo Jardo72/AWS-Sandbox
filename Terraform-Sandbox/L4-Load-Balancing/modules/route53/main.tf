@@ -18,6 +18,7 @@
 #
 
 resource "aws_route53_record" "load_balancer_alias" {
+  count   = var.enabled ? 1 : 0
   zone_id = var.alias_zone_id
   name    = var.alias_fqdn
   type    = "A"
