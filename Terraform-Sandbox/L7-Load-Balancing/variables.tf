@@ -20,7 +20,6 @@
 variable "aws_region" {
   description = "The AWS region where the resources are to be provisioned"
   type        = string
-  default     = "eu-central-1"
 }
 
 variable "vpc_cidr_block" {

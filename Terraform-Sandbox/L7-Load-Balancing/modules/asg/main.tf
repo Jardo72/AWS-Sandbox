@@ -78,12 +78,17 @@ resource "aws_security_group" "security_group" {
 }
 
 resource "aws_security_group_rule" "security_group_ingress_rule" {
-  type                     = "ingress"
-  security_group_id        = aws_security_group.security_group.id
-  protocol                 = "tcp"
-  from_port                = var.ec2_instance.port
-  to_port                  = var.ec2_instance.port
-  source_security_group_id = var.load_balancer_security_group_id
+  type              = "ingress"
+  security_group_id = aws_security_group.security_group.id
+  protocol          = "tcp"
+  from_port         = var.ec2_instance.port
+  to_port           = var.ec2_instance.port
+
+  // we also need direct access (i.e. bypass of the load balancer) so that we can configure
+  // the health check response for particular instances; therefore, wildcard CIDR block is
+  // used instead of the reference to the ALB security group
+  // source_security_group_id = var.load_balancer_security_group_id
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "security_group_egress_rule" {
