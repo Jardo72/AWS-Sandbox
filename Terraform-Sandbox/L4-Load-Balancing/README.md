@@ -11,4 +11,53 @@ The configuration is divided to the following modules:
 The following snippet illustrates the values of variables used during my experiments:
 
 ```hcl
+vpc_cidr_block = "10.0.0.0/16"
+
+availability_zones = {
+  "AZ-1" = {
+    az_name                   = "eu-central-1a"
+    private_subnet_cidr_block = "10.0.0.0/24"
+    public_subnet_cidr_block  = "10.0.10.0/24"
+  },
+  "AZ-2" = {
+    az_name                   = "eu-central-1b"
+    private_subnet_cidr_block = "10.0.1.0/24"
+    public_subnet_cidr_block  = "10.0.11.0/24"
+  },
+  "AZ-3" = {
+    az_name                   = "eu-central-1c"
+    private_subnet_cidr_block = "10.0.2.0/24"
+    public_subnet_cidr_block  = "10.0.12.0/24"
+  }
+}
+
+application_installation = {
+  deployment_artifactory_bucket_name_export     = "CommonDeploymentArtifactoryBucketName"
+  deployment_artifactory_access_role_arn_export = "CommonDeploymentArtifactoryReadAccessPolicyArn"
+  deployment_artifactory_prefix                 = "L4-LB-DEMO"
+  application_jar_file                          = "aws-sandbox-network-load-balancing-server-1.0.jar"
+}
+
+ec2_settings = {
+  instance_type       = "t2.nano"
+  port                = 1234
+  healthy_threshold   = 2
+  unhealthy_threshold = 2
+}
+
+nlb_port = 1234
+
+route53_alias_settings = {
+  enabled                = true
+  alias_hosted_zone_name = "jardo72.de."
+  alias_fqdn             = "nlb-demo.jardo72.de"
+}
+
+resource_name_prefix = "L4-LB-Demo"
+
+tags = {
+  Stack         = "L4-Load-Balancing-Demo"
+  ProvisionedBy = "Terraform",
+}
+
 ```
