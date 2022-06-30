@@ -107,3 +107,59 @@ resource "aws_route_table_association" "private_subnet_route_table_association" 
   subnet_id      = aws_subnet.private_subnet[each.key].id
   route_table_id = aws_route_table.private_subnet_route_table[each.key].id
 }
+
+resource "aws_cloudwatch_log_group" "vpc_flow_log_cw_log_group" {
+  name = "${var.resource_name_prefix}-VPC-Flow-CW-Log-Group"
+  retention_in_days = 3
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-VPC-Flow-Log-CW-Log-Group"
+  })
+}
+
+resource "aws_iam_role" "vpc_flow_log_writer_role" {
+  name = "${var.resource_name_prefix}-VPC-Flow-Log-Writer"
+  assume_role_policy = jsonencode({
+    Version : "2012-10-17",
+    Statement : [
+      {
+        Sid : "AllowFlowLogAssume",
+        Action : "sts:AssumeRole",
+        Principal : {
+          Service : "vpc-flow-logs.amazonaws.com"
+        },
+        Effect : "Allow"
+      }
+    ]
+  })
+  inline_policy {
+    name = "AllowAccessToVpcFlowLogGroup"
+    policy = jsonencode({
+      Version: "2012-10-17",
+      Statement: [
+        {
+          Action: [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogGroups",
+            "logs:DescribeLogStreams"
+          ],
+          Effect: "Allow",
+          Resource: aws_cloudwatch_log_group.vpc_flow_log_cw_log_group.arn
+        }
+      ]
+    })
+  }
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-VPC-Flow-Log-Writer"
+  })
+}
+
+resource "aws_flow_log" "vpc_flow_log" {
+  vpc_id          = aws_vpc.vpc.id
+  iam_role_arn    = aws_iam_role.vpc_flow_log_writer_role.arn
+  log_destination = aws_cloudwatch_log_group.vpc_flow_log_cw_log_group.arn
+  traffic_type    = "ALL"
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-VPC-Flow-Log"
+  })
+}

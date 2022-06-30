@@ -31,3 +31,7 @@ output "public_subnets" {
 output "private_subnets" {
   value = { for az, subnet in aws_subnet.private_subnet : az => { az = var.availability_zones[az].az_name, subnet_id = subnet.id, subnet_arn = subnet.arn } }
 }
+
+output "vpc_flow_log_cloudwatch_log_group_name" {
+  value = aws_cloudwatch_log_group.vpc_flow_log_cw_log_group.name
+}

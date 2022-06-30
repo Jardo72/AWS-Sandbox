@@ -79,7 +79,7 @@ resource "aws_security_group" "security_group" {
     protocol    = "tcp"
     from_port   = var.ec2_instance.port
     to_port     = var.ec2_instance.port
-    cidr_blocks = [var.vpc_cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     protocol    = "-1"
