@@ -11,6 +11,8 @@ The configuration is divided to the following modules:
 The following snippet illustrates the values of variables used during my experiments:
 
 ```hcl
+aws_region = "eu-central-1"
+
 vpc_cidr_block = "10.0.0.0/16"
 
 availability_zones = {
