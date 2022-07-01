@@ -18,5 +18,5 @@
 #
 
 output "load_balancer_dns_alias" {
-  value = aws_route53_record.load_balancer_alias[0].fqdn
+  value = var.enabled ? aws_route53_record.load_balancer_alias[0].fqdn : "N/A"
 }
