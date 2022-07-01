@@ -25,11 +25,7 @@ terraform {
       version = "~>4.15.0"
     }
   }
-  backend "s3" {
-    bucket = "jardo72-terraform-state"
-    key    = "terraform-sandbox/s3-backend/terraform.tfstate"
-    region = "eu-central-1"
-  }
+  backend "s3" {}
 }
 
 provider "aws" {
