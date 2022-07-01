@@ -1,0 +1,123 @@
+{
+    "start": "-PT1H",
+    "widgets": [
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 0,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "metrics": [
+                    [ "AWS/NetworkELB", "ProcessedBytes", "LoadBalancer", "${load_balancer_id}" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Sum",
+                "title": "Load Balancer - Processed Bytes",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 8,
+            "y": 0,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "metrics": [
+                    [ "AWS/NetworkELB", "ProcessedPackets", "LoadBalancer", "${load_balancer_id}" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Sum",
+                "title": "Load Balancer - Processed Packets",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 6,
+            "width": 8,
+            "height": 3,
+            "properties": {
+                "period": 60,
+                "view": "singleValue",
+                "liveData": true,
+                "sparkline": true,
+                "metrics": [
+                    [ "AWS/NetworkELB", "ActiveFlowCount", "LoadBalancer", "${load_balancer_id}" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "Load Balancer - Active Connections"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 9,
+            "width": 8,
+            "height": 3,
+            "properties": {
+                "period": 60,
+                "view": "singleValue",
+                "liveData": true,
+                "sparkline": true,
+                "metrics": [
+                    [ "AWS/NetworkELB", "NewFlowCount", "LoadBalancer", "${load_balancer_id}" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "Load Balancer - New Connections"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 8,
+            "y": 6,
+            "width": 8,
+            "height": 3,
+            "properties": {
+                "period": 60,
+                "view": "singleValue",
+                "liveData": true,
+                "sparkline": true,
+                "metrics": [
+                    [ "AWS/NetworkELB", "HealthyHostCount", "TargetGroup", "${target_group_id}", "LoadBalancer", "${load_balancer_id}" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "NLB Target Group - Healthy Host Count"
+            }
+        },
+        {
+            "type": "metric",
+            "x": 8,
+            "y": 9,
+            "width": 8,
+            "height": 3,
+            "properties": {
+                "period": 60,
+                "view": "singleValue",
+                "liveData": true,
+                "sparkline": true,
+                "metrics": [
+                    [ "AWS/NetworkELB", "UnHealthyHostCount", "TargetGroup", "${target_group_id}", "LoadBalancer", "${load_balancer_id}" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "NLB Target Group - Unhealthy Host Count"
+            }
+        }
+    ]
+}
