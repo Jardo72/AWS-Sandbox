@@ -20,11 +20,12 @@
 resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
   dashboard_name = var.dashboard_name
   dashboard_body = templatefile("${path.module}/dashboard-widgets.tftpl", {
-    aws_region             = var.aws_region,
-    load_balancer_arn      = var.load_balancer_arn,
-    load_balancer_id       = replace(var.load_balancer_arn, "/.+:\\d{12}:loadbalancer//", "")
-    target_group_arn       = var.target_group_arn,
-    target_group_id        = replace(var.target_group_arn, "/.+:\\d{12}:/", "")
-    autoscaling_group_name = var.autoscaling_group_name
+    aws_region                                         = var.aws_region,
+    load_balancer_arn                                  = var.load_balancer_arn,
+    load_balancer_id                                   = replace(var.load_balancer_arn, "/.+:\\d{12}:loadbalancer//", "")
+    target_group_arn                                   = var.target_group_arn,
+    target_group_id                                    = replace(var.target_group_arn, "/.+:\\d{12}:/", "")
+    autoscaling_group_name                             = var.autoscaling_group_name
+    autoscaling_group_target_cpu_utilization_threshold = var.autoscaling_group_target_cpu_utilization_threshold
   })
 }

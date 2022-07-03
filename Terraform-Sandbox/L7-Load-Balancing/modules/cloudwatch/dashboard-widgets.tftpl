@@ -95,12 +95,25 @@
                 "metrics": [
                     [ "AWS/EC2", "CPUUtilization", "AutoScalingGroupName", "${autoscaling_group_name}" ]
                 ],
+                "annotations": {
+                    "horizontal": [
+                        {
+                            "label": "target tracking policy threshold",
+                            "value": ${autoscaling_group_target_cpu_utilization_threshold},
+                            "visible": true,
+                            "fill": "above",
+                            "yAxis": "left",
+                            "color": "#FDB9A0"
+                        }
+                    ]
+                },
                 "region": "${aws_region}",
                 "stat": "Average",
                 "title": "Auto-Scaling Group - CPU Utilization",
                 "yAxis": {
                     "left": {
-                        "min": 0
+                        "min": 0,
+                        "max": 100
                     }
                 }
             }
