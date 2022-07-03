@@ -127,11 +127,12 @@ module "route53" {
 }
 
 module "cloudwatch" {
-  source                 = "./modules/cloudwatch"
-  aws_region             = var.aws_region
-  dashboard_name         = var.resource_name_prefix
-  autoscaling_group_name = module.asg.autoscaling_group_details.name
-  load_balancer_arn      = module.alb.load_balancer_details.arn
-  target_group_arn       = module.alb.target_group_details.arn
-  depends_on             = [module.alb, module.asg]
+  source                                             = "./modules/cloudwatch"
+  aws_region                                         = var.aws_region
+  dashboard_name                                     = var.resource_name_prefix
+  autoscaling_group_name                             = module.asg.autoscaling_group_details.name
+  load_balancer_arn                                  = module.alb.load_balancer_details.arn
+  target_group_arn                                   = module.alb.target_group_details.arn
+  autoscaling_group_target_cpu_utilization_threshold = var.autoscaling_group_settings.target_cpu_utilization_threshold
+  depends_on                                         = [module.alb, module.asg]
 }

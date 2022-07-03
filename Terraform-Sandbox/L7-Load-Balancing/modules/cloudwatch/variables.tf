@@ -41,3 +41,8 @@ variable "target_group_arn" {
   description = "The ARN of the ALB target group"
   type        = string
 }
+
+variable "autoscaling_group_target_cpu_utilization_threshold" {
+  description = "CPU utilization threshold for the autoscaling group"
+  type        = number
+}
