@@ -58,3 +58,16 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
     Name = "${var.resource_name_prefix}-EC2-Instance-Profile"
   })
 }
+
+resource "aws_instance" "web_server" {
+  ami                         = data.aws_ami.latest_amazon_linux_ami.id
+  instance_type               = var.instance_type
+  subnet_id                   = var.subnet_id
+  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data = templatefile("${path.module}/user-data.tftpl", {
+    aws_region = var.aws_region
+  })
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-EC2"
+  })
+}

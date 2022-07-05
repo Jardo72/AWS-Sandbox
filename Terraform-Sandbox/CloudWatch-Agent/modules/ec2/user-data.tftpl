@@ -21,3 +21,40 @@
 
 yum update -y
 yum install amazon-cloudwatch-agent -y
+CLOUDWATCH_AGENT_CONFIG_FILE=/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
+{
+    "agent": {
+        "metrics_collection_interval": 60,
+        "region": "${aws_region}",
+
+    },
+    "metrics": {
+        "namespace": "CWAgent",
+        "metrics_collected": {
+            "collectd": {},
+            "cpu": {},
+            "netstat": {
+                "measurement": [
+                    "tcp_established",
+                    "tcp_syn_sent",
+                    "tcp_close"
+                ],
+            },
+            "disk": {},
+            "processes": {
+                "measurement": [
+                    "running",
+                    "sleeping",
+                    "dead"
+                ]
+            },
+            "append_dimensions": {
+                "ImageId": "$${aws:ImageId}",
+                "InstanceId": "$${aws:InstanceId}",
+                "InstanceType": "$${aws:InstanceType}"
+            }
+        }
+    }
+}
+JSON_EOF
