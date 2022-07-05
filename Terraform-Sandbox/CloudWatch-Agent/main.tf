@@ -54,6 +54,7 @@ module "vpc" {
 
 module "ec2" {
   source               = "./modules/ec2"
+  aws_region           = var.aws_region
   instance_type        = var.ec2_instance_type
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags

@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+variable "aws_region" {
+  description = "The name of the AWS region where the application is running"
+  type        = string
+}
+
 variable "instance_type" {
   description = "Instance type for the EC2 instances to be started"
   type        = string

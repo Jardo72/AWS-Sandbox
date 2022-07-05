@@ -43,7 +43,8 @@ resource "aws_iam_role" "ec2_iam_role" {
   })
   managed_policy_arns = [
     # needed in order to be able to connect to the EC2 instances via the SSM Session Manager
-    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+    "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+    "arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy"
   ]
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-IAM-Role"
