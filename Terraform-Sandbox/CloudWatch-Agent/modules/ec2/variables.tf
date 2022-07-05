@@ -22,6 +22,11 @@ variable "aws_region" {
   type        = string
 }
 
+variable "vpc_id" {
+  description = "The ID of the VPC the EC2 instance(s) are to be launched in"
+  type        = string
+}
+
 variable "subnet_id" {
   description = "The ID of the subnet the EC2 instance(s) are to be launched in"
   type        = string

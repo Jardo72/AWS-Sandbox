@@ -55,14 +55,17 @@ module "vpc" {
 module "ec2" {
   source               = "./modules/ec2"
   aws_region           = var.aws_region
+  vpc_id               = module.vpc.vpc_id
   subnet_id            = module.vpc.private_subnets[0]
   instance_type        = var.ec2_instance_type
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
+  depends_on           = [module.vpc]
 }
 
 module "cloudwatch" {
   source         = "./modules/cloudwatch"
   aws_region     = var.aws_region
   dashboard_name = var.resource_name_prefix
+  depends_on     = [module.ec2]
 }

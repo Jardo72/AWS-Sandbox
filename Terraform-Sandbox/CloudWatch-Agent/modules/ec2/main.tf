@@ -59,10 +59,26 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   })
 }
 
-resource "aws_instance" "web_server" {
+resource "aws_security_group" "ec2_security_group" {
+  name        = "${var.resource_name_prefix}-SG"
+  description = "Allow any outbound traffic"
+  vpc_id      = var.vpc_id
+  egress {
+    protocol         = "-1"
+    from_port        = 0
+    to_port          = 0
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-SG"
+  })
+}
+
+resource "aws_instance" "ec2_instance" {
   ami                         = data.aws_ami.latest_amazon_linux_ami.id
   instance_type               = var.instance_type
   subnet_id                   = var.subnet_id
+  vpc_security_group_ids      = [aws_security_group.ec2_security_group.id]
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
   user_data = templatefile("${path.module}/user-data.tftpl", {
     aws_region = var.aws_region

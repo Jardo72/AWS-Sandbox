@@ -21,7 +21,10 @@
 
 yum update -y
 yum install amazon-cloudwatch-agent -y
-CLOUDWATCH_AGENT_CONFIG_FILE=/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+
+CLOUDWATCH_AGENT_CONFIG_DIR=/opt/aws/amazon-cloudwatch-agent/etc
+CLOUDWATCH_AGENT_CONFIG_FILE=$CLOUDWATCH_AGENT_CONFIG_DIR/amazon-cloudwatch-agent.json
+mkdir -p $CLOUDWATCH_AGENT_CONFIG_DIR
 cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
 {
     "agent": {
