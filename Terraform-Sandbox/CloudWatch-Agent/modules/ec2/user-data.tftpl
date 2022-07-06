@@ -65,12 +65,12 @@ cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
                     "sleeping",
                     "dead"
                 ]
-            },
-            "append_dimensions": {
-                "ImageId": "${aws_image_id}",
-                "InstanceId": "${aws_instance_id}",
-                "InstanceType": "${aws_instance_type}"
             }
+        },
+        "append_dimensions": {
+            "ImageId": "${aws_image_id}",
+            "InstanceId": "${aws_instance_id}",
+            "InstanceType": "${aws_instance_type}"
         }
     }
 }
