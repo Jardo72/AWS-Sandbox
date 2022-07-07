@@ -16,3 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+resource "aws_cloudwatch_dashboard" "cloudwatch_dashboard" {
+  dashboard_name = var.dashboard_name
+  dashboard_body = templatefile("${path.module}/dashboard-widgets.tftpl", {
+    aws_region      = var.aws_region,
+    ec2_instance_id = var.ec2_instance_id
+  })
+}

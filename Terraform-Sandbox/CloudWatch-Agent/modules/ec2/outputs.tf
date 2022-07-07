@@ -16,3 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "ec2_instance_id" {
+  value = aws_instance.ec2_instance.id
+}

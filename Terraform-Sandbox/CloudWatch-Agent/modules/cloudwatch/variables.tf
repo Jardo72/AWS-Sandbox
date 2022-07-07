@@ -26,3 +26,8 @@ variable "dashboard_name" {
   description = "The name of the CloudWatch dashboard to be created"
   type        = string
 }
+
+variable "ec2_instance_id" {
+  description = "The instance ID of the EC2 instance where the CloudWatch Agent is installed"
+  type        = string
+}

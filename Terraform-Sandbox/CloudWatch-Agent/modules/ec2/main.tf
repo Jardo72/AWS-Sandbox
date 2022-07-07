@@ -80,7 +80,7 @@ resource "aws_instance" "ec2_instance" {
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
-  
+
   # TODO: remove
   # https://github.com/awsdocs/amazon-cloudwatch-user-guide/blob/master/doc_source/CloudWatch-Agent-Configuration-File-Details.md
 

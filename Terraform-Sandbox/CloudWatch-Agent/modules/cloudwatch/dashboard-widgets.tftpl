@@ -1,6 +1,30 @@
 {
     "start": "-PT1H",
     "widgets": [
-
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 0,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "view": "timeSeries",
+                "liveData": false,
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/EC2", "CPUUtilization", "InstanceId", "i-044e3141333f1b68f" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "CPU Utilization",
+                "yAxis": {
+                    "left": {
+                        "min": 0,
+                        "max": 100
+                    }
+                }
+            }
+        }
     ]
 }

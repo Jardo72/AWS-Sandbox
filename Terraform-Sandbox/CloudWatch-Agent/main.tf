@@ -64,8 +64,9 @@ module "ec2" {
 }
 
 module "cloudwatch" {
-  source         = "./modules/cloudwatch"
-  aws_region     = var.aws_region
-  dashboard_name = var.resource_name_prefix
-  depends_on     = [module.ec2]
+  source          = "./modules/cloudwatch"
+  aws_region      = var.aws_region
+  dashboard_name  = var.resource_name_prefix
+  ec2_instance_id = module.ec2.ec2_instance_id
+  depends_on      = [module.ec2]
 }
