@@ -29,14 +29,15 @@ cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
 {
     "agent": {
         "metrics_collection_interval": 60,
+        "debug": true,
         "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+        "run_as_user": "cwagent",
         "region": "${aws_region}"
     },
     "metrics": {
         "namespace": "CWAgent",
         "metrics_collected": {
             "collectd": {},
-            "cpu": {},
             "mem": {
                 "measurement": [
                     "mem_used",
@@ -56,9 +57,8 @@ cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
                     "tcp_established",
                     "tcp_syn_sent",
                     "tcp_close"
-                ],
+                ]
             },
-            "disk": {},
             "processes": {
                 "measurement": [
                     "running",
@@ -76,4 +76,4 @@ cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
 }
 JSON_EOF
 
-# /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE

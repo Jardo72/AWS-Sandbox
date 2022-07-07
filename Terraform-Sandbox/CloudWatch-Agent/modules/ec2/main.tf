@@ -86,9 +86,9 @@ resource "aws_instance" "ec2_instance" {
 
   user_data = templatefile("${path.module}/user-data.tftpl", {
     aws_region        = var.aws_region
-    aws_image_id      = "$${aws:ImageId}"
-    aws_instance_type = "$${aws:InstanceType}"
-    aws_instance_id   = "$${aws:InstanceId}"
+    aws_image_id      = "\\$${aws:ImageId}"
+    aws_instance_type = "\\$${aws:InstanceType}"
+    aws_instance_id   = "\\$${aws:InstanceId}"
   })
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2"
