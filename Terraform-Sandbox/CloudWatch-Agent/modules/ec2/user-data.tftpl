@@ -46,29 +46,24 @@ cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
             "mem": {
                 "measurement": [
                     "mem_used",
-                    "mem_cached",
+                    "mem_free",
+                    "mem_active",
                     "mem_total"
-                ]
-            },
-            "swap": {
-                "measurement": [
-                    "swap_used",
-                    "swap_free",
-                    "swap_used_percent"
                 ]
             },
             "netstat": {
                 "measurement": [
-                    "tcp_established",
-                    "tcp_syn_sent",
-                    "tcp_close"
+                    "netstat_tcp_listen",
+                    "netstat_tcp_established"
                 ]
             },
             "processes": {
                 "measurement": [
-                    "running",
-                    "sleeping",
-                    "dead"
+                    "processes_total",
+                    "processes_running",
+                    "processes_sleeping",
+                    "processes_stopped",
+                    "processes_dead"
                 ]
             }
         },
