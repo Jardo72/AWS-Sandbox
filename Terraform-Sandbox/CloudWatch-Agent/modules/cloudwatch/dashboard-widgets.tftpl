@@ -25,6 +25,32 @@
                     }
                 }
             }
+        },
+        {
+            "type": "metric",
+            "x": 8,
+            "y": 0,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "view": "timeSeries",
+                "liveData": false,
+                "stacked": false,
+                "metrics": [
+                    [ "CWAgent", "mem_used", "InstanceId", "${ec2_instance_id}" ],
+                    [ ".", "mem_cached", ".", "." ],
+                    [ ".", "mem_total", ".", "." ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "Memory",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
+            }
         }
     ]
 }
