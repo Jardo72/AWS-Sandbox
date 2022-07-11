@@ -65,6 +65,31 @@
                 "liveData": false,
                 "stacked": false,
                 "metrics": [
+                    [ "CWAgent", "diskio_reads", "InstanceId", "${ec2_instance_id}" ],
+                    [ ".", "diskio_writes", ".", "." ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "Disk I/O",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 6,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "view": "timeSeries",
+                "liveData": false,
+                "stacked": false,
+                "metrics": [
                     [ "CWAgent", "processes_total", "InstanceId", "${ec2_instance_id}" ],
                     [ ".", "processes_running", ".", "." ],
                     [ ".", "processes_sleeping", ".", "." ],
@@ -83,7 +108,7 @@
         },
         {
             "type": "metric",
-            "x": 0,
+            "x": 8,
             "y": 6,
             "width": 8,
             "height": 6,

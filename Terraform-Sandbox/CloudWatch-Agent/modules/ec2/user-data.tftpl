@@ -25,6 +25,8 @@ yum install amazon-cloudwatch-agent -y
 amazon-linux-extras install epel -y
 yum install stress -y
 
+# see also
+# https://github.com/awsdocs/amazon-cloudwatch-user-guide/blob/master/doc_source/CloudWatch-Agent-Configuration-File-Details.md
 CLOUDWATCH_AGENT_CONFIG_DIR=/opt/aws/amazon-cloudwatch-agent/etc
 CLOUDWATCH_AGENT_CONFIG_FILE=$CLOUDWATCH_AGENT_CONFIG_DIR/amazon-cloudwatch-agent.json
 mkdir -p $CLOUDWATCH_AGENT_CONFIG_DIR
@@ -65,6 +67,15 @@ cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
                     "processes_stopped",
                     "processes_dead"
                 ]
+            },
+            "diskio": {
+                "measurement": [
+                    "diskio_reads",
+                    "diskio_writes"
+                ],
+                "resources": [
+                    "*"
+                ]
             }
         },
         "append_dimensions": {
@@ -83,4 +94,3 @@ mkdir -p /usr/share/collectd
 touch /usr/share/collectd/types.db
 
 /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE
-
