@@ -1,0 +1,135 @@
+{
+    "start": "-PT1H",
+    "widgets": [
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 0,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "view": "timeSeries",
+                "liveData": false,
+                "stacked": false,
+                "metrics": [
+                    [ "AWS/EC2", "CPUUtilization", "InstanceId", "${ec2_instance_id}" ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "CPU Utilization",
+                "yAxis": {
+                    "left": {
+                        "min": 0,
+                        "max": 100
+                    }
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 8,
+            "y": 0,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "view": "timeSeries",
+                "liveData": false,
+                "stacked": false,
+                "metrics": [
+                    [ "CWAgent", "mem_used", "InstanceId", "${ec2_instance_id}" ],
+                    [ ".", "mem_free", ".", "." ],
+                    [ ".", "mem_active", ".", "." ],
+                    [ ".", "mem_total", ".", "." ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "Memory",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 16,
+            "y": 0,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "view": "timeSeries",
+                "liveData": false,
+                "stacked": false,
+                "metrics": [
+                    [ "CWAgent", "diskio_reads", "InstanceId", "${ec2_instance_id}" ],
+                    [ ".", "diskio_writes", ".", "." ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "Disk I/O",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 6,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "view": "timeSeries",
+                "liveData": false,
+                "stacked": false,
+                "metrics": [
+                    [ "CWAgent", "processes_total", "InstanceId", "${ec2_instance_id}" ],
+                    [ ".", "processes_running", ".", "." ],
+                    [ ".", "processes_sleeping", ".", "." ],
+                    [ ".", "processes_stopped", ".", "." ],
+                    [ ".", "processes_dead", ".", "." ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "Processes",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
+            }
+        },
+        {
+            "type": "metric",
+            "x": 8,
+            "y": 6,
+            "width": 8,
+            "height": 6,
+            "properties": {
+                "period": 60,
+                "view": "timeSeries",
+                "liveData": false,
+                "stacked": false,
+                "metrics": [
+                    [ "CWAgent", "netstat_tcp_listen", "InstanceId", "${ec2_instance_id}" ],
+                    [ ".", "netstat_tcp_established", ".", "." ]
+                ],
+                "region": "${aws_region}",
+                "stat": "Average",
+                "title": "TCP Connections",
+                "yAxis": {
+                    "left": {
+                        "min": 0
+                    }
+                }
+            }
+        }
+    ]
+}
