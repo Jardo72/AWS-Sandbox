@@ -1,10 +1,25 @@
-import stat
 from aws_cdk import (
     aws_ec2 as ec2,
+    aws_elasticloadbalancingv2 as elb,
     aws_iam as iam,
+    Fn,
     Stack,
 )
 from constructs import Construct
+
+
+user_data = """MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="==BOUNDARY=="
+
+--==BOUNDARY==
+Content-Type: text/x-shellscript; charset="us-ascii"
+
+#!/bin/bash
+echo "Running custom user data script"
+
+--==BOUNDARY==--\
+"""
+
 
 class L7LoadBalancingStack(Stack):
 
@@ -15,9 +30,12 @@ class L7LoadBalancingStack(Stack):
         alb_security_group = self._create_alb_security_group(vpc)
         ec2_security_group = self._create_ec2_security_group(vpc)
         ec2_instance_profile = self._create_ec2_instance_profile()
+        launch_template = self._create_launch_template(ec2_security_group, ec2_instance_profile)
+        load_balancer = self._create_load_balancer(vpc)
 
     def _create_vpc(self) -> ec2.Vpc:
-        return ec2.Vpc(self, "L7-LB-Demo-VPC",
+        return ec2.Vpc(self,
+            id="VPC",
             vpc_name="L7-LB-Demo-VPC",
             cidr="10.0.0.0/16",
             enable_dns_hostnames=True,
@@ -34,7 +52,7 @@ class L7LoadBalancingStack(Stack):
 
     def _create_alb_security_group(self, vpc: ec2.Vpc) -> ec2.SecurityGroup:
         alb_security_group = ec2.SecurityGroup(self,
-            id="ALB-Security-Group",
+            id="ALBSecurityGroup",
             security_group_name="L7-LB-Demo-ALB-SG",
             vpc=vpc,
             description="Security group for the application load balancer",
@@ -54,7 +72,7 @@ class L7LoadBalancingStack(Stack):
 
     def _create_ec2_security_group(self, vpc: ec2.Vpc) -> ec2.SecurityGroup:
         ec2_security_group = ec2.SecurityGroup(self,
-            id="EC2-Security-Group",
+            id="EC2SecurityGroup",
             security_group_name="L7-LB-Demo-ASG-SG",
             vpc=vpc,
             description="Security group for the EC2 instances",
@@ -69,7 +87,7 @@ class L7LoadBalancingStack(Stack):
 
     def _create_ec2_instance_profile(self) -> iam.CfnInstanceProfile:
         ec2_instance_role = iam.Role(self,
-            id="L7-LB-Demo-EC2-IAM-Role",
+            id="EC2IAMRole",
             assumed_by=iam.ServicePrincipal(service="ec2.amazonaws.com"),
             role_name="L7-LB-Demo-EC2-IAM-Role",
             managed_policies=[
@@ -78,8 +96,33 @@ class L7LoadBalancingStack(Stack):
             ]
         )
         ec2_instance_profile = iam.CfnInstanceProfile(self,
-            id="L7-LB-Demo-EC2-Instance-Profile",
+            id="EC2InstanceProfile",
             instance_profile_name="L7-LB-Demo-EC2-Instance-Profile",
             roles=[ec2_instance_role.role_name]
         )
         return ec2_instance_profile
+
+    def _create_launch_template(self, security_group: ec2.SecurityGroup, instance_profile: iam.CfnInstanceProfile) -> ec2.CfnLaunchTemplate:
+        launch_template = ec2.CfnLaunchTemplate(self,
+            id="LaunchTemplate",
+            launch_template_name="L7-LB-Demo-Launch-Template",
+            launch_template_data=ec2.CfnLaunchTemplate.LaunchTemplateDataProperty(
+                image_id="ami-0a1ee2fb28fe05df3",
+                instance_type="t2.micro",
+                # iam_instance_profile=instance_profile.attr_arn,
+                security_group_ids=[
+                    security_group.security_group_id
+                ],
+                user_data=Fn.base64(user_data)
+            )
+        )
+        return launch_template
+
+    def _create_load_balancer(self, vpc: ec2.Vpc) -> elb.ApplicationLoadBalancer:
+        load_balancer = elb.ApplicationLoadBalancer(self,
+            id="LoadBalancer",
+            vpc=vpc,
+            internet_facing=True
+        )
+        # listener = load_balancer.add_listener("HTTP-Listener", port=80)
+        return load_balancer
