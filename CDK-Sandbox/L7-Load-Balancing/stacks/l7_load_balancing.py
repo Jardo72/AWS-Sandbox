@@ -119,6 +119,7 @@ class L7LoadBalancingStack(Stack):
         return launch_template
 
     def _create_load_balancer(self, vpc: ec2.Vpc) -> elb.ApplicationLoadBalancer:
+        # see https://github.com/aws-samples/aws-cdk-examples
         load_balancer = elb.ApplicationLoadBalancer(self,
             id="LoadBalancer",
             vpc=vpc,
