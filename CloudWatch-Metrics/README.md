@@ -46,10 +46,29 @@ The following screenshot illustrates the log events the metric originates from.
 ![LogEventsForMetricFilter](./LogEventsForMetricFilter.png)
 
 ### Generate Log Events for Metric Filter Counting Log Messages
-The [put-log-events-for-metric-filter-with-count.py](./put-log-events-for-metric-filter-with-count.py) script generates dummy log events for CloudWatch Logs. The events do not carry any numeric value, every log message contains one of the following three colors: red, green, blue. The generated log events can be used to create metric filter that count the number of occurences of each color. The following screenshot illustrates the metric filters for two of the three colors.
+The [put-log-events-for-metric-filter-with-count.py](./put-log-events-for-metric-filter-with-count.py) script generates dummy log events for CloudWatch Logs. The script expects single command line argument, namely the number of log events to be generated. The events do not carry any numeric value, every log message contains one of the following three words representing colors: red, green, blue. The generated log events can be used to create metric filter that count the number of occurences of each color. The following screenshot illustrates the metric filters for two of the three colors.
 
 ![MetricFilterOccurenceCount](./MetricFilterOccurenceCount.png)
 
 When watching the metrics on a dashboard, use the sum statistics. As each log message generates the value 1, the sum statistics will generate the number of occurences. When generating the log messages, the script randomly picks the colors. However, the distribution of the colors is not equal. The blue color will have the highest number of occurences, the red color the lowest. The following screenshot shows the metrics produced by the metric filter.
 
 ![OccurenceCountDashboard](./OccurenceCountDashboard.png)
+
+The generated log events can also be used to experiment with CloudWatch Insights queries.
+
+```
+fields @timestamp, @message
+| sort @timestamp desc
+| limit 50
+
+
+fields @timestamp, @message
+| filter @message like /blue/
+
+fields @timestamp, @message
+| filter @message not like /polygon/
+
+
+stats count(*)
+| filter @message like /polygon/
+```
