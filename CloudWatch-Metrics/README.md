@@ -71,4 +71,28 @@ fields @timestamp, @message
 
 stats count(*)
 | filter @message like /polygon/
+
+
+fields @timestamp, @message
+| filter @message like /green/ and @message like /circle/
+
+
+fields @timestamp, @message
+| filter @message like /green|blue/
+
+
+fields @timestamp, @message
+| filter @message not like /green|blue/
+
+
+fields @timestamp, @message
+| filter @message like /green|blue/ and @message like /circle|triangle/
+
+
+fields @timestamp, @message
+| filter @message =~ /green.+circle/ or @message =~ /blue.+triangle/
+
+
+fields @timestamp, @message
+| filter @message like /(?i)car/
 ```
