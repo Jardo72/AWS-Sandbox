@@ -1,4 +1,4 @@
-# CloudWatch Metrics
+# CloudWatch Logs & Metrics
 
 ## Introduction
 Collection of simple Python scripts demonstrating the functionality of CloudWatch Metrics, Alarms and Logs. Except of the AWS SDK for Python, the scripts do not depend on any other 3rd party modules/libraries.
