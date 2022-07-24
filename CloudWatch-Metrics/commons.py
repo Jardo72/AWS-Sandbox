@@ -53,9 +53,8 @@ class Sample:
     status_code: int
 
 
-# TODO: rename to MetricSummary
 @dataclass(frozen=True)
-class Summary:
+class MetricDataSummary:
     number_of_values: int
     min_value: int
     max_value: int
@@ -64,7 +63,7 @@ class Summary:
     max_timestamp: datetime
 
 
-def calculate_summary(samples: Sequence[Sample]) -> Summary:
+def calculate_summary(samples: Sequence[Sample]) -> MetricDataSummary:
     relevant_samples = filter(lambda s: s.status_code == 200, samples)
     relevant_samples = list(relevant_samples)
     values = list(map(lambda s: s.value, relevant_samples))
@@ -74,10 +73,10 @@ def calculate_summary(samples: Sequence[Sample]) -> Summary:
     max_value = max(values)
     start_time = relevant_samples[0].timestamp
     end_time = relevant_samples[-1].timestamp
-    return Summary(number_of_values, min_value, max_value, avg_value, start_time, end_time)
+    return MetricDataSummary(number_of_values, min_value, max_value, avg_value, start_time, end_time)
 
 
-def print_summary(instance_id: str, summary: Summary) -> None:
+def print_summary(instance_id: str, summary: MetricDataSummary) -> None:
     min_timestamp = summary.min_timestamp.strftime(Constants.timestamp_format())
     max_timestamp = summary.max_timestamp.strftime(Constants.timestamp_format())
     print()

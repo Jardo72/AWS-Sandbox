@@ -17,7 +17,10 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    RawTextHelpFormatter
+)
 from dataclasses import dataclass
 from json import load
 from random import randint
@@ -28,8 +31,13 @@ from uuid import uuid4
 
 from boto3 import client
 
-from commons import Constants, Sample, Summary
-from commons import calculate_summary, print_summary
+from commons import (
+    Constants,
+    MetricDataSummary,
+    Sample,
+    calculate_summary,
+    print_summary
+)
 
 
 @dataclass(frozen=True)
@@ -106,7 +114,7 @@ def publish_single_sample(cloud_watch, config_entry: ConfigEntry, instance_id: s
     return Sample(datetime.utcnow(), value, status_code)
 
 
-def publish_config_entry_samples(cloud_watch, config_entry: ConfigEntry, instance_id: str, period_sec: int) -> Summary:
+def publish_config_entry_samples(cloud_watch, config_entry: ConfigEntry, instance_id: str, period_sec: int) -> MetricDataSummary:
     samples = []
     for i in range(config_entry.number_of_samples):
         sample = publish_single_sample(cloud_watch, config_entry, instance_id)
@@ -118,7 +126,7 @@ def publish_config_entry_samples(cloud_watch, config_entry: ConfigEntry, instanc
     return calculate_summary(samples)
 
 
-def publish_samples(config: Config, instance_id: str) -> Tuple[Summary, ...]:
+def publish_samples(config: Config, instance_id: str) -> Tuple[MetricDataSummary, ...]:
     cloud_watch = client('cloudwatch')
     summaries = []
     for index, entry in enumerate(config.schedule_entries):
@@ -131,7 +139,7 @@ def publish_samples(config: Config, instance_id: str) -> Tuple[Summary, ...]:
     return tuple(summaries)
 
 
-def print_summaries(summaries: Sequence[Summary], instance_id: str) -> None:
+def print_summaries(summaries: Sequence[MetricDataSummary], instance_id: str) -> None:
     for index, single_summary in enumerate(summaries):
         print()
         print(f'Batch {index + 1}/{len(summaries)}')

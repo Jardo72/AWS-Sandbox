@@ -17,7 +17,10 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    RawTextHelpFormatter
+)
 from datetime import datetime
 from random import randint
 from time import sleep
@@ -26,8 +29,12 @@ from uuid import uuid4
 
 from boto3 import client
 
-from commons import Constants, Sample
-from commons import calculate_summary, print_summary
+from commons import (
+    Constants,
+    Sample,
+    calculate_summary,
+    print_summary
+)
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:

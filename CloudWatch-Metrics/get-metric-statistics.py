@@ -17,7 +17,10 @@
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    RawTextHelpFormatter
+)
 from typing import Any, Dict
 
 from boto3 import resource
