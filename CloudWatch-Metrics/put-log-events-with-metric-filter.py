@@ -25,7 +25,12 @@ from time import sleep, time
 from typing import Optional, Tuple
 from uuid import uuid4
 
-from commons import Constants, current_timestamp
+from commons import (
+    Constants,
+    create_log_stream,
+    current_timestamp,
+    current_time_millis
+)
 
 
 @dataclass(frozen=True)
@@ -81,24 +86,10 @@ def print_parameters(number_of_entries: int, period_sec: int, min: int, max: int
     print('--------------')
     print('- Parameters')
     print('--------------')
-    print(f'{number_of_entries} samples to be generated, period = {period_sec} sec')
+    print(f'{number_of_entries} log events to be generated, period = {period_sec} sec')
     print(f'Range for the random values = [{min}; {max}]')
     print(f'Create metric filter? {create_filter}')
     print()
-
-
-def current_time_millis() -> int:
-    return int(time() * 1000)
-
-
-def create_log_stream(cloud_watch, log_stream_name: str) -> None:
-    try:
-        cloud_watch.create_log_group(logGroupName=Constants.log_group_name())
-    except Exception:
-        # chances are the log group already exists - we do not want to fail in such a case
-        pass
-    cloud_watch.create_log_stream(logGroupName=Constants.log_group_name(), logStreamName=log_stream_name)
-    print(f'Log stream created (name = {log_stream_name})')
 
 
 def create_metric_filter(cloud_watch, no_filter: bool) -> None:

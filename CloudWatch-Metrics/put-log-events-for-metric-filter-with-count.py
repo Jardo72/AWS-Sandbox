@@ -21,15 +21,20 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from boto3 import client
 from dataclasses import dataclass
 from random import randint
-from time import sleep, time
+from time import sleep
 from typing import Optional, Tuple
 from uuid import uuid4
 
-from commons import Constants, current_timestamp
+from commons import (
+    Constants,
+    create_log_stream,
+    current_timestamp,
+    current_time_millis
+)
 
 
 @dataclass(frozen=True)
-class Summary:
+class LogEventsSummary:
     log_stream_name: str
     start_timestamp: str
     end_timestamp: str
@@ -83,22 +88,8 @@ def print_parameters(number_of_entries: int) -> None:
     print('--------------')
     print('- Parameters')
     print('--------------')
-    print(f'{number_of_entries} samples to be generated')
+    print(f'{number_of_entries} log entries to be generated')
     print()
-
-
-def current_time_millis() -> int:
-    return int(time() * 1000)
-
-
-def create_log_stream(cloud_watch, log_stream_name: str) -> None:
-    try:
-        cloud_watch.create_log_group(logGroupName=Constants.log_group_name())
-    except Exception:
-        # chances are the log group already exists - we do not want to fail in such a case
-        pass
-    cloud_watch.create_log_stream(logGroupName=Constants.log_group_name(), logStreamName=log_stream_name)
-    print(f'Log stream created (name = {log_stream_name})')
 
 
 def publish_bulk_of_log_entries(cloud_watch, log_stream_name: str, sequence_token: Optional[str]) -> Tuple[int, str]:
@@ -126,7 +117,7 @@ def publish_bulk_of_log_entries(cloud_watch, log_stream_name: str, sequence_toke
     return (len(log_events), response['nextSequenceToken'])
 
 
-def publish_log_entries(number_of_entries: int) -> Summary:
+def publish_log_entries(number_of_entries: int) -> LogEventsSummary:
     log_stream_name = str(uuid4())
     cloud_watch = client('logs')
     create_log_stream(cloud_watch, log_stream_name)
@@ -140,10 +131,10 @@ def publish_log_entries(number_of_entries: int) -> Summary:
         sleep(0.5)
     end_timestamp = current_timestamp()
 
-    return Summary(log_stream_name, start_timestamp, end_timestamp, counter)
+    return LogEventsSummary(log_stream_name, start_timestamp, end_timestamp, counter)
 
 
-def print_summary(summary: Summary) -> None:
+def print_summary(summary: LogEventsSummary) -> None:
     print()
     print('-----------')
     print('- Summary')

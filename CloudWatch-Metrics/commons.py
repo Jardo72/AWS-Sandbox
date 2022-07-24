@@ -19,6 +19,7 @@
 
 from dataclasses import dataclass
 from datetime import datetime
+from time import time
 from typing import Sequence
 
 
@@ -42,7 +43,7 @@ class Constants:
 
     @staticmethod
     def log_group_name():
-        return 'CloudWatch-Metrics-Demo'
+        return 'CloudWatch-Logs-Plus-Metrics-Demo'
 
 
 @dataclass(frozen=True)
@@ -52,6 +53,7 @@ class Sample:
     status_code: int
 
 
+# TODO: rename to MetricSummary
 @dataclass(frozen=True)
 class Summary:
     number_of_values: int
@@ -90,3 +92,17 @@ def print_summary(instance_id: str, summary: Summary) -> None:
 
 def current_timestamp() -> str:
     return datetime.utcnow().strftime(Constants.timestamp_format())
+
+
+def current_time_millis() -> int:
+    return int(time() * 1000)
+
+
+def create_log_stream(cloud_watch, log_stream_name: str) -> None:
+    try:
+        cloud_watch.create_log_group(logGroupName=Constants.log_group_name())
+    except Exception:
+        # chances are the log group already exists - we do not want to fail in such a case
+        pass
+    cloud_watch.create_log_stream(logGroupName=Constants.log_group_name(), logStreamName=log_stream_name)
+    print(f'Log stream created (name = {log_stream_name})')
