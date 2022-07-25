@@ -27,18 +27,11 @@ from uuid import uuid4
 
 from commons import (
     Constants,
+    LogEventsSummary,
     create_log_stream,
     current_timestamp,
     current_time_millis
 )
-
-
-@dataclass(frozen=True)
-class LogEventsSummary:
-    log_stream_name: str
-    start_timestamp: str
-    end_timestamp: str
-    number_of_log_entries: int
 
 
 class RandomMessageGenerator:
@@ -58,6 +51,7 @@ class RandomMessageGenerator:
 
     _colors = ['red', 'green', 'blue', 'green', 'blue', 'green', 'blue', 'blue', 'blue']
 
+    @staticmethod
     def next_message() -> str:
         color_index = randint(0, len(RandomMessageGenerator._colors) - 1)
         color = RandomMessageGenerator._colors[color_index]

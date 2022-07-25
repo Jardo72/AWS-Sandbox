@@ -63,6 +63,14 @@ class MetricDataSummary:
     max_timestamp: datetime
 
 
+@dataclass(frozen=True)
+class LogEventsSummary:
+    log_stream_name: str
+    start_timestamp: str
+    end_timestamp: str
+    number_of_log_entries: int
+
+
 def calculate_summary(samples: Sequence[Sample]) -> MetricDataSummary:
     relevant_samples = filter(lambda s: s.status_code == 200, samples)
     relevant_samples = list(relevant_samples)
