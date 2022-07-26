@@ -96,3 +96,37 @@ fields @timestamp, @message
 fields @timestamp, @message
 | filter @message like /(?i)car/
 ```
+
+### Generate Structured Log Events for Insights
+The [put-custom-log-events.py](./put-custom-log-events.py) script generates log events with message carrying a JSON structure. The script expects single command line argument, namely the number of log events to be generated. The following snippet illustrates the structure of the messages.
+
+```json
+{"httpMethod": "GET", "resourcePath": "/manager/all", "statusCode": 401, "duration": 1290}
+```
+
+All generated log events have the same structure of the message, the values of the JSON fields are randomly generated. The log events can be used to experiments with CloudWatch Insights queries (see the examples below).
+
+```
+fields @timestamp, httpMethod, resourcePath, statusCode, duration
+| sort @timestamp desc
+
+
+fields @timestamp, httpMethod, resourcePath, statusCode, duration
+| filter httpMethod in ["GET", "POST"] and statusCode != 200
+| sort @timestamp desc
+
+
+fields @timestamp, @message
+| filter statusCode = 200 and duration > 800
+| sort duration desc
+
+
+fields @timestamp, @message
+| filter resourcePath like /manager/
+
+
+stats count(*) by httpMethod
+
+
+stats count(*) as count by statusCode
+```

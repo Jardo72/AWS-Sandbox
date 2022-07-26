@@ -42,8 +42,11 @@ class Constants:
         return '%Y-%m-%dT%H:%M:%SZ'
 
     @staticmethod
-    def log_group_name():
-        return 'CloudWatch-Logs-Plus-Metrics-Demo'
+    def metrics_log_group_name() -> str:
+        return 'CloudWatch-Logs-For-Metrics'
+
+    def insights_log_group_name() -> str:
+        return 'CloudWatch-Logs-For-Insights'
 
 
 @dataclass(frozen=True)
@@ -68,7 +71,7 @@ class LogEventsSummary:
     log_stream_name: str
     start_timestamp: str
     end_timestamp: str
-    number_of_log_entries: int
+    number_of_log_events: int
 
 
 def calculate_summary(samples: Sequence[Sample]) -> MetricDataSummary:
@@ -105,11 +108,11 @@ def current_time_millis() -> int:
     return int(time() * 1000)
 
 
-def create_log_stream(cloud_watch, log_stream_name: str) -> None:
+def create_log_stream(cloud_watch, log_group_name: str, log_stream_name: str) -> None:
     try:
-        cloud_watch.create_log_group(logGroupName=Constants.log_group_name())
+        cloud_watch.create_log_group(logGroupName=log_group_name)
     except Exception:
         # chances are the log group already exists - we do not want to fail in such a case
         pass
-    cloud_watch.create_log_stream(logGroupName=Constants.log_group_name(), logStreamName=log_stream_name)
-    print(f'Log stream created (name = {log_stream_name})')
+    cloud_watch.create_log_stream(logGroupName=log_group_name, logStreamName=log_stream_name)
+    print(f'Log stream created (name = {log_stream_name}, log group = {log_group_name})')
