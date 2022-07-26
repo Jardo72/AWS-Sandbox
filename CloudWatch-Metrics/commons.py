@@ -10,7 +10,7 @@
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicationlicationlicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -19,6 +19,7 @@
 
 from dataclasses import dataclass
 from datetime import datetime
+from time import time
 from typing import Sequence
 
 
@@ -41,8 +42,11 @@ class Constants:
         return '%Y-%m-%dT%H:%M:%SZ'
 
     @staticmethod
-    def log_group_name():
-        return 'CloudWatch-Metrics-Demo'
+    def metrics_log_group_name() -> str:
+        return 'CloudWatch-Logs-For-Metrics'
+
+    def insights_log_group_name() -> str:
+        return 'CloudWatch-Logs-For-Insights'
 
 
 @dataclass(frozen=True)
@@ -53,7 +57,7 @@ class Sample:
 
 
 @dataclass(frozen=True)
-class Summary:
+class MetricDataSummary:
     number_of_values: int
     min_value: int
     max_value: int
@@ -62,7 +66,15 @@ class Summary:
     max_timestamp: datetime
 
 
-def calculate_summary(samples: Sequence[Sample]) -> Summary:
+@dataclass(frozen=True)
+class LogEventsSummary:
+    log_stream_name: str
+    start_timestamp: str
+    end_timestamp: str
+    number_of_log_events: int
+
+
+def calculate_summary(samples: Sequence[Sample]) -> MetricDataSummary:
     relevant_samples = filter(lambda s: s.status_code == 200, samples)
     relevant_samples = list(relevant_samples)
     values = list(map(lambda s: s.value, relevant_samples))
@@ -72,10 +84,10 @@ def calculate_summary(samples: Sequence[Sample]) -> Summary:
     max_value = max(values)
     start_time = relevant_samples[0].timestamp
     end_time = relevant_samples[-1].timestamp
-    return Summary(number_of_values, min_value, max_value, avg_value, start_time, end_time)
+    return MetricDataSummary(number_of_values, min_value, max_value, avg_value, start_time, end_time)
 
 
-def print_summary(instance_id: str, summary: Summary) -> None:
+def print_summary(instance_id: str, summary: MetricDataSummary) -> None:
     min_timestamp = summary.min_timestamp.strftime(Constants.timestamp_format())
     max_timestamp = summary.max_timestamp.strftime(Constants.timestamp_format())
     print()
@@ -90,3 +102,17 @@ def print_summary(instance_id: str, summary: Summary) -> None:
 
 def current_timestamp() -> str:
     return datetime.utcnow().strftime(Constants.timestamp_format())
+
+
+def current_time_millis() -> int:
+    return int(time() * 1000)
+
+
+def create_log_stream(cloud_watch, log_group_name: str, log_stream_name: str) -> None:
+    try:
+        cloud_watch.create_log_group(logGroupName=log_group_name)
+    except Exception:
+        # chances are the log group already exists - we do not want to fail in such a case
+        pass
+    cloud_watch.create_log_stream(logGroupName=log_group_name, logStreamName=log_stream_name)
+    print(f'Log stream created (name = {log_stream_name}, log group = {log_group_name})')

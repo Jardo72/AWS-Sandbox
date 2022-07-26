@@ -10,14 +10,17 @@
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicationlicationlicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
 
-from argparse import ArgumentParser, RawTextHelpFormatter
+from argparse import (
+    ArgumentParser,
+    RawTextHelpFormatter
+)
 from datetime import datetime
 from random import randint
 from time import sleep
@@ -26,8 +29,12 @@ from uuid import uuid4
 
 from boto3 import client
 
-from commons import Constants, Sample
-from commons import calculate_summary, print_summary
+from commons import (
+    Constants,
+    Sample,
+    calculate_summary,
+    print_summary
+)
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:
