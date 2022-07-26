@@ -109,7 +109,7 @@ def print_parameters(number_of_events: int) -> None:
     print()
 
 
-def publish_bulk_of_log_entries(cloud_watch, log_stream_name: str, sequence_token: Optional[str]) -> Tuple[int, str]:
+def publish_bulk_of_log_events(cloud_watch, log_stream_name: str, sequence_token: Optional[str]) -> Tuple[int, str]:
     timestamp = current_time_millis()
     log_events = []
     for _ in range(0, 100):
@@ -134,7 +134,7 @@ def publish_bulk_of_log_entries(cloud_watch, log_stream_name: str, sequence_toke
     return (len(log_events), response['nextSequenceToken'])
 
 
-def publish_log_entries(number_of_entries: int) -> LogEventsSummary:
+def publish_log_events(number_of_events: int) -> LogEventsSummary:
     log_stream_name = str(uuid4())
     cloud_watch = client('logs')
     create_log_stream(cloud_watch, Constants.insights_log_group_name(), log_stream_name)
@@ -142,8 +142,8 @@ def publish_log_entries(number_of_entries: int) -> LogEventsSummary:
     start_timestamp = current_timestamp()
     sequence_token = None
     counter = 0
-    while counter < number_of_entries:
-        log_event_count, sequence_token = publish_bulk_of_log_entries(cloud_watch, log_stream_name, sequence_token)
+    while counter < number_of_events:
+        log_event_count, sequence_token = publish_bulk_of_log_events(cloud_watch, log_stream_name, sequence_token)
         counter += log_event_count
         sleep(0.5)
     end_timestamp = current_timestamp()
@@ -165,7 +165,7 @@ def print_summary(summary: LogEventsSummary) -> None:
 def main():
     params = parse_command_line_arguments()
     print_parameters(params.number_of_events)
-    summary = publish_log_entries(params.number_of_events)
+    summary = publish_log_events(params.number_of_events)
     print_summary(summary)
 
 

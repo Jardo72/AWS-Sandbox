@@ -57,7 +57,7 @@ def create_command_line_arguments_parser() -> ArgumentParser:
     parser = ArgumentParser(description = "CloudWatch Log Events Generator", formatter_class = RawTextHelpFormatter)
 
     parser.add_argument('period_sec',
-        help='period (i.e. break between two consecutive log entries) in seconds',
+        help='period (i.e. break between two consecutive log events) in seconds',
         type=int)
     parser.add_argument('number_of_events',
         help='number of log events to be generated',
@@ -146,7 +146,7 @@ def publish_single_log_entry(cloud_watch, log_stream_name: str, min: int, max: i
     return (value, response['nextSequenceToken'])
 
 
-def publish_log_entries(number_of_entries: int, period_sec: int, min: int, max: int, no_filter: bool) -> Summary:
+def publish_log_events(number_of_events: int, period_sec: int, min: int, max: int, no_filter: bool) -> Summary:
     log_stream_name = str(uuid4())
     cloud_watch = client('logs')
     create_log_stream(cloud_watch, Constants.metrics_log_group_name(), log_stream_name)
@@ -155,10 +155,10 @@ def publish_log_entries(number_of_entries: int, period_sec: int, min: int, max: 
     start_timestamp = current_timestamp()
     sequence_token = None
     values = []
-    for i in range(0, number_of_entries):
+    for i in range(0, number_of_events):
         value, sequence_token = publish_single_log_entry(cloud_watch, log_stream_name, min, max, sequence_token)
         values.append(value)
-        if i < number_of_entries - 1:
+        if i < number_of_events - 1:
             sleep(period_sec)
     end_timestamp = current_timestamp()
 
@@ -182,7 +182,7 @@ def print_summary(summary: Summary) -> None:
 def main():
     params = parse_command_line_arguments()
     print_parameters(params.number_of_events, params.period_sec, params.min, params.max, params.no_filter)
-    summary = publish_log_entries(params.number_of_events, params.period_sec, params.min, params.max, params.no_filter)
+    summary = publish_log_events(params.number_of_events, params.period_sec, params.min, params.max, params.no_filter)
     print_summary(summary)
 
 
