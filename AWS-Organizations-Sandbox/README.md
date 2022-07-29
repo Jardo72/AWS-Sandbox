@@ -15,7 +15,7 @@ The following table describes the custom SCPs used during the experiments.
 ## Scenarios
 For all scenarios documented below, all operations were tested with an IAM user having AdministratorAccess (arn:aws:iam::aws:policy/AdministratorAccess) within the tested AWS account.
 
-### Scenario #1: FullAWSAccess Everywhere Down the Hierarchy (TODO)
+### Scenario #1: FullAWSAccess Everywhere Down the Hierarchy
 The following table summarizes the hierarchy of organizational units (OUs) and the SCPs applied to particular OUs.
 | OU                  | Applied SCP(s) | Parent OU         |
 | ------------------- | -------------- | ----------------- |

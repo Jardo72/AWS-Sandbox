@@ -12,7 +12,7 @@
       ]
     },
     {
-      "Sid": "AllowAllEC2Operations",
+      "Sid": "RestrictInstanceType",
       "Effect": "Deny",
       "Action": [
         "ec2:RunInstances"
