@@ -16,12 +16,13 @@ The following table describes the custom SCPs used during the experiments.
 For all scenarios documented below, all operations were tested with an IAM user having AdministratorAccess (arn:aws:iam::aws:policy/AdministratorAccess) within the tested AWS account.
 
 ### Scenario #1: FullAWSAccess Everywhere Down the Hierarchy
-The following table summarizes the hierarchy of organizational units (OUs) and the SCPs applied to particular OUs.
-| OU                  | Applied SCP(s) | Parent OU         |
+The following table summarizes the hierarchy of organizational units (OUs) and the SCPs applied to particular OUs and the test account.
+| OU/AWS Account      | Applied SCP(s) | Parent OU         |
 | ------------------- | -------------- | ----------------- |
 | Root                | FullAWSAccess  |                   |
 | SANDBOX-LEVEL1-OU   | FullAWSAccess  | Root              |
 | SANDBOX-LEVEL2-OU   | FullAWSAccess  | SANDBOX-LEVEL1-OU |
+| AWS account         | FullAWSAccess  | SANDBOX-LEVEL2-OU |
 
 The following table summarizes the outcome of experimental testing of access.
 | Operation                            | Access          |
@@ -33,23 +34,24 @@ The following table summarizes the outcome of experimental testing of access.
 | Display all IAM users                | Allowed         |
 | Create a new IAM user                | Allowed         |
 
-### Scenario #2: FullAWSAccess Only Inherited from Root (TODO)
-The following table summarizes the hierarchy of organizational units (OUs) and the SCPs applied to particular OUs.
-| OU                  | Applied SCP(s) | Parent OU         |
-| ------------------- | -------------- | ----------------- |
-| Root                | FullAWSAccess  |                   |
-| SANDBOX-LEVEL1-OU   |                | Root              |
-| SANDBOX-LEVEL2-OU   |                | SANDBOX-LEVEL1-OU |
+### Scenario #2: Reduced Access SCP Attached to Parent OU, FullAWSAccess Attached to AWS Account (TODO)
+The following table summarizes the hierarchy of organizational units (OUs) and the SCPs applied to particular OUs and the test account.
+| OU/AWS Account      | Applied SCP(s)                             | Parent OU         |
+| ------------------- | ------------------------------------------ | ----------------- |
+| Root                | FullAWSAccess                              |                   |
+| SANDBOX-LEVEL1-OU   | FullAWSAccess                              | Root              |
+| SANDBOX-LEVEL2-OU   | AllowAllS3Operations, RestrictEC2ToT2Micro | SANDBOX-LEVEL1-OU |
+| AWS account         | FullAWSAccess                              | SANDBOX-LEVEL2-OU |
 
 The following table summarizes the outcome of experimental testing of access.
 | Operation                            | Access          |
 | ------------------------------------ | --------------- |
-| Display all S3 buckets               |                 |
-| Create a new S3 bucket               |                 |
+| Display all S3 buckets               | Allowed         |
+| Create a new S3 bucket               | Allowed         |
 | Launch a new EC2 instance (t2.micro) |                 |
 | Launch a new EC2 instance (t2.nano)  |                 |
-| Display all IAM users                |                 |
-| Create a new IAM user                |                 |
+| Display all IAM users                | Denied          |
+| Create a new IAM user                | Denied          |
 
 ### Scenario #3: FullAWSAccess Assigned Only Directly (TODO)
 The following table summarizes the hierarchy of organizational units (OUs) and the SCPs applied to particular OUs.

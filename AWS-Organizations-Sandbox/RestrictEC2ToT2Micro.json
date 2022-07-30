@@ -3,7 +3,7 @@
   "Statement": [
     {
       "Sid": "AllowAllEC2Operations",
-      "Effect": "Deny",
+      "Effect": "Allow",
       "Action": [
         "ec2:*"
       ],
