@@ -1,7 +1,7 @@
 # AWS-Sandbox
 Set of experimental applications/deployments for AWS. The following index categorizes the demos by the services demonstrated.
 
-### AWS Organizations
+#### AWS Organizations
 * [AWS-Organizations-Sandbox](./AWS-Organizations-Sandbox)
 
 ### AWS SDK
