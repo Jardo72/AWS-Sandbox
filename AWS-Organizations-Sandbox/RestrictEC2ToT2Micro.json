@@ -12,13 +12,23 @@
       ]
     },
     {
+      "Sid": "AllowAccessToCloudWatchAlarmsForEC2Instances",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:DescribeAlarms"
+      ],
+      "Resource": [
+        "arn:aws:ec2:*:*:instance/*"
+      ]
+    },
+    {
       "Sid": "RestrictInstanceType",
       "Effect": "Deny",
       "Action": [
         "ec2:RunInstances"
       ],
       "Resource": [
-        "*"
+        "arn:aws:ec2:*:*:instance/*"
       ],
       "Condition": {
         "StringNotEquals": {

@@ -34,7 +34,7 @@ The following table summarizes the outcome of experimental testing of access.
 | Display all IAM users                | Allowed         |
 | Create a new IAM user                | Allowed         |
 
-### Scenario #2: Reduced Access SCP Attached to Parent OU, FullAWSAccess Attached to AWS Account (TODO)
+### Scenario #2: Reduced Access SCP Attached to Direct Parent OU, FullAWSAccess Attached to AWS Account (TODO)
 The following table summarizes the hierarchy of organizational units (OUs) and the SCPs applied to particular OUs and the test account.
 | OU/AWS Account      | Applied SCP(s)                             | Parent OU         |
 | ------------------- | ------------------------------------------ | ----------------- |
@@ -53,13 +53,18 @@ The following table summarizes the outcome of experimental testing of access.
 | Display all IAM users                | Denied          |
 | Create a new IAM user                | Denied          |
 
-### Scenario #3: FullAWSAccess Assigned Only Directly (TODO)
+TODO - see also
+https://stackoverflow.com/questions/62505588/aws-scp-for-ec2-type
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ExamplePolicies_EC2.html
+
+### Scenario #3: Reduced Access SCP Attached to Indirect Parent OU, FullAWSAccess Attached to AWS Account (TODO)
 The following table summarizes the hierarchy of organizational units (OUs) and the SCPs applied to particular OUs.
-| OU                  | Applied SCP(s)        | Parent OU         |
-| ------------------- | --------------------- | ----------------- |
-| Root                |                       |                   |
-| SANDBOX-LEVEL1-OU   |                       | Root              |
-| SANDBOX-LEVEL2-OU   | FullAWSAccess         | SANDBOX-LEVEL1-OU |
+| OU/AWS Account      | Applied SCP(s)                             | Parent OU         |
+| ------------------- | ------------------------------------------ | ----------------- |
+| Root                |                                            |                   |
+| SANDBOX-LEVEL1-OU   | AllowAllS3Operations, RestrictEC2ToT2Micro | Root              |
+| SANDBOX-LEVEL2-OU   | FullAWSAccess                              | SANDBOX-LEVEL1-OU |
+| AWS account         | FullAWSAccess                              | SANDBOX-LEVEL2-OU |
 
 The following table summarizes the outcome of experimental testing of access.
 | Operation                            | Access          |
