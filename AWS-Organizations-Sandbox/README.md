@@ -48,8 +48,8 @@ The following table summarizes the outcome of experimental testing of access.
 | ------------------------------------ | --------------- |
 | Display all S3 buckets               | Allowed         |
 | Create a new S3 bucket               | Allowed         |
-| Launch a new EC2 instance (t2.micro) |                 |
-| Launch a new EC2 instance (t2.nano)  |                 |
+| Launch a new EC2 instance (t2.micro) | Allowed         |
+| Launch a new EC2 instance (t2.nano)  | Denied          |
 | Display all IAM users                | Denied          |
 | Create a new IAM user                | Denied          |
 

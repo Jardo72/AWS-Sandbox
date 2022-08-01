@@ -18,7 +18,7 @@
         "cloudwatch:DescribeAlarms"
       ],
       "Resource": [
-        "arn:aws:ec2:*:*:instance/*"
+        "*"
       ]
     },
     {
