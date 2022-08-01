@@ -59,6 +59,8 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [Route53-Failover](./Route53-Failover)
 * [L4-Load-Balancing](./L4-Load-Balancing)
 * [L7-Load-Balancing](./L7-Load-Balancing)
+* [Terraform-Sandbox/L4-Load-Balancing](./Terraform-Sandbox/L4-Load-Balancing)
+* [Terraform-Sandbox/L7-Load-Balancing](./Terraform-Sandbox/L7-Load-Balancing)
 
 ### S3
 * [Common-S3-Buckets](./Common-S3-Buckets)
