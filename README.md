@@ -13,10 +13,12 @@ Set of experimental applications/deployments for AWS. The following index catego
 #### CloudFormation
 * [CloudFormation-Sandbox](./CloudFormation-Sandbox)
 * [ALB-Lambda](./ALB-Lambda)
+* [IAM-Policy-Sandbox](./IAM-Policy-Sandbox)
 * [L4-Load-Balancing](./L4-Load-Balancing)
 * [L7-Load-Balancing](./L7-Load-Balancing)
 * [Route53-Failover](./Route53-Failover)
 * [S3-Notifications-Lambda](./S3-Notifications-Lambda)
+* [S3-Replication-Demo](./S3-Replication-Demo)
 * [VPC-Endpoint](./VPC-Endpoint)
 * [VPC-Peering](./VPC-Peering)
 
