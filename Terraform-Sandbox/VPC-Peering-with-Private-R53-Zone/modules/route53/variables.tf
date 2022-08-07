@@ -23,10 +23,20 @@ variable "hosted_zone_name" {
   default     = "example.jch"
 }
 
-var "ttl" {
+variable "ttl" {
   description = "TTL (in seconds) for the Route 53 record to be created"
   type        = number
   default     = 300
+}
+
+variable "vpc_one_vpc_id" {
+  description = "VPC ID of the VPC #1"
+  type        = string
+}
+
+variable "vpc_two_vpc_id" {
+  description = "VPC ID of the VPC #2"
+  type        = string
 }
 
 variable "ec2_instance_one_ip_address" {

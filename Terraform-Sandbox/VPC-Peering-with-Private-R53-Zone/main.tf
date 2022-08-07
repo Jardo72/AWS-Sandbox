@@ -72,6 +72,25 @@ resource "aws_vpc_peering_connection" "vpc_peering" {
   tags = var.tags
 }
 
+module "ec2" {
+  source               = "./modules/ec2"
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
+}
+
+module "route53" {
+  source                      = "./modules/route53"
+  hosted_zone_name            = "example.jch"
+  ttl                         = 300
+  vpc_one_vpc_id              = module.vpc_one.vpc_id
+  vpc_two_vpc_id              = module.vpc_two.vpc_id
+  ec2_instance_one_ip_address = module.ec2.ec2_instance_one_ip_address
+  ec2_instance_two_ip_address = module.ec2.ec2_instance_two_ip_address
+  resource_name_prefix        = var.resource_name_prefix
+  tags                        = var.tags
+}
+
+/* TODO: remove
 resource "aws_route53_zone" "private_hosted_zone" {
   name    = "example.jch"
   comment = "Experimental private hosted zone for peered VPCs (${var.resource_name_prefix} demo)"
@@ -82,4 +101,4 @@ resource "aws_route53_zone" "private_hosted_zone" {
     vpc_id = module.vpc_two.vpc_id
   }
   tags = var.tags
-}
+} */

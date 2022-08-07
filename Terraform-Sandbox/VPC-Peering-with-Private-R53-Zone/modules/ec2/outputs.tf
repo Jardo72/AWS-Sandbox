@@ -16,3 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "ec2_instance_one_ip_address" {
+  value = "TODO"
+}
+
+output "ec2_instance_two_ip_address" {
+  value = "TODO"
+}

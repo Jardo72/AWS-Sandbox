@@ -21,26 +21,26 @@ resource "aws_route53_zone" "private_hosted_zone" {
   name    = var.hosted_zone_name
   comment = "Experimental private hosted zone for peered VPCs (${var.resource_name_prefix} demo)"
   vpc {
-    vpc_id = module.vpc_one.vpc_id
+    vpc_id = var.vpc_one_vpc_id
   }
   vpc {
-    vpc_id = module.vpc_two.vpc_id
+    vpc_id = var.vpc_two_vpc_id
   }
   tags = var.tags
 }
 
 resource "aws_route53_record" "ec2_instance_one_record" {
-  zone_id = aws_route53_zone.private_hosted_zone.zone_id
-  name    = "ec2-one.${var.hosted_zone_name}"
-  type    = "A"
-  ttl     = 300
-  reords  = [var.ec2_instance_one_ip_address]
+  zone_id  = aws_route53_zone.private_hosted_zone.zone_id
+  name     = "ec2-one.${var.hosted_zone_name}"
+  type     = "A"
+  ttl      = 300
+  records  = [var.ec2_instance_one_ip_address]
 }
 
 resource "aws_route53_record" "ec2_instance_two_record" {
-  zone_id = aws_route53_zone.private_hosted_zone.zone_id
-  name    = "ec2-two.${var.hosted_zone_name}"
-  type    = "A"
-  ttl     = 300
-  reords  = [var.ec2_instance_two_ip_address]
+  zone_id  = aws_route53_zone.private_hosted_zone.zone_id
+  name     = "ec2-two.${var.hosted_zone_name}"
+  type     = "A"
+  ttl      = 300
+  records  = [var.ec2_instance_two_ip_address]
 }
