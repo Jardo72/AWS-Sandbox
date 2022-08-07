@@ -71,3 +71,15 @@ resource "aws_vpc_peering_connection" "vpc_peering" {
   }
   tags = var.tags
 }
+
+resource "aws_route53_zone" "private_hosted_zone" {
+  name    = "example.jch"
+  comment = "Experimental private hosted zone for peered VPCs (${var.resource_name_prefix} demo)"
+  vpc {
+    vpc_id = module.vpc_one.vpc_id
+  }
+  vpc {
+    vpc_id = module.vpc_two.vpc_id
+  }
+  tags = var.tags
+}
