@@ -21,11 +21,9 @@ variable "vpc_one_details" {
   description = "Configuration parameters for the first of the two VPCs"
   type = object({
     cidr_block = string
-    aws_region = string
   })
   default = {
     cidr_block = "10.0.0.0/16"
-    aws_region = "eu-central-1"
   }
 }
 
@@ -33,11 +31,9 @@ variable "vpc_two_details" {
   description = "Configuration parameters for the second of the two VPCs"
   type = object({
     cidr_block = string
-    aws_region = string
   })
   default = {
     cidr_block = "10.1.0.0/16"
-    aws_region = "eu-north-1"
   }
 }
 
