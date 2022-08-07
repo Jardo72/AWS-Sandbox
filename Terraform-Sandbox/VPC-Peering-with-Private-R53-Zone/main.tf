@@ -46,12 +46,14 @@ data "aws_availability_zones" "region_two_available" {
 }
 
 module "vpc_one" {
-  source             = "terraform-aws-modules/vpc/aws"
+  source = "terraform-aws-modules/vpc/aws"
+  providers = {
+    aws = aws.vpc_one_region
+  }
   name               = "${var.resource_name_prefix}-VPC-#1"
   cidr               = var.vpc_one_details.cidr_block
   azs                = data.aws_availability_zones.region_one_available.names
-  public_subnets     = []
-  private_subnets    = ["10.0.1.0/24"]
+  private_subnets    = [cidrsubnet(var.vpc_one_details.cidr_block, 4, 0)]
   enable_nat_gateway = false
   tags               = var.tags
   vpc_tags = {
@@ -60,12 +62,14 @@ module "vpc_one" {
 }
 
 module "vpc_two" {
-  source             = "terraform-aws-modules/vpc/aws"
+  source = "terraform-aws-modules/vpc/aws"
+  providers = {
+    aws = aws.vpc_two_region
+  }
   name               = "${var.resource_name_prefix}-VPC-#2"
   cidr               = var.vpc_two_details.cidr_block
   azs                = data.aws_availability_zones.region_two_available.names
-  public_subnets     = []
-  private_subnets    = ["10.0.1.0/24"]
+  private_subnets    = [cidrsubnet(var.vpc_two_details.cidr_block, 4, 0)]
   enable_nat_gateway = false
   tags               = var.tags
   vpc_tags = {

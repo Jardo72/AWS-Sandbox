@@ -19,7 +19,7 @@
 
 variable "vpc_one_details" {
   description = "Configuration parameters for the first of the two VPCs"
-  type        = object({
+  type = object({
     cidr_block = string
     aws_region = string
   })
@@ -31,7 +31,7 @@ variable "vpc_one_details" {
 
 variable "vpc_two_details" {
   description = "Configuration parameters for the second of the two VPCs"
-  type        = object({
+  type = object({
     cidr_block = string
     aws_region = string
   })
