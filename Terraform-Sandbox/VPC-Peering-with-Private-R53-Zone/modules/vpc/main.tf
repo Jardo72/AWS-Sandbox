@@ -59,6 +59,8 @@ resource "aws_vpc_peering_connection" "vpc_peering" {
   accepter {
     allow_remote_vpc_dns_resolution = true
   }
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-Peering-Connection"
+  })
 }
 

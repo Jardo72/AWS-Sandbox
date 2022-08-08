@@ -58,3 +58,34 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   })
 }
 
+resource "aws_security_group" "ec2_one_security_group" {
+  name        = "${var.resource_name_prefix}-EC2-#1-SG"
+  description = "Allow inbound ICMP traffic from the peered VPC"
+  vpc_id      = var.vpc_one_vpc_id
+  ingress {
+    protocol    = "icmp"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = [var.vpc_two_cidr_block]
+    description = "Allow inbound ICMP traffic from the peered VPC"
+  }
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-EC2-#1-SG"
+  })
+}
+
+resource "aws_security_group" "ec2_two_security_group" {
+  name        = "${var.resource_name_prefix}-EC2-#2-SG"
+  description = "Allow inbound ICMP traffic from the peered VPC"
+  vpc_id      = var.vpc_two_vpc_id
+  ingress {
+    protocol    = "icmp"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = [var.vpc_one_cidr_block]
+    description = "Allow inbound ICMP traffic from the peered VPC"
+  }
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-EC2-#2-SG"
+  })
+}

@@ -27,6 +27,16 @@ variable "vpc_two_vpc_id" {
   type        = string
 }
 
+variable "vpc_one_cidr_block" {
+  description = "CIDR block for the VPC #1"
+  type        = string
+}
+
+variable "vpc_two_cidr_block" {
+  description = "CIDR block for the VPC #2"
+  type        = string
+}
+
 variable "ec2_instance_type" {
   description = "Instance type of the EC2 instances to be started"
   type        = string

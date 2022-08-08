@@ -26,7 +26,9 @@ resource "aws_route53_zone" "private_hosted_zone" {
   vpc {
     vpc_id = var.vpc_two_vpc_id
   }
-  tags = var.tags
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-Hosted-Zone"
+  })
 }
 
 resource "aws_route53_record" "ec2_instance_one_record" {
