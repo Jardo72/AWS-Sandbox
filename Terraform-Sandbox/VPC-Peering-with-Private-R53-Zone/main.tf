@@ -75,6 +75,8 @@ resource "aws_vpc_peering_connection" "vpc_peering" {
 module "ec2" {
   source               = "./modules/ec2"
   resource_name_prefix = var.resource_name_prefix
+  vpc_one_vpc_id       = module.vpc_one.vpc_id
+  vpc_two_vpc_id       = module.vpc_two.vpc_id
   tags                 = var.tags
 }
 

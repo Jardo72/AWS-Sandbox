@@ -16,3 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "ec2_instance_one_dns_name" {
+  value = aws_route53_record.ec2_instance_one_record.fqdn
+}
+
+output "ec2_instance_two_dns_name" {
+  value = aws_route53_record.ec2_instance_two_record.fqdn
+}

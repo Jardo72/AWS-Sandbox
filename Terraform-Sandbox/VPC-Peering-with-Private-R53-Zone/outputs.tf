@@ -17,22 +17,10 @@
 # limitations under the License.
 #
 
-variable "vpc_one_vpc_id" {
-  description = "VPC ID of the VPC #1"
-  type        = string
+output "ec2_instance_one_dns_name" {
+  value = module.route53.ec2_instance_one_dns_name
 }
 
-variable "vpc_two_vpc_id" {
-  description = "VPC ID of the VPC #2"
-  type        = string
-}
-
-variable "resource_name_prefix" {
-  description = "Prefix for the names to be applied to the provisioned resources"
-  type        = string
-}
-
-variable "tags" {
-  description = "Common tags to be applied to the provisioned resources"
-  type        = map(string)
+output "ec2_instance_two_dns_name" {
+  value = module.route53.ec2_instance_two_dns_name
 }
