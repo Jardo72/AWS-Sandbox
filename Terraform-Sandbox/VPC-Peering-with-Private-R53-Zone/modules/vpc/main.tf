@@ -63,4 +63,3 @@ resource "aws_vpc_peering_connection" "vpc_peering" {
     Name = "${var.resource_name_prefix}-Peering-Connection"
   })
 }
-
