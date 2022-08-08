@@ -19,33 +19,99 @@
 
 data "aws_availability_zones" "available" {}
 
+resource "aws_cloudwatch_log_group" "vpc_one_flow_log_cw_log_group" {
+  name              = "${var.resource_name_prefix}-VPC-Flow-Log-1"
+  retention_in_days = 3
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-VPC-Flow-Log-1"
+  })
+}
+
+resource "aws_cloudwatch_log_group" "vpc_two_flow_log_cw_log_group" {
+  name              = "${var.resource_name_prefix}-VPC-Flow-Log-2"
+  retention_in_days = 3
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-VPC-Flow-Log-2"
+  })
+}
+
+resource "aws_iam_role" "vpc_flow_log_writer_role" {
+  name = "${var.resource_name_prefix}-VPC-Flow-Log-Writer"
+  assume_role_policy = jsonencode({
+    Version : "2012-10-17",
+    Statement : [
+      {
+        Sid : "AllowFlowLogAssume",
+        Action : "sts:AssumeRole",
+        Principal : {
+          Service : "vpc-flow-logs.amazonaws.com"
+        },
+        Effect : "Allow"
+      }
+    ]
+  })
+  inline_policy {
+    name = "AllowAccessToVpcFlowLogGroup"
+    policy = jsonencode({
+      Version : "2012-10-17",
+      Statement : [
+        {
+          Action : [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogGroups",
+            "logs:DescribeLogStreams"
+          ],
+          Effect : "Allow",
+          Resource : "*"
+        }
+      ]
+    })
+  }
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-VPC-Flow-Log-Writer"
+  })
+}
+
 module "vpc_one" {
-  source               = "terraform-aws-modules/vpc/aws"
-  name                 = "${var.resource_name_prefix}-VPC-#1"
-  cidr                 = var.vpc_one_cidr_block
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = [cidrsubnet(var.vpc_one_cidr_block, 4, 0)]
-  public_subnets       = [cidrsubnet(var.vpc_one_cidr_block, 4, 1)]
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-  enable_nat_gateway   = true
-  tags                 = var.tags
+  source                            = "terraform-aws-modules/vpc/aws"
+  name                              = "${var.resource_name_prefix}-VPC-#1"
+  cidr                              = var.vpc_one_cidr_block
+  azs                               = data.aws_availability_zones.available.names
+  private_subnets                   = [cidrsubnet(var.vpc_one_cidr_block, 4, 0)]
+  public_subnets                    = [cidrsubnet(var.vpc_one_cidr_block, 4, 1)]
+  enable_dns_hostnames              = true
+  enable_dns_support                = true
+  enable_nat_gateway                = true
+  enable_flow_log                   = true
+  flow_log_destination_type         = "cloud-watch-logs"
+  flow_log_destination_arn          = aws_cloudwatch_log_group.vpc_one_flow_log_cw_log_group.arn
+  flow_log_traffic_type             = "ALL"
+  flow_log_max_aggregation_interval = 60
+  flow_log_cloudwatch_iam_role_arn  = aws_iam_role.vpc_flow_log_writer_role.arn
+  tags                              = var.tags
   vpc_tags = {
     Name = "${var.resource_name_prefix}-VPC-#1"
   }
 }
 
 module "vpc_two" {
-  source               = "terraform-aws-modules/vpc/aws"
-  name                 = "${var.resource_name_prefix}-VPC-#2"
-  cidr                 = var.vpc_two_cidr_block
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = [cidrsubnet(var.vpc_two_cidr_block, 4, 0)]
-  public_subnets       = [cidrsubnet(var.vpc_two_cidr_block, 4, 1)]
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-  enable_nat_gateway   = true
-  tags                 = var.tags
+  source                            = "terraform-aws-modules/vpc/aws"
+  name                              = "${var.resource_name_prefix}-VPC-#2"
+  cidr                              = var.vpc_two_cidr_block
+  azs                               = data.aws_availability_zones.available.names
+  private_subnets                   = [cidrsubnet(var.vpc_two_cidr_block, 4, 0)]
+  public_subnets                    = [cidrsubnet(var.vpc_two_cidr_block, 4, 1)]
+  enable_dns_hostnames              = true
+  enable_dns_support                = true
+  enable_nat_gateway                = true
+  enable_flow_log                   = true
+  flow_log_destination_type         = "cloud-watch-logs"
+  flow_log_destination_arn          = aws_cloudwatch_log_group.vpc_two_flow_log_cw_log_group.arn
+  flow_log_traffic_type             = "ALL"
+  flow_log_max_aggregation_interval = 60
+  flow_log_cloudwatch_iam_role_arn  = aws_iam_role.vpc_flow_log_writer_role.arn
+  tags                              = var.tags
   vpc_tags = {
     Name = "${var.resource_name_prefix}-VPC-#2"
   }
