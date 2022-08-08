@@ -17,20 +17,14 @@
 # limitations under the License.
 #
 
-variable "vpc_one_vpc_id" {
-  description = "VPC ID of the VPC #1"
+variable "vpc_one_cidr_block" {
+  description = "CIDR block for the VPC #1"
   type        = string
 }
 
-variable "vpc_two_vpc_id" {
-  description = "VPC ID of the VPC #2"
+variable "vpc_two_cidr_block" {
+  description = "CIDR block for the VPC #2"
   type        = string
-}
-
-variable "ec2_instance_type" {
-  description = "Instance type of the EC2 instances to be started"
-  type        = string
-  default     = "t2.micro"
 }
 
 variable "resource_name_prefix" {

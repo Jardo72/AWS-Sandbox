@@ -18,9 +18,9 @@
 #
 
 output "ec2_instance_one_ip_address" {
-  value = "TODO"
+  value = "10.0.0.54"
 }
 
 output "ec2_instance_two_ip_address" {
-  value = "TODO"
+  value = "10.1.0.43"
 }

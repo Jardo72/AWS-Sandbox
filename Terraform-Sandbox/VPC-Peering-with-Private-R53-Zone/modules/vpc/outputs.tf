@@ -17,28 +17,14 @@
 # limitations under the License.
 #
 
-variable "vpc_one_vpc_id" {
-  description = "VPC ID of the VPC #1"
-  type        = string
+output "vpc_one_vpc_id" {
+  value = module.vpc_one.vpc_id
 }
 
-variable "vpc_two_vpc_id" {
-  description = "VPC ID of the VPC #2"
-  type        = string
+output "vpc_two_vpc_id" {
+  value = module.vpc_two.vpc_id
 }
 
-variable "ec2_instance_type" {
-  description = "Instance type of the EC2 instances to be started"
-  type        = string
-  default     = "t2.micro"
-}
-
-variable "resource_name_prefix" {
-  description = "Prefix for the names to be applied to the provisioned resources"
-  type        = string
-}
-
-variable "tags" {
-  description = "Common tags to be applied to the provisioned resources"
-  type        = map(string)
+output "vpc_peering_connection_id" {
+  value = aws_vpc_peering_connection.vpc_peering.id
 }

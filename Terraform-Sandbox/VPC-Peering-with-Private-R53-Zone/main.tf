@@ -27,80 +27,33 @@ terraform {
   }
 }
 
-data "aws_availability_zones" "available" {}
-
-module "vpc_one" {
-  source               = "terraform-aws-modules/vpc/aws"
-  name                 = "${var.resource_name_prefix}-VPC-#1"
-  cidr                 = var.vpc_one_details.cidr_block
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = [cidrsubnet(var.vpc_one_details.cidr_block, 4, 0)]
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-  enable_nat_gateway   = false
+module "vpc" {
+  source               = "./modules/vpc"
+  vpc_one_cidr_block   = var.vpc_one_cidr_block
+  vpc_two_cidr_block   = var.vpc_two_cidr_block
+  resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
-  vpc_tags = {
-    Name = "${var.resource_name_prefix}-VPC-#1"
-  }
-}
-
-module "vpc_two" {
-  source               = "terraform-aws-modules/vpc/aws"
-  name                 = "${var.resource_name_prefix}-VPC-#2"
-  cidr                 = var.vpc_two_details.cidr_block
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = [cidrsubnet(var.vpc_two_details.cidr_block, 4, 0)]
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-  enable_nat_gateway   = false
-  tags                 = var.tags
-  vpc_tags = {
-    Name = "${var.resource_name_prefix}-VPC-#2"
-  }
-}
-
-resource "aws_vpc_peering_connection" "vpc_peering" {
-  vpc_id      = module.vpc_one.vpc_id
-  peer_vpc_id = module.vpc_two.vpc_id
-  auto_accept = true
-  requester {
-    allow_remote_vpc_dns_resolution = true
-  }
-  accepter {
-    allow_remote_vpc_dns_resolution = true
-  }
-  tags = var.tags
 }
 
 module "ec2" {
   source               = "./modules/ec2"
+  vpc_one_vpc_id       = module.vpc.vpc_one_vpc_id
+  vpc_two_vpc_id       = module.vpc.vpc_two_vpc_id
+  ec2_instance_type    = var.ec2_instance_type
   resource_name_prefix = var.resource_name_prefix
-  vpc_one_vpc_id       = module.vpc_one.vpc_id
-  vpc_two_vpc_id       = module.vpc_two.vpc_id
   tags                 = var.tags
+  depends_on           = [module.vpc]
 }
 
 module "route53" {
   source                      = "./modules/route53"
   hosted_zone_name            = "example.jch"
   ttl                         = 300
-  vpc_one_vpc_id              = module.vpc_one.vpc_id
-  vpc_two_vpc_id              = module.vpc_two.vpc_id
+  vpc_one_vpc_id              = module.vpc.vpc_one_vpc_id
+  vpc_two_vpc_id              = module.vpc.vpc_two_vpc_id
   ec2_instance_one_ip_address = module.ec2.ec2_instance_one_ip_address
   ec2_instance_two_ip_address = module.ec2.ec2_instance_two_ip_address
   resource_name_prefix        = var.resource_name_prefix
   tags                        = var.tags
+  depends_on                  = [module.ec2]
 }
-
-/* TODO: remove
-resource "aws_route53_zone" "private_hosted_zone" {
-  name    = "example.jch"
-  comment = "Experimental private hosted zone for peered VPCs (${var.resource_name_prefix} demo)"
-  vpc {
-    vpc_id = module.vpc_one.vpc_id
-  }
-  vpc {
-    vpc_id = module.vpc_two.vpc_id
-  }
-  tags = var.tags
-} */

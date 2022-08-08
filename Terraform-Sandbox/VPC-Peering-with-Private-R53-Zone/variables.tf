@@ -17,24 +17,22 @@
 # limitations under the License.
 #
 
-variable "vpc_one_details" {
-  description = "Configuration parameters for the first of the two VPCs"
-  type = object({
-    cidr_block = string
-  })
-  default = {
-    cidr_block = "10.0.0.0/16"
-  }
+variable "vpc_one_cidr_block" {
+  description = "CIDR block for the first of the two VPCs"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
-variable "vpc_two_details" {
-  description = "Configuration parameters for the second of the two VPCs"
-  type = object({
-    cidr_block = string
-  })
-  default = {
-    cidr_block = "10.1.0.0/16"
-  }
+variable "vpc_two_cidr_block" {
+  description = "CIDR block for the second of the two VPCs"
+  type        = string
+  default     = "10.1.0.0/16"
+}
+
+variable "ec2_instance_type" {
+  description = "Instance type of the EC2 instances to be started"
+  type        = string
+  default     = "t2.micro"
 }
 
 variable "resource_name_prefix" {
