@@ -18,9 +18,9 @@
 #
 
 output "ec2_instance_one_ip_address" {
-  value = "10.0.0.54"
+  value = aws_instance.ec2_instance_one.private_ip
 }
 
 output "ec2_instance_two_ip_address" {
-  value = "10.1.0.43"
+  value = aws_instance.ec2_instance_two.private_ip
 }
