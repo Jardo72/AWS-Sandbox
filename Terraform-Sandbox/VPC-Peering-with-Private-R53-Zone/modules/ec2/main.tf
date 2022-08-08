@@ -78,6 +78,13 @@ resource "aws_security_group" "ec2_one_security_group" {
   }
   egress {
     protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow outbound HTTPS traffic (needed for the SSM Agent)"
+  }
+  egress {
+    protocol    = "tcp"
     from_port   = 0
     to_port     = 0
     cidr_blocks = [var.vpc_two_cidr_block]
@@ -105,6 +112,13 @@ resource "aws_security_group" "ec2_two_security_group" {
     to_port     = 0
     cidr_blocks = [var.vpc_two_cidr_block]
     description = "Allow outbound ICMP traffic to the peered VPC"
+  }
+  egress {
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow outbound HTTPS traffic (needed for the SSM Agent)"
   }
   ingress {
     protocol    = "tcp"
