@@ -25,9 +25,10 @@ module "vpc_one" {
   cidr                 = var.vpc_one_cidr_block
   azs                  = data.aws_availability_zones.available.names
   private_subnets      = [cidrsubnet(var.vpc_one_cidr_block, 4, 0)]
+  public_subnets       = [cidrsubnet(var.vpc_one_cidr_block, 4, 1)]
   enable_dns_hostnames = true
   enable_dns_support   = true
-  enable_nat_gateway   = false
+  enable_nat_gateway   = true
   tags                 = var.tags
   vpc_tags = {
     Name = "${var.resource_name_prefix}-VPC-#1"
@@ -40,9 +41,10 @@ module "vpc_two" {
   cidr                 = var.vpc_two_cidr_block
   azs                  = data.aws_availability_zones.available.names
   private_subnets      = [cidrsubnet(var.vpc_two_cidr_block, 4, 0)]
+  public_subnets       = [cidrsubnet(var.vpc_two_cidr_block, 4, 1)]
   enable_dns_hostnames = true
   enable_dns_support   = true
-  enable_nat_gateway   = false
+  enable_nat_gateway   = true
   tags                 = var.tags
   vpc_tags = {
     Name = "${var.resource_name_prefix}-VPC-#2"
