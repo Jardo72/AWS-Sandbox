@@ -103,3 +103,25 @@ resource "aws_security_group" "ec2_two_security_group" {
     Name = "${var.resource_name_prefix}-EC2-#2-SG"
   })
 }
+
+resource "aws_instance" "ec2_instance_one" {
+  ami                         = data.aws_ami.latest_amazon_linux_ami.id
+  instance_type               = var.ec2_instance_type
+  subnet_id                   = var.vpc_one_subnet_id
+  vpc_security_group_ids      = [aws_security_group.ec2_one_security_group.id]
+  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-EC2-#1"
+  })
+}
+
+resource "aws_instance" "ec2_instance_two" {
+  ami                         = data.aws_ami.latest_amazon_linux_ami.id
+  instance_type               = var.ec2_instance_type
+  subnet_id                   = var.vpc_two_subnet_id
+  vpc_security_group_ids      = [aws_security_group.ec2_two_security_group.id]
+  iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.name
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-EC2-#2"
+  })
+}

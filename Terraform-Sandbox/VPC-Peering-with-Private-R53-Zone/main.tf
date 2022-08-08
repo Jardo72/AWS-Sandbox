@@ -41,6 +41,8 @@ module "ec2" {
   vpc_two_vpc_id       = module.vpc.vpc_two_vpc_id
   vpc_one_cidr_block   = var.vpc_one_cidr_block
   vpc_two_cidr_block   = var.vpc_two_cidr_block 
+  vpc_one_subnet_id    = module.vpc.vpc_one_subnet_id
+  vpc_two_subnet_id    = module.vpc.vpc_two_subnet_id
   ec2_instance_type    = var.ec2_instance_type
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags

@@ -21,8 +21,16 @@ output "vpc_one_vpc_id" {
   value = module.vpc_one.vpc_id
 }
 
+output "vpc_one_subnet_id" {
+  value = module.vpc_one.private_subnets[0]
+}
+
 output "vpc_two_vpc_id" {
   value = module.vpc_two.vpc_id
+}
+
+output "vpc_two_subnet_id" {
+  value = module.vpc_two.private_subnets[0]
 }
 
 output "vpc_peering_connection_id" {
