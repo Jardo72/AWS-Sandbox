@@ -70,6 +70,13 @@ resource "aws_security_group" "ec2_one_security_group" {
     description = "Allow inbound ICMP traffic from the peered VPC"
   }
   egress {
+    protocol    = "icmp"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = [var.vpc_two_cidr_block]
+    description = "Allow outbound ICMP traffic to the peered VPC"
+  }
+  egress {
     protocol    = "tcp"
     from_port   = 0
     to_port     = 0
@@ -91,6 +98,13 @@ resource "aws_security_group" "ec2_two_security_group" {
     to_port     = 0
     cidr_blocks = [var.vpc_one_cidr_block]
     description = "Allow inbound ICMP traffic from the peered VPC"
+  }
+  egress {
+    protocol    = "icmp"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = [var.vpc_two_cidr_block]
+    description = "Allow outbound ICMP traffic to the peered VPC"
   }
   ingress {
     protocol    = "tcp"

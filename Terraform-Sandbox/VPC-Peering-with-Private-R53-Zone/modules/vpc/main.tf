@@ -63,3 +63,15 @@ resource "aws_vpc_peering_connection" "vpc_peering" {
     Name = "${var.resource_name_prefix}-Peering-Connection"
   })
 }
+
+resource "aws_route" "vpc_one_peering_route" {
+  route_table_id            = module.vpc_one.private_route_table_ids[0]
+  destination_cidr_block    = var.vpc_two_cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.vpc_peering.id
+}
+
+resource "aws_route" "vpc_two_peering_route" {
+  route_table_id            = module.vpc_two.private_route_table_ids[0]
+  destination_cidr_block    = var.vpc_one_cidr_block
+  vpc_peering_connection_id = aws_vpc_peering_connection.vpc_peering.id
+}
