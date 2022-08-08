@@ -69,6 +69,13 @@ resource "aws_security_group" "ec2_one_security_group" {
     cidr_blocks = [var.vpc_two_cidr_block]
     description = "Allow inbound ICMP traffic from the peered VPC"
   }
+  egress {
+    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = [var.vpc_two_cidr_block]
+    description = "Allow outbound TCP traffic to the peered VPC"
+  }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-#1-SG"
   })
@@ -84,6 +91,13 @@ resource "aws_security_group" "ec2_two_security_group" {
     to_port     = 0
     cidr_blocks = [var.vpc_one_cidr_block]
     description = "Allow inbound ICMP traffic from the peered VPC"
+  }
+  ingress {
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 100
+    cidr_blocks = [var.vpc_one_cidr_block]
+    description = "Allow inbound TCP traffic from the peered VPC for ports between 80 and 100"
   }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-#2-SG"
