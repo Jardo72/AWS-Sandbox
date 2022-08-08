@@ -138,6 +138,7 @@ resource "aws_instance" "ec2_instance_one" {
   subnet_id              = var.vpc_one_subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_one_security_group.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data              = templatefile("${path.module}/ec2-user-data.tftpl", {})
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-#1"
   })
@@ -149,6 +150,7 @@ resource "aws_instance" "ec2_instance_two" {
   subnet_id              = var.vpc_two_subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_two_security_group.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_instance_profile.name
+  user_data              = templatefile("${path.module}/ec2-user-data.tftpl", {})
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-#2"
   })

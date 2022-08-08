@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # Copyright 2022 Jaroslav Chmurny
 #
@@ -17,18 +19,5 @@
 # limitations under the License.
 #
 
-output "ec2_instance_one_private_ip" {
-  value = module.ec2.ec2_instance_one_ip_address
-}
-
-output "ec2_instance_one_dns_name" {
-  value = module.route53.ec2_instance_one_dns_name
-}
-
-output "ec2_instance_two_private_ip" {
-  value = module.ec2.ec2_instance_two_ip_address
-}
-
-output "ec2_instance_two_dns_name" {
-  value = module.route53.ec2_instance_two_dns_name
-}
+yum update -y
+yum install nc -y
