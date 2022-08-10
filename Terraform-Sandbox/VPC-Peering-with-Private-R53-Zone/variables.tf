@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+variable "aws_region" {
+  description = "The AWS region where the resources are to be provisioned"
+  type        = string
+}
+
 variable "vpc_one_cidr_block" {
   description = "CIDR block for the first of the two VPCs"
   type        = string
@@ -33,6 +38,11 @@ variable "ec2_instance_type" {
   description = "Instance type of the EC2 instances to be started"
   type        = string
   default     = "t2.micro"
+}
+
+variable "hosted_zone_name" {
+  description = "The name of the Route 53 hosted zone to be created"
+  type        = string
 }
 
 variable "resource_name_prefix" {

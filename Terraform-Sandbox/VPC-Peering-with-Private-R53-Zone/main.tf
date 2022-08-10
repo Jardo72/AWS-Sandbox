@@ -24,7 +24,15 @@ terraform {
       source  = "hashicorp/aws"
       version = "~>4.15.0"
     }
+    template = {
+      source  = "hashicorp/template"
+      version = "~>2.2.0"
+    }
   }
+}
+
+provider "aws" {
+  region = var.aws_region
 }
 
 module "vpc" {
@@ -51,7 +59,7 @@ module "ec2" {
 
 module "route53" {
   source                      = "./modules/route53"
-  hosted_zone_name            = "example.jch"
+  hosted_zone_name            = var.hosted_zone_name
   ttl                         = 300
   vpc_one_vpc_id              = module.vpc.vpc_one_vpc_id
   vpc_two_vpc_id              = module.vpc.vpc_two_vpc_id

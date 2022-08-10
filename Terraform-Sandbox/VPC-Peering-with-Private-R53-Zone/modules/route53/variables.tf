@@ -20,7 +20,6 @@
 variable "hosted_zone_name" {
   description = "The name of the Route 53 hosted zone to be created"
   type        = string
-  default     = "example.jch"
 }
 
 variable "ttl" {

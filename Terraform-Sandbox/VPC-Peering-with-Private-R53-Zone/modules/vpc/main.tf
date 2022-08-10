@@ -23,7 +23,7 @@ resource "aws_cloudwatch_log_group" "vpc_one_flow_log_cw_log_group" {
   name              = "${var.resource_name_prefix}-VPC-Flow-Log-1"
   retention_in_days = 3
   tags = merge(var.tags, {
-    Name = "${var.resource_name_prefix}-VPC-Flow-Log-1"
+    Name = "${var.resource_name_prefix}-VPC-Flow-Log-VPC-1"
   })
 }
 
@@ -31,7 +31,7 @@ resource "aws_cloudwatch_log_group" "vpc_two_flow_log_cw_log_group" {
   name              = "${var.resource_name_prefix}-VPC-Flow-Log-2"
   retention_in_days = 3
   tags = merge(var.tags, {
-    Name = "${var.resource_name_prefix}-VPC-Flow-Log-2"
+    Name = "${var.resource_name_prefix}-VPC-Flow-Log-VPC-2"
   })
 }
 

@@ -19,3 +19,6 @@ The following snippet illustrates the values of Terraform variables used during 
 ```
 
 # Connectivity Testing & VPC Flow Logs
+
+```
+```
