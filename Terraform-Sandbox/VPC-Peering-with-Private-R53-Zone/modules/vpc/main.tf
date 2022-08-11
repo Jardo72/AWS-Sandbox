@@ -20,7 +20,7 @@
 data "aws_availability_zones" "available" {}
 
 resource "aws_cloudwatch_log_group" "vpc_one_flow_log_cw_log_group" {
-  name              = "${var.resource_name_prefix}-VPC-Flow-Log-1"
+  name              = "${var.resource_name_prefix}-VPC-Flow-Log-1-${uuid()}"
   retention_in_days = 3
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-VPC-Flow-Log-VPC-1"
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_log_group" "vpc_one_flow_log_cw_log_group" {
 }
 
 resource "aws_cloudwatch_log_group" "vpc_two_flow_log_cw_log_group" {
-  name              = "${var.resource_name_prefix}-VPC-Flow-Log-2"
+  name              = "${var.resource_name_prefix}-VPC-Flow-Log-2-${uuid()}"
   retention_in_days = 3
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-VPC-Flow-Log-VPC-2"
@@ -57,6 +57,7 @@ resource "aws_iam_role" "vpc_flow_log_writer_role" {
       Statement : [
         {
           Action : [
+            "logs:CreateLogGroup",
             "logs:CreateLogStream",
             "logs:PutLogEvents",
             "logs:DescribeLogGroups",
@@ -93,6 +94,10 @@ module "vpc_one" {
   vpc_tags = {
     Name = "${var.resource_name_prefix}-VPC-#1"
   }
+  depends_on = [
+    aws_cloudwatch_log_group.vpc_one_flow_log_cw_log_group,
+    aws_iam_role.vpc_flow_log_writer_role
+  ]
 }
 
 module "vpc_two" {
@@ -115,6 +120,10 @@ module "vpc_two" {
   vpc_tags = {
     Name = "${var.resource_name_prefix}-VPC-#2"
   }
+  depends_on = [
+    aws_cloudwatch_log_group.vpc_two_flow_log_cw_log_group,
+    aws_iam_role.vpc_flow_log_writer_role
+  ]
 }
 
 resource "aws_vpc_peering_connection" "vpc_peering" {
