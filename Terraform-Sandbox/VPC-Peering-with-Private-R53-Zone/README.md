@@ -100,8 +100,8 @@ CloudWatch Insights queries - TCP traffic:
 ####################################################################################
 # TCP traffic to port 70 from EC2-#1 to EC2-#2
 # - applicable for both flow logs
-# - REJECT records found in flow log for VPC #1
-# - no records found in flow log for VPC #2
+# - ACCEPT records found in flow log for VPC #1
+# - REJECT records found in flow log for VPC #2
 ####################################################################################
 fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
 | filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 70
@@ -133,8 +133,8 @@ fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
 ####################################################################################
 # TCP traffic to port 110 from EC2-#1 to EC2-#2
 # - applicable for both flow logs
-# - REJECT records found in flow log for VPC #1
-# - no records found in flow log for VPC #2
+# - ACCEPT records found in flow log for VPC #1
+# - REJECT records found in flow log for VPC #2
 ####################################################################################
 fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
 | filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 110
