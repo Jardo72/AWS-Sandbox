@@ -21,3 +21,6 @@
 
 yum update -y
 yum install nc -y
+
+# open TCP port 80 in listening mode, keep it open & accept many connections
+nc -l -k 80 &

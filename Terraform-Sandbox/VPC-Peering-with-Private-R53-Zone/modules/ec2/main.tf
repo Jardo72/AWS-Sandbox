@@ -86,7 +86,7 @@ resource "aws_security_group" "ec2_one_security_group" {
   egress {
     protocol    = "tcp"
     from_port   = 0
-    to_port     = 0
+    to_port     = 65535
     cidr_blocks = [var.vpc_two_cidr_block]
     description = "Allow outbound TCP traffic to the peered VPC"
   }
