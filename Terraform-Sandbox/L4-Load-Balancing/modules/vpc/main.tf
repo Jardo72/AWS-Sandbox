@@ -109,7 +109,7 @@ resource "aws_route_table_association" "private_subnet_route_table_association" 
 }
 
 resource "aws_cloudwatch_log_group" "vpc_flow_log_cw_log_group" {
-  name = "${var.resource_name_prefix}-VPC-Flow-CW-Log-Group"
+  name = "${var.resource_name_prefix}-VPC-Flow-CW-Log-Group-${uuid()}"
   retention_in_days = 3
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-VPC-Flow-Log-CW-Log-Group"
@@ -123,11 +123,11 @@ resource "aws_iam_role" "vpc_flow_log_writer_role" {
     Statement : [
       {
         Sid : "AllowFlowLogAssume",
+        Effect : "Allow",
         Action : "sts:AssumeRole",
         Principal : {
           Service : "vpc-flow-logs.amazonaws.com"
-        },
-        Effect : "Allow"
+        }
       }
     ]
   })
@@ -137,14 +137,16 @@ resource "aws_iam_role" "vpc_flow_log_writer_role" {
       Version: "2012-10-17",
       Statement: [
         {
+          Sid : "AllowLogOperations",
+          Effect: "Allow",
           Action: [
+            "logs:CreateLogGroup",
             "logs:CreateLogStream",
             "logs:PutLogEvents",
             "logs:DescribeLogGroups",
             "logs:DescribeLogStreams"
           ],
-          Effect: "Allow",
-          Resource: aws_cloudwatch_log_group.vpc_flow_log_cw_log_group.arn
+          Resource: "*"
         }
       ]
     })
@@ -162,4 +164,9 @@ resource "aws_flow_log" "vpc_flow_log" {
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-VPC-Flow-Log"
   })
+  depends_on = [
+    aws_cloudwatch_log_group.vpc_flow_log_cw_log_group,
+    aws_iam_role.vpc_flow_log_writer_role,
+    aws_vpc.vpc
+  ]
 }

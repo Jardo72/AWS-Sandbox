@@ -63,7 +63,7 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [L7-Load-Balancing](./L7-Load-Balancing)
 * [Terraform-Sandbox/L4-Load-Balancing](./Terraform-Sandbox/L4-Load-Balancing)
 * [Terraform-Sandbox/L7-Load-Balancing](./Terraform-Sandbox/L7-Load-Balancing)
-* [VPC-Peering-with-Private-R53-Zone](./VPC-Peering-with-Private-R53-Zone)
+* [Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone](./Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone)
 
 #### S3
 * [Common-S3-Buckets](./Common-S3-Buckets)
@@ -96,7 +96,7 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [Terraform-Sandbox/CloudWatch-Agent](./Terraform-Sandbox/CloudWatch-Agent)
 * [Terraform-Sandbox/L4-Load-Balancing](./Terraform-Sandbox/L4-Load-Balancing)
 * [Terraform-Sandbox/L7-Load-Balancing](./Terraform-Sandbox/L7-Load-Balancing)
-* [VPC-Peering-with-Private-R53-Zone](./VPC-Peering-with-Private-R53-Zone)
+* [Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone](./Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone)
 * [Terraform-Sandbox/S3-Cross-Region-Replication](./Terraform-Sandbox/S3-Cross-Region-Replication)
 
 #### VPC
@@ -107,4 +107,4 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [Terraform-Sandbox/Modules](./Terraform-Sandbox/Modules)
 * [Terraform-Sandbox/L4-Load-Balancing](./Terraform-Sandbox/L4-Load-Balancing)
 * [Terraform-Sandbox/L7-Load-Balancing](./Terraform-Sandbox/L7-Load-Balancing)
-* [VPC-Peering-with-Private-R53-Zone](./VPC-Peering-with-Private-R53-Zone)
+* [Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone](./Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone)
