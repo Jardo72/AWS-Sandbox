@@ -10,7 +10,7 @@
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicationlicationlicable law or agreed to in writing, software
+# Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
@@ -25,7 +25,12 @@ from time import sleep, time
 from typing import Optional, Tuple
 from uuid import uuid4
 
-from commons import Constants, current_timestamp
+from commons import (
+    Constants,
+    create_log_stream,
+    current_timestamp,
+    current_time_millis
+)
 
 
 @dataclass(frozen=True)
@@ -52,10 +57,10 @@ def create_command_line_arguments_parser() -> ArgumentParser:
     parser = ArgumentParser(description = "CloudWatch Log Events Generator", formatter_class = RawTextHelpFormatter)
 
     parser.add_argument('period_sec',
-        help='period (i.e. break between two consecutive log entries) in seconds',
+        help='period (i.e. break between two consecutive log events) in seconds',
         type=int)
-    parser.add_argument('number_of_entries',
-        help='number of log entries to be generated',
+    parser.add_argument('number_of_events',
+        help='number of log events to be generated',
         type=int)
     parser.add_argument('min',
         help='minimum for the generated metric value',
@@ -75,30 +80,16 @@ def parse_command_line_arguments():
     return parser.parse_args()
 
 
-def print_parameters(number_of_entries: int, period_sec: int, min: int, max: int, no_filter: bool) -> None:
+def print_parameters(number_of_events: int, period_sec: int, min: int, max: int, no_filter: bool) -> None:
     create_filter = 'No.' if no_filter else 'Yes.'
     print()
     print('--------------')
     print('- Parameters')
     print('--------------')
-    print(f'{number_of_entries} samples to be generated, period = {period_sec} sec')
+    print(f'{number_of_events} log events to be generated, period = {period_sec} sec')
     print(f'Range for the random values = [{min}; {max}]')
     print(f'Create metric filter? {create_filter}')
     print()
-
-
-def current_time_millis() -> int:
-    return int(time() * 1000)
-
-
-def create_log_stream(cloud_watch, log_stream_name: str) -> None:
-    try:
-        cloud_watch.create_log_group(logGroupName=Constants.log_group_name())
-    except Exception:
-        # chances are the log group already exists - we do not want to fail in such a case
-        pass
-    cloud_watch.create_log_stream(logGroupName=Constants.log_group_name(), logStreamName=log_stream_name)
-    print(f'Log stream created (name = {log_stream_name})')
 
 
 def create_metric_filter(cloud_watch, no_filter: bool) -> None:
@@ -114,7 +105,7 @@ def create_metric_filter(cloud_watch, no_filter: bool) -> None:
         },
     ]
     cloud_watch.put_metric_filter(
-        logGroupName=Constants.log_group_name(),
+        logGroupName=Constants.metrics_log_group_name(),
         filterName='RandomValueFilter',
         filterPattern='[message, randomValue]',
         metricTransformations=metric_transformations)
@@ -142,12 +133,12 @@ def publish_single_log_entry(cloud_watch, log_stream_name: str, min: int, max: i
 
     if sequence_token is None:    
         response = cloud_watch.put_log_events(
-            logGroupName=Constants.log_group_name(),
+            logGroupName=Constants.metrics_log_group_name(),
             logStreamName=log_stream_name,
             logEvents=log_events)
     else:
         response = cloud_watch.put_log_events(
-            logGroupName=Constants.log_group_name(),
+            logGroupName=Constants.metrics_log_group_name(),
             logStreamName=log_stream_name,
             logEvents=log_events,
             sequenceToken=sequence_token)
@@ -155,19 +146,19 @@ def publish_single_log_entry(cloud_watch, log_stream_name: str, min: int, max: i
     return (value, response['nextSequenceToken'])
 
 
-def publish_log_entries(number_of_entries: int, period_sec: int, min: int, max: int, no_filter: bool) -> Summary:
+def publish_log_events(number_of_events: int, period_sec: int, min: int, max: int, no_filter: bool) -> Summary:
     log_stream_name = str(uuid4())
     cloud_watch = client('logs')
-    create_log_stream(cloud_watch, log_stream_name)
+    create_log_stream(cloud_watch, Constants.metrics_log_group_name(), log_stream_name)
     create_metric_filter(cloud_watch, no_filter)
 
     start_timestamp = current_timestamp()
     sequence_token = None
     values = []
-    for i in range(0, number_of_entries):
+    for i in range(0, number_of_events):
         value, sequence_token = publish_single_log_entry(cloud_watch, log_stream_name, min, max, sequence_token)
         values.append(value)
-        if i < number_of_entries - 1:
+        if i < number_of_events - 1:
             sleep(period_sec)
     end_timestamp = current_timestamp()
 
@@ -190,12 +181,10 @@ def print_summary(summary: Summary) -> None:
 
 def main():
     params = parse_command_line_arguments()
-    print_parameters(params.number_of_entries, params.period_sec, params.min, params.max, params.no_filter)
-    summary = publish_log_entries(params.number_of_entries, params.period_sec, params.min, params.max, params.no_filter)
+    print_parameters(params.number_of_events, params.period_sec, params.min, params.max, params.no_filter)
+    summary = publish_log_events(params.number_of_events, params.period_sec, params.min, params.max, params.no_filter)
     print_summary(summary)
 
 
-# https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html
-# https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/logs.html#CloudWatchLogs.Client.describe_log_groups
 if __name__ == "__main__":
     main()
