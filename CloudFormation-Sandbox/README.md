@@ -58,7 +58,7 @@ aws cloudformation create-stack --stack-name CFN-Sandbox-Intrinsic-Functions --t
 ```
 
 
-## CFN Signal Demo
+## Creation Policy & CFN Signal Demo
 Launches an EC2 instance which sends a cfn-signal during the bootstrapping. The CloudFormation template involves a creation policy which waits for the signal from the EC2 instance.
 
 Source code:
@@ -98,3 +98,22 @@ aws cloudformation create-stack --stack-name CFN-Helper-Scripts --template-body 
 ```
 
 In order to demonstrate the cfn-hup functionality, update the stack using the same template via the AWS Management Console, but use a different value for the message parameter.
+
+
+## Wait Condition & CFN Signal Demo
+TODO
+
+Source code:
+
+
+## Stack Role Demo
+TODO
+
+Source code:
+- [cloud-formation-role-template.yml](./cloud-formation-role-template.yml)
+- []()
+
+Creation of IAM role that can be used as execution role for CloudFormation, plus creation of IAM user that can pass the execution role to CloudFormation.
+```
+aws cloudformation create-stack --stack-name CFN-Execution-Role --template-body file://cloud-formation-role-template.yml --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
+```
