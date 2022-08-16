@@ -107,19 +107,18 @@ Source code:
 
 
 ## Stack Role Demo
-TODO
+Demonstration of stack creation using an IAM role. The IAM user that triggers the stack creation does not have permissions to create the resources defined in the CloudFormation template, but the user is permitted to pass an IAM role to CloudFormation, and the passed role has permissions to create the resources.
 
 Source code:
 - [cloud-formation-create-role-for-assume-template.yml](./cloud-formation-create-role-for-assume-template.yml)
 - [cloud-formation-assume-role-template.yml](./cloud-formation-assume-role-template.yml)
 
-Creation of IAM role that can be used as execution role for CloudFormation, plus creation of IAM user that can pass the execution role to CloudFormation:
+Step 1: creation of IAM role to be assumed by CloudFormation, plus creation of IAM user that can pass the IAM role to CloudFormation:
 ```
 aws cloudformation create-stack --stack-name CFN-Execution-Role --template-body file://cloud-formation-create-role-for-assume-template.yml --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
 
-Creation of stack via the IAM user and the IAM role created by the command above (use an access key belonging to the IAM user, replace the role ARN): 
-
+Step 2: creation of stack using the IAM user and the IAM role created by the command above (use an access key belonging to the IAM user, replace the role ARN at the end of the command so that CloudFormation will assume the role): 
 ```
 aws cloudformation create-stack --stack-name CFN-Stack-Created-with-Assumed-Role --template-body file://cloud-formation-assume-role-template.yml --on-failure ROLLBACK --role-arn <ROLE-ARN>
 ```

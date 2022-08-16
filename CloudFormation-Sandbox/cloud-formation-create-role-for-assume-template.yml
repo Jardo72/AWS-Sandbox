@@ -52,6 +52,15 @@ Resources:
                 Action:
                   - "s3:*"
                 Resource: "*"
+        - PolicyName: SSMParametersPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "ssm:GetParameter"
+                  - "ssm:GetParameters"
+                Effect: Allow
+                Resource: "arn:aws:ssm:*:*:parameter/aws/service/*"
 
   StackManagementUser:
     Type: AWS::IAM::User
@@ -69,6 +78,14 @@ Resources:
                 Condition:
                   StringEquals:
                     "iam:PassedToService": "cloudformation.amazonaws.com"
+        - PolicyName: CloudFormationPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "cloudformation:*"
+                Effect: Allow
+                Resource: "*"
 
 Outputs:
   CloudFormationExecutionRoleArn:
@@ -77,4 +94,4 @@ Outputs:
   
   StackManagementUserName:
     Description: The name of the IAM user that is to be used when creating the other stack belonging to this demo
-    Value: !GetAtt StackManagementUser.UserName
+    Value: !Ref StackManagementUser
