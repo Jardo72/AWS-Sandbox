@@ -19,7 +19,7 @@
 
 AWSTemplateFormatVersion: '2010-09-09'
 Description: |
-  Demonstration of execution role for CloudFormation
+  Demonstration of execution role for CloudFormation - creation of IAM user & IAM role
 
 Resources:
   CloudFormationExecutionRole:
@@ -69,3 +69,12 @@ Resources:
                 Condition:
                   StringEquals:
                     "iam:PassedToService": "cloudformation.amazonaws.com"
+
+Outputs:
+  CloudFormationExecutionRoleArn:
+    Description: ARN of the IAM role CloudFormation is supposed to assume when creating the other stack belonging to this demo
+    Value: !GetAtt CloudFormationExecutionRole.Arn
+  
+  StackManagementUserName:
+    Description: The name of the IAM user that is to be used when creating the other stack belonging to this demo
+    Value: !GetAtt StackManagementUser.UserName

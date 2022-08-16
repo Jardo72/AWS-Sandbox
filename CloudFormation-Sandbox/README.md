@@ -110,10 +110,16 @@ Source code:
 TODO
 
 Source code:
-- [cloud-formation-role-template.yml](./cloud-formation-role-template.yml)
-- []()
+- [cloud-formation-create-role-for-assume-template.yml](./cloud-formation-create-role-for-assume-template.yml)
+- [cloud-formation-assume-role-template.yml](./cloud-formation-assume-role-template.yml)
 
-Creation of IAM role that can be used as execution role for CloudFormation, plus creation of IAM user that can pass the execution role to CloudFormation.
+Creation of IAM role that can be used as execution role for CloudFormation, plus creation of IAM user that can pass the execution role to CloudFormation:
 ```
-aws cloudformation create-stack --stack-name CFN-Execution-Role --template-body file://cloud-formation-role-template.yml --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
+aws cloudformation create-stack --stack-name CFN-Execution-Role --template-body file://cloud-formation-create-role-for-assume-template.yml --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
+```
+
+Creation of stack via the IAM user and the IAM role created by the command above (use an access key belonging to the IAM user, replace the role ARN): 
+
+```
+aws cloudformation create-stack --stack-name CFN-Stack-Created-with-Assumed-Role --template-body file://cloud-formation-assume-role-template.yml --on-failure ROLLBACK --role-arn <ROLE-ARN>
 ```
