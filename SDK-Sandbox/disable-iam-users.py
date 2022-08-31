@@ -112,7 +112,7 @@ def create_command_line_arguments_parser() -> ArgumentParser:
     parser.add_argument("inactive_users_report_file",
         help = "the name of the input file containing the names of inactive users (TXT format, single name per line)")
     parser.add_argument("deactivated_users_report_file",
-        help = "the name of the output file the generated report with deactivated IAM users is to be written to")
+        help = "the name of the output file the generated report with deactivated IAM users is to be written to (JSON format)")
 
     return parser
 
@@ -125,7 +125,7 @@ def parse_command_line_arguments():
 
 def load_user_names(filename: str) -> List[str]:
     with open(filename, "r") as input_file:
-        return input_file.readlines()
+        return list(map(lambda s: s.strip(), input_file.readlines()))
 
 
 def deactivate_users(users: List[str]) -> List[UserDeactivationResult]:
