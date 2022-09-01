@@ -16,3 +16,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+data "archive_file" "kms_function_archive" {
+  type        = "zip"
+  source_file = "${path.module}/kms-encryption.py"
+  output_path = "${path.module}/kms-encryption.zip"
+}
+
+data "archive_file" "ssm_parameter_function_archive" {
+  type        = "zip"
+  source_file = "${path.module}/read-ssm-parameter.py"
+  output_path = "${path.module}/read-ssm-parameter.zip"
+}
+
+resource "aws_lambda_function" "kms_encryption_function" {
+  function_name = "${var.resource_name_prefix}-KMSDecryption-Function"
+  filename      = ""
+  runtime       = "python3.8"
+  handler       = ""
+  timeout       = 10
+  role          = ""
+}
+
+resource "aws_lambda_function" "kms_decryption_function" {
+  function_name = "${var.resource_name_prefix}-KMSEncryption-Function"
+  filename      = ""
+  runtime       = "python3.8"
+  handler       = ""
+  timeout       = 10
+  role          = ""
+}
+
+resource "aws_lambda_function" "read_ssm_parameter_function" {
+  function_name = "${var.resource_name_prefix}-SSMParameterReader-Function"
+  filename      = ""
+  runtime       = "python3.8"
+  handler       = ""
+  timeout       = 10
+  role          = ""
+}

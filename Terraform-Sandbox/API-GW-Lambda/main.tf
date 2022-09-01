@@ -31,29 +31,35 @@ terraform {
   }
 }
 
+provider "aws" {
+  region = var.aws_region
+}
+
 data "aws_route53_zone" "alias_hosted_zone" {
   name         = var.route53_alias_settings.alias_hosted_zone_name
   private_zone = false
 }
 
-provider "aws" {
-  region = var.aws_region
+module "ssm" {
+  source               = "./modules/ssm"
+  resource_name_prefix = var.resource_name_prefix
+  tags                 = var.tags
 }
 
 module "lambda" {
-  source = "./modules/lambda"
+  source               = "./modules/lambda"
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
 }
 
 module "api-gw" {
-  source = "./modules/api-gw"
+  source               = "./modules/api-gw"
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
 }
 
 module "route53" {
-  source = "./modules/route53"
+  source               = "./modules/route53"
   resource_name_prefix = var.resource_name_prefix
   tags                 = var.tags
 }
