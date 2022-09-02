@@ -41,9 +41,16 @@ data "aws_route53_zone" "alias_hosted_zone" {
 }
 
 module "ssm" {
-  source               = "./modules/ssm"
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+  source                = "./modules/ssm"
+  parameter_name_prefix = "TODO"
+  parameter_one_name    = "TODO"
+  parameter_one_value   = "TODO"
+  parameter_two_name    = "TODO"
+  parameter_two_value   = "TODO"
+  parameter_three_name  = "TODO"
+  parameter_three_value = "TODO"
+  resource_name_prefix  = var.resource_name_prefix
+  tags                  = var.tags
 }
 
 module "lambda" {

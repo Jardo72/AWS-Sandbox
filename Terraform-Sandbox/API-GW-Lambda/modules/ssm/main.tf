@@ -16,3 +16,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+resource "aws_ssm_parameter" "ssm_parameter_one" {
+  type  = "String"
+  tier  = "Standard"
+  name  = "${var.parameter_name_prefix}/${var.parameter_one_name}"
+  value = var.parameter_one_value
+  tags  = var.tags
+}
+
+resource "aws_ssm_parameter" "ssm_parameter_two" {
+  type  = "String"
+  tier  = "Standard"
+  name  = "${var.parameter_name_prefix}/${var.parameter_two_name}"
+  value = var.parameter_two_value
+  tags  = var.tags
+}
+
+resource "aws_ssm_parameter" "ssm_parameter_three" {
+  type  = "String"
+  tier  = "Standard"
+  name  = "${var.parameter_name_prefix}/${var.parameter_three_name}"
+  value = var.parameter_three_value
+  tags  = var.tags
+}

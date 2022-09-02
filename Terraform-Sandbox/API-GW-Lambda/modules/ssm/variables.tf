@@ -17,6 +17,41 @@
 # limitations under the License.
 #
 
+variable "parameter_name_prefix" {
+  description = "The prefix (path) for the names of the parameters"
+  type        = string
+}
+
+variable "parameter_one_name" {
+  description = "The short name (without any prefix) of the 1st parameter"
+  type        = string
+}
+
+variable "parameter_one_value" {
+  description = "The value of the 1st parameter"
+  type        = string
+}
+
+variable "parameter_two_name" {
+  description = "The short name (without any prefix) of the 2nd parameter"
+  type        = string
+}
+
+variable "parameter_two_value" {
+  description = "The value of the 2nd parameter"
+  type        = string
+}
+
+variable "parameter_three_name" {
+  description = "The short name (without any prefix) of the 3rd parameter"
+  type        = string
+}
+
+variable "parameter_three_value" {
+  description = "The value of the 3rd parameter"
+  type        = string
+}
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string
