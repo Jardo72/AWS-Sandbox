@@ -22,6 +22,7 @@ variable "aws_region" {
   type        = string
 }
 
+/* TODO:
 variable "route53_alias_settings" {
   description = "Settings for the Route 53 alias for the ALB"
   type = object({
@@ -29,7 +30,7 @@ variable "route53_alias_settings" {
     alias_hosted_zone_name = string
     alias_fqdn             = string
   })
-}
+} */
 
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"

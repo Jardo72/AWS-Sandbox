@@ -90,8 +90,32 @@ resource "aws_iam_policy" "kms_operations_access_policy" {
   })
 }
 
+resource "aws_iam_role" "ssm_parameters_reader_role" {
+  name = "${var.resource_name_prefix}-SSMParametersReader-Role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+  managed_policy_arns = [
+    aws_iam_policy.cloudwatch_logs_access_policy.arn,
+    aws_iam_policy.ssm_parameters_access_policy.arn
+  ]
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-SSM-Parameters-Reader-Role"
+  })
+}
+
 resource "aws_iam_role" "kms_encryption_role" {
-  name = "${var.resource_name_prefix}-"
+  name = "${var.resource_name_prefix}-KMSEncryption-Role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -120,7 +144,7 @@ resource "aws_lambda_function" "read_ssm_parameter_function" {
   handler       = "read-ssm-parameter.main"
   runtime       = local.runtime
   timeout       = local.timeout
-  role          = ""
+  role          = aws_iam_role.ssm_parameters_reader_role.arn
 }
 
 resource "aws_lambda_function" "kms_encryption_function" {

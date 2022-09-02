@@ -35,10 +35,11 @@ provider "aws" {
   region = var.aws_region
 }
 
+/* TODO:
 data "aws_route53_zone" "alias_hosted_zone" {
   name         = var.route53_alias_settings.alias_hosted_zone_name
   private_zone = false
-}
+} */
 
 module "ssm" {
   source = "./modules/ssm"
