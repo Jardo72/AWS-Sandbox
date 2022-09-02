@@ -16,3 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+resource "aws_api_gateway_rest_api" "rest_api" {
+  name = "${var.resource_name_prefix}-REST-API"
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+  body = templatefile("${path.module}/api-definition.yml", {})
+}

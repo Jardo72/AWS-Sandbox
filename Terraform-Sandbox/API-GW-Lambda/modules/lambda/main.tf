@@ -164,3 +164,24 @@ resource "aws_lambda_function" "kms_decryption_function" {
   timeout       = local.timeout
   role          = aws_iam_role.kms_encryption_role.arn
 }
+
+resource "aws_lambda_permission" "read_ssm_parameter_function_permission" {
+  statement_id  = "AllowInvocationToAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.read_ssm_parameter_function.function_name
+  principal     = "apigateway.amazonaws.com"
+}
+
+resource "aws_lambda_permission" "kms_encryption_function_permission" {
+  statement_id  = "AllowInvocationToAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.kms_encryption_function.function_name
+  principal     = "apigateway.amazonaws.com"
+}
+
+resource "aws_lambda_permission" "kms_decryption_function_permission" {
+  statement_id  = "AllowInvocationToAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.kms_decryption_function.function_name
+  principal     = "apigateway.amazonaws.com"
+}
