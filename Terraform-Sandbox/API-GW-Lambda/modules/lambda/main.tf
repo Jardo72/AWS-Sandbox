@@ -34,6 +34,41 @@ data "archive_file" "ssm_parameter_function_archive" {
   output_path = "${path.module}/read-ssm-parameter.zip"
 }
 
+resource "aws_iam_policy" "cloudwatch_logs_access_policy" {
+  name = "${var.resource_name_prefix}-"
+  policy = jsonencode({
+
+  })
+}
+
+resource "aws_iam_policy" "kms_operations_access_policy" {
+  name = "${var.resource_name_prefix}-"
+  policy = jsonencode({
+
+  })
+}
+
+resource "aws_iam_role" "kms_encryption_role" {
+  name = "${var.resource_name_prefix}-"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+  managed_policy_arns = [
+    aws_iam_policy.cloudwatch_logs_access_policy.arn,
+    aws_iam_policy.kms_operations_access_policy.arn
+  ]
+}
+
 resource "aws_lambda_function" "read_ssm_parameter_function" {
   function_name = "${var.resource_name_prefix}-SSMParameterReader-Function"
   filename      = data.archive_file.ssm_parameter_function_archive.output_path
@@ -49,7 +84,7 @@ resource "aws_lambda_function" "kms_encryption_function" {
   handler       = "kms-encryption.encrypt_main"
   runtime       = local.runtime
   timeout       = local.timeout
-  role          = ""
+  role          = aws_iam_role.kms_encryption_role.arn
 }
 
 resource "aws_lambda_function" "kms_decryption_function" {
@@ -58,5 +93,5 @@ resource "aws_lambda_function" "kms_decryption_function" {
   handler       = "kms-encryption.decrypt_main"
   runtime       = local.runtime
   timeout       = local.timeout
-  role          = ""
+  role          = aws_iam_role.kms_encryption_role.arn
 }

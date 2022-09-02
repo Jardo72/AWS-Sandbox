@@ -17,6 +17,21 @@
 # limitations under the License.
 #
 
+variable "read_ssm_parameter_function_arn" {
+  description = "ARN of the Lambda function to be used as backend for the read SSM paramater API endpoint"
+  type        = string
+}
+
+variable "kms_encryption_function_arn" {
+  description = "ARN of the Lambda function to be used as backend for the KMS encryption API endpoint"
+  type        = string
+}
+
+variable "kms_decryption_function_arn" {
+  description = "ARN of the Lambda function to be used as backend for the KMS decryption API endpoint"
+  type        = string
+}
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string
