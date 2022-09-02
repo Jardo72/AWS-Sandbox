@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+locals {
+  runtime = "python3.8"
+  timeout = 10
+}
+
 data "archive_file" "kms_function_archive" {
   type        = "zip"
   source_file = "${path.module}/kms-encryption.py"
@@ -29,29 +34,29 @@ data "archive_file" "ssm_parameter_function_archive" {
   output_path = "${path.module}/read-ssm-parameter.zip"
 }
 
+resource "aws_lambda_function" "read_ssm_parameter_function" {
+  function_name = "${var.resource_name_prefix}-SSMParameterReader-Function"
+  filename      = data.archive_file.ssm_parameter_function_archive.output_path
+  handler       = "read-ssm-parameter.main"
+  runtime       = local.runtime
+  timeout       = local.timeout
+  role          = ""
+}
+
 resource "aws_lambda_function" "kms_encryption_function" {
   function_name = "${var.resource_name_prefix}-KMSDecryption-Function"
-  filename      = ""
-  runtime       = "python3.8"
-  handler       = ""
-  timeout       = 10
+  filename      = data.archive_file.kms_function_archive.output_path
+  handler       = "kms-encryption.encrypt_main"
+  runtime       = local.runtime
+  timeout       = local.timeout
   role          = ""
 }
 
 resource "aws_lambda_function" "kms_decryption_function" {
   function_name = "${var.resource_name_prefix}-KMSEncryption-Function"
-  filename      = ""
-  runtime       = "python3.8"
-  handler       = ""
-  timeout       = 10
-  role          = ""
-}
-
-resource "aws_lambda_function" "read_ssm_parameter_function" {
-  function_name = "${var.resource_name_prefix}-SSMParameterReader-Function"
-  filename      = ""
-  runtime       = "python3.8"
-  handler       = ""
-  timeout       = 10
+  filename      = data.archive_file.kms_function_archive.output_path
+  handler       = "kms-encryption.decrypt_main"
+  runtime       = local.runtime
+  timeout       = local.timeout
   role          = ""
 }
