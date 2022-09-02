@@ -35,16 +35,58 @@ data "archive_file" "ssm_parameter_function_archive" {
 }
 
 resource "aws_iam_policy" "cloudwatch_logs_access_policy" {
-  name = "${var.resource_name_prefix}-"
+  name = "${var.resource_name_prefix}-CloudWatchLogs-AccessPolicy"
   policy = jsonencode({
+    Version : "2012-10-17",
+    Statement : [
+      {
+        Sid : "AllowCloudWatchLogsAccess",
+        Effect : "Allow",
+        Action : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource : "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
 
+resource "aws_iam_policy" "ssm_parameters_access_policy" {
+  name = "${var.resource_name_prefix}-SSMParameters-AccessPolicy"
+  policy = jsonencode({
+    Version : "2012-10-17",
+    Statement : [
+      {
+        Sid : "AllowCloudWatchLogsAccess",
+        Effect : "Allow",
+        Action : [
+          "ssm:GetParameter"
+        ],
+        # TODO: fine-tune the allowed resources
+        Resource : "*"
+      }
+    ]
   })
 }
 
 resource "aws_iam_policy" "kms_operations_access_policy" {
-  name = "${var.resource_name_prefix}-"
+  name = "${var.resource_name_prefix}-KMSOperations-AccessPolicy"
   policy = jsonencode({
-
+    Version : "2012-10-17",
+    Statement : [
+      {
+        Sid : "AllowKMSEncryptionDecryption",
+        Effect : "Allow",
+        Action : [
+          "kms:encrypt",
+          "kms:decrypt"
+        ]
+        # TODO: fine-tune the allowed resources
+        Resource : "*"
+      }
+    ]
   })
 }
 
@@ -67,6 +109,9 @@ resource "aws_iam_role" "kms_encryption_role" {
     aws_iam_policy.cloudwatch_logs_access_policy.arn,
     aws_iam_policy.kms_operations_access_policy.arn
   ]
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-KMS-Encryption-Role"
+  })
 }
 
 resource "aws_lambda_function" "read_ssm_parameter_function" {

@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+variable "ssm_parameter_name_prefix" {
+  description = "Prefix for the names of the SSM parameters (needed for the execution role for the corresponding Lambda function)"
+  type        = string
+}
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string

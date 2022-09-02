@@ -41,22 +41,25 @@ data "aws_route53_zone" "alias_hosted_zone" {
 }
 
 module "ssm" {
-  source                = "./modules/ssm"
-  parameter_name_prefix = "TODO"
-  parameter_one_name    = "TODO"
-  parameter_one_value   = "TODO"
-  parameter_two_name    = "TODO"
-  parameter_two_value   = "TODO"
-  parameter_three_name  = "TODO"
-  parameter_three_value = "TODO"
+  source = "./modules/ssm"
+  # TODO: the names & values shoould not be hardcoded here
+  parameter_name_prefix = "/api-gw-lambda-samples"
+  parameter_one_name    = "sample-param-one"
+  parameter_one_value   = "Sample SSM value #1 for API-GW-Lambda-Demo"
+  parameter_two_name    = "sample-param-two"
+  parameter_two_value   = "Sample SSM value #2 for API-GW-Lambda-Demo"
+  parameter_three_name  = "sample-param-three"
+  parameter_three_value = "Sample SSM value #3 for API-GW-Lambda-Demo"
   resource_name_prefix  = var.resource_name_prefix
   tags                  = var.tags
 }
 
 module "lambda" {
-  source               = "./modules/lambda"
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+  source = "./modules/lambda"
+  # TODO: the prefix should not be hardcoded here
+  ssm_parameter_name_prefix = "/api-gw-lambda-samples"
+  resource_name_prefix      = var.resource_name_prefix
+  tags                      = var.tags
 }
 
 module "api-gw" {
