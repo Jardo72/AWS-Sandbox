@@ -50,6 +50,11 @@ paths:
                 $ref: "#/components/schemas/SSMParameterDetailsResponse"
         '404':
           description: SSM parameter with the given name not found
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: "${read_ssm_parameter_function_arn}"
+        httpMethod: "GET"
+        timeoutInMillis: 10000
 
   /kms/encrypt:
     post:
@@ -81,6 +86,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDetails"
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: "${kms_encryption_function_arn}"
+        httpMethod: "POST"
+        timeoutInMillis: 10000
 
   /kms/decrypt:
     post:
@@ -112,6 +122,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDetails"
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        uri: "${kms_decryption_function_arn}"
+        httpMethod: "POST"
+        timeoutInMillis: 10000
 
 components:
   schemas:

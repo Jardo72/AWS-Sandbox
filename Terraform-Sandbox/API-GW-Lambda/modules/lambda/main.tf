@@ -139,30 +139,33 @@ resource "aws_iam_role" "kms_encryption_role" {
 }
 
 resource "aws_lambda_function" "read_ssm_parameter_function" {
-  function_name = "${var.resource_name_prefix}-SSMParameterReader-Function"
-  filename      = data.archive_file.ssm_parameter_function_archive.output_path
-  handler       = "read-ssm-parameter.main"
-  runtime       = local.runtime
-  timeout       = local.timeout
-  role          = aws_iam_role.ssm_parameters_reader_role.arn
+  function_name    = "${var.resource_name_prefix}-SSMParameterReader-Function"
+  filename         = data.archive_file.ssm_parameter_function_archive.output_path
+  source_code_hash = data.archive_file.ssm_parameter_function_archive.output_base64sha256
+  handler          = "read-ssm-parameter.main"
+  runtime          = local.runtime
+  timeout          = local.timeout
+  role             = aws_iam_role.ssm_parameters_reader_role.arn
 }
 
 resource "aws_lambda_function" "kms_encryption_function" {
-  function_name = "${var.resource_name_prefix}-KMSDecryption-Function"
-  filename      = data.archive_file.kms_function_archive.output_path
-  handler       = "kms-encryption.encrypt_main"
-  runtime       = local.runtime
-  timeout       = local.timeout
-  role          = aws_iam_role.kms_encryption_role.arn
+  function_name    = "${var.resource_name_prefix}-KMSDecryption-Function"
+  filename         = data.archive_file.kms_function_archive.output_path
+  source_code_hash = data.archive_file.kms_function_archive.output_base64sha256
+  handler          = "kms-encryption.encrypt_main"
+  runtime          = local.runtime
+  timeout          = local.timeout
+  role             = aws_iam_role.kms_encryption_role.arn
 }
 
 resource "aws_lambda_function" "kms_decryption_function" {
-  function_name = "${var.resource_name_prefix}-KMSEncryption-Function"
-  filename      = data.archive_file.kms_function_archive.output_path
-  handler       = "kms-encryption.decrypt_main"
-  runtime       = local.runtime
-  timeout       = local.timeout
-  role          = aws_iam_role.kms_encryption_role.arn
+  function_name    = "${var.resource_name_prefix}-KMSEncryption-Function"
+  filename         = data.archive_file.kms_function_archive.output_path
+  source_code_hash = data.archive_file.kms_function_archive.output_base64sha256
+  handler          = "kms-encryption.decrypt_main"
+  runtime          = local.runtime
+  timeout          = local.timeout
+  role             = aws_iam_role.kms_encryption_role.arn
 }
 
 resource "aws_lambda_permission" "read_ssm_parameter_function_permission" {
