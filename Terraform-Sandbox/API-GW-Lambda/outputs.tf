@@ -16,3 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "read_ssm_parameter_function_arn" {
+  value = module.lambda.read_ssm_parameter_function_arn
+}
+
+output "kms_encryption_function_arn" {
+  value = module.lambda.kms_encryption_function_arn
+}
+
+output "kms_decryption_function_arn" {
+  value = module.lambda.kms_decryption_function_arn
+}

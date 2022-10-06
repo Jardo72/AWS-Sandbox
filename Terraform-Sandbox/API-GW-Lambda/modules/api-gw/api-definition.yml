@@ -52,8 +52,9 @@ paths:
           description: SSM parameter with the given name not found
       x-amazon-apigateway-integration:
         type: "aws_proxy"
-        uri: "${read_ssm_parameter_function_arn}"
-        httpMethod: "GET"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${read_ssm_parameter_function_arn}/invocations"
         timeoutInMillis: 10000
 
   /kms/encrypt:
@@ -88,8 +89,9 @@ paths:
                 $ref: "#/components/schemas/ErrorDetails"
       x-amazon-apigateway-integration:
         type: "aws_proxy"
-        uri: "${kms_encryption_function_arn}"
         httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${kms_encryption_function_arn}/invocations"
         timeoutInMillis: 10000
 
   /kms/decrypt:
@@ -124,8 +126,9 @@ paths:
                 $ref: "#/components/schemas/ErrorDetails"
       x-amazon-apigateway-integration:
         type: "aws_proxy"
-        uri: "${kms_decryption_function_arn}"
         httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${kms_decryption_function_arn}/invocations"
         timeoutInMillis: 10000
 
 components:

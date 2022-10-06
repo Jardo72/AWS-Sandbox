@@ -23,6 +23,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
     types = ["REGIONAL"]
   }
   body = templatefile("${path.module}/api-definition.yml", {
+    aws_region                      = var.aws_region,
     read_ssm_parameter_function_arn = var.read_ssm_parameter_function_arn,
     kms_encryption_function_arn     = var.kms_encryption_function_arn,
     kms_decryption_function_arn     = var.kms_decryption_function_arn

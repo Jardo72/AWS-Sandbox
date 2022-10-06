@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+variable "aws_region" {
+  description = "The AWS region where the resources are to be provisioned"
+  type        = string
+}
+
 variable "read_ssm_parameter_function_arn" {
   description = "ARN of the Lambda function to be used as backend for the read SSM paramater API endpoint"
   type        = string
