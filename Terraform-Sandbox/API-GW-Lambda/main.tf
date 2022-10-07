@@ -74,7 +74,8 @@ module "api-gw" {
 }
 
 module "route53" {
-  source               = "./modules/route53"
-  resource_name_prefix = var.resource_name_prefix
-  tags                 = var.tags
+  source        = "./modules/route53"
+  enabled       = false
+  alias_zone_id = "TODO"
+  alias_fqdn    = "TODO"
 }

@@ -18,5 +18,5 @@
 #
 
 output "rest_api_invocation_url" {
-  value = "TODO"
+  value = aws_api_gateway_stage.stage.invoke_url
 }

@@ -17,12 +17,17 @@
 # limitations under the License.
 #
 
-variable "resource_name_prefix" {
-  description = "Prefix for the names to be applied to the provisioned resources"
+variable "enabled" {
+  description = "Determines whether the Route 53 alias for the API GW stage is to be created or not"
+  type        = bool
+}
+
+variable "alias_zone_id" {
+  description = "Zone ID of the hosted zone the alias record is to be added to"
   type        = string
 }
 
-variable "tags" {
-  description = "Common tags to be applied to the provisioned resources"
-  type        = map(string)
+variable "alias_fqdn" {
+  description = "FQDN for the alias record"
+  type        = string
 }

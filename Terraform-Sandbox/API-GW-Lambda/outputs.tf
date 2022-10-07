@@ -28,3 +28,7 @@ output "kms_encryption_function_arn" {
 output "kms_decryption_function_arn" {
   value = module.lambda.kms_decryption_function_arn
 }
+
+output "rest_api_invocation_url" {
+  value = module.api-gw.rest_api_invocation_url
+}
