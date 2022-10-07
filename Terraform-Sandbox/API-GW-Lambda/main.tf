@@ -35,15 +35,14 @@ provider "aws" {
   region = var.aws_region
 }
 
-/* TODO:
 data "aws_route53_zone" "alias_hosted_zone" {
-  name         = var.route53_alias_settings.alias_hosted_zone_name
+  name         = var.route53_alias_hosted_zone_name
   private_zone = false
-} */
+}
 
 module "ssm" {
   source = "./modules/ssm"
-  # TODO: the names & values shoould not be hardcoded here
+  # TODO: the names & values should not be hardcoded here
   parameter_name_prefix = "/api-gw-lambda-samples"
   parameter_one_name    = "sample-param-one"
   parameter_one_value   = "Sample SSM value #1 for API-GW-Lambda-Demo"
@@ -75,7 +74,7 @@ module "api-gw" {
 
 module "route53" {
   source        = "./modules/route53"
-  enabled       = false
-  alias_zone_id = "TODO"
-  alias_fqdn    = "TODO"
+  enabled       = var.route53_alias_enabled
+  alias_zone_id = data.aws_route53_zone.alias_hosted_zone.id
+  alias_fqdn    = var.route53_alias_fqdn
 }
