@@ -31,3 +31,8 @@ variable "alias_fqdn" {
   description = "FQDN for the alias record"
   type        = string
 }
+
+variable "api_gw_stage_dns_name" {
+  description = "FQDN automatically assigned to the API Gateway stage by AWS"
+  type        = string
+}

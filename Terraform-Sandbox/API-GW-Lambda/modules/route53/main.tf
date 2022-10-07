@@ -17,16 +17,14 @@
 # limitations under the License.
 #
 
-/* TODO:
 resource "aws_route53_record" "api_gw_stage_alias" {
   count   = var.enabled ? 1 : 0
   zone_id = var.alias_zone_id
   name    = var.alias_fqdn
   type    = "A"
   alias {
-    name                   = var.load_balancer_dns_name
-    zone_id                = var.load_balancer_zone_id
+    name                   = var.api_gw_stage_dns_name
+    zone_id                = "Z1U9ULNL0V5AJ3"
     evaluate_target_health = false
   }
 }
-*/

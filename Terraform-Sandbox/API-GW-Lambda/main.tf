@@ -73,8 +73,9 @@ module "api-gw" {
 }
 
 module "route53" {
-  source        = "./modules/route53"
-  enabled       = var.route53_alias_enabled
-  alias_zone_id = data.aws_route53_zone.alias_hosted_zone.id
-  alias_fqdn    = var.route53_alias_fqdn
+  source                = "./modules/route53"
+  enabled               = var.route53_alias_enabled
+  alias_zone_id         = data.aws_route53_zone.alias_hosted_zone.id
+  alias_fqdn            = var.route53_alias_fqdn
+  api_gw_stage_dns_name = module.api-gw.rest_api_invocation_url
 }

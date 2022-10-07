@@ -17,7 +17,6 @@
 # limitations under the License.
 #
 
-/* TODO
 output "rest_api_dns_alias" {
   value = var.enabled ? aws_route53_record.api_gw_stage_alias[0].fqdn : "N/A"
-} */
+}
