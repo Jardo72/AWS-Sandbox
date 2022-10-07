@@ -59,7 +59,7 @@ resource "aws_iam_policy" "ssm_parameters_access_policy" {
     Version : "2012-10-17",
     Statement : [
       {
-        Sid : "AllowCloudWatchLogsAccess",
+        Sid : "AllowSSMParamReadAccess",
         Effect : "Allow",
         Action : [
           "ssm:GetParameter"
@@ -96,9 +96,9 @@ resource "aws_iam_role" "ssm_parameters_reader_role" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "AllowLambdaToAssumeRole"
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid    = ""
         Principal = {
           Service = "lambda.amazonaws.com"
         }
@@ -120,9 +120,9 @@ resource "aws_iam_role" "kms_encryption_role" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "AllowLambdaToAssumeRole"
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid    = ""
         Principal = {
           Service = "lambda.amazonaws.com"
         }
