@@ -18,10 +18,14 @@
 #
 
 from dataclasses import dataclass
+from urllib import response
 from pytest import mark
 
 import requests
 
+
+HOSTNAME = "xwhwsybzm5.execute-api.eu-central-1.amazonaws.com/sandbox"
+KMS_KEY_ID = "a48a7295-7b9a-421a-9ba0-c6a78e39f873"
 
 @dataclass(frozen=True)
 class TestCaseData:
@@ -37,7 +41,7 @@ class TestSsmParamaterReading:
         TestCaseData(name="/api-gw-lambda-samples/sample-param-three", expected_value="Sample SSM value #3 for API-GW-Lambda-Demo"),
     ])
     def test_that_proper_param_value_is_read(self, test_case_data: TestCaseData) -> None:
-        url = f"/ssm-parameter"
+        url = f"https://{HOSTNAME}/ssm-parameter"
         response = requests.get(url)
 
         assert response.status_code == 200
@@ -49,4 +53,22 @@ class TestSsmParamaterReading:
 
 
 class KmsEncryptionDecryption:
-    pass
+
+    def test_that_() -> None:
+        encryption_url = f"https://{HOSTNAME}/kms/encrypt"
+        encryption_response = requests.post(encryption_url, data={
+            "plaintext": "Hello world!!!",
+            "kmsKeyId": KMS_KEY_ID
+        })
+
+        assert encryption_response.status_code == 200
+        ciphertext = encryption_response.json["ciphertext"]
+
+        decryption_url = f"https://{HOSTNAME}/kms/decrypt"
+        decryption_response = requests.post(decryption_url, data={
+            "ciphertext": ciphertext,
+            "kmsKeyId": KMS_KEY_ID
+        })
+
+        assert decryption_response.status_code == 200
+        plaintext = decryption_response.json()["plaintext"]
