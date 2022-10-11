@@ -106,6 +106,7 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [Terraform-Sandbox/L7-Load-Balancing](./Terraform-Sandbox/L7-Load-Balancing)
 * [Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone](./Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone)
 * [Terraform-Sandbox/S3-Cross-Region-Replication](./Terraform-Sandbox/S3-Cross-Region-Replication)
+* [Terraform-Sandbox/API-GW-Lambda](./Terraform-Sandbox/API-GW-Lambda)
 
 #### VPC
 * [VPC-Endpoint](./VPC-Endpoint)

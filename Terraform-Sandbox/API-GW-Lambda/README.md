@@ -44,7 +44,7 @@ tags = {
 
 
 ## Automated Tests
-The automated test suite is available in the [tests](./tests) directory. It is implemented in Python, and it is based on [pytest](https://pypi.org/project/pytest/) and [requests](https://pypi.org/project/requests) 3rd party packages (see also [requirements.txt](./requirements.txt)). The following command can be used to start the test suite (assumed the [tests](./tests) directory is the current directory, and the 3rd party packages have been installed).
+The automated test suite is available in the [tests](./tests) directory. It is implemented in Python, and it is based on [pytest](https://pypi.org/project/pytest/) and [requests](https://pypi.org/project/requests) 3rd party packages (see also [requirements.txt](./tests/requirements.txt)). The following command can be used to start the test suite (assumed the [tests](./tests) directory is the current directory, and the 3rd party packages have been installed).
 
 ```
 pytest test_api.py
