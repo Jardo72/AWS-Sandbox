@@ -35,11 +35,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "aws_route53_zone" "alias_hosted_zone" {
-  name         = var.route53_alias_hosted_zone_name
-  private_zone = false
-}
-
 module "ssm" {
   source = "./modules/ssm"
   # TODO: the names & values should not be hardcoded here
@@ -70,12 +65,4 @@ module "api-gw" {
   kms_decryption_function_arn     = module.lambda.kms_decryption_function_arn
   resource_name_prefix            = var.resource_name_prefix
   tags                            = var.tags
-}
-
-module "route53" {
-  source                = "./modules/route53"
-  enabled               = var.route53_alias_enabled
-  alias_zone_id         = data.aws_route53_zone.alias_hosted_zone.id
-  alias_fqdn            = var.route53_alias_fqdn
-  api_gw_stage_dns_name = module.api-gw.rest_api_invocation_url
 }

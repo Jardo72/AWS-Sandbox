@@ -4,7 +4,7 @@
 
 # Manual Testing
 
-`GET `
+`GET /ssm-paramater`
 
 `POST /kms/encrypt`
 ```json
@@ -24,3 +24,7 @@
 
 
 ## Automated Tests
+
+```
+pytest test_api.py
+```
