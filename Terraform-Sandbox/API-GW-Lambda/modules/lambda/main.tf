@@ -64,8 +64,7 @@ resource "aws_iam_policy" "ssm_parameters_access_policy" {
         Action : [
           "ssm:GetParameter"
         ],
-        # TODO: fine-tune the allowed resources
-        Resource : "*"
+        Resource : "arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter${var.ssm_parameter_name_prefix}/*"
       }
     ]
   })
@@ -83,7 +82,6 @@ resource "aws_iam_policy" "kms_operations_access_policy" {
           "kms:encrypt",
           "kms:decrypt"
         ]
-        # TODO: fine-tune the allowed resources
         Resource : "*"
       }
     ]

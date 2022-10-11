@@ -38,9 +38,9 @@ class Params:
 class TestSsmParamaterReading:
     
     @mark.parametrize("test_case_data", [
-        Params(param_name="/api-gw-lambda-samples/sample-param-one", expected_value="Sample SSM value #1 for API-GW-Lambda-Demo"),
-        Params(param_name="/api-gw-lambda-samples/sample-param-two", expected_value="Sample SSM value #2 for API-GW-Lambda-Demo"),
-        Params(param_name="/api-gw-lambda-samples/sample-param-three", expected_value="Sample SSM value #3 for API-GW-Lambda-Demo"),
+        Params(param_name="/api-gw-lambda-samples/sample-param-one", expected_value="Sample SSM parameter value #1 for API-GW-Lambda-Demo"),
+        Params(param_name="/api-gw-lambda-samples/sample-param-two", expected_value="Second SSM parameter value for API-GW-Lambda-Demo"),
+        Params(param_name="/api-gw-lambda-samples/sample-param-three", expected_value="Dummy SSM parameter value #3 for API-GW-Lambda-Demo"),
     ])
     def test_that_proper_param_value_is_read(self, test_case_data: Params) -> None:
         response = requests.get(

@@ -17,6 +17,16 @@
 # limitations under the License.
 #
 
+variable "aws_region" {
+  description = "The AWS region where the resources are to be provisioned"
+  type        = string
+}
+
+variable "aws_account_id" {
+  description = "Account ID of the current AWS account"
+  type        = string
+}
+
 variable "ssm_parameter_name_prefix" {
   description = "Prefix for the names of the SSM parameters (needed for the execution role for the corresponding Lambda function)"
   type        = string

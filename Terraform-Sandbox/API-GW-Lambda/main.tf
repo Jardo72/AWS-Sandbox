@@ -35,24 +35,26 @@ provider "aws" {
   region = var.aws_region
 }
 
+data "aws_caller_identity" "current" {}
+
 module "ssm" {
   source = "./modules/ssm"
-  # TODO: the names & values should not be hardcoded here
-  parameter_name_prefix = "/api-gw-lambda-samples"
-  parameter_one_name    = "sample-param-one"
-  parameter_one_value   = "Sample SSM value #1 for API-GW-Lambda-Demo"
-  parameter_two_name    = "sample-param-two"
-  parameter_two_value   = "Sample SSM value #2 for API-GW-Lambda-Demo"
-  parameter_three_name  = "sample-param-three"
-  parameter_three_value = "Sample SSM value #3 for API-GW-Lambda-Demo"
+  parameter_name_prefix = var.ssm_parameter_name_prefix
+  parameter_one_name    = var.ssm_parameter_one_name
+  parameter_one_value   = var.ssm_parameter_one_value
+  parameter_two_name    = var.ssm_parameter_two_name
+  parameter_two_value   = var.ssm_parameter_two_value
+  parameter_three_name  = var.ssm_parameter_three_name
+  parameter_three_value = var.ssm_parameter_three_value
   resource_name_prefix  = var.resource_name_prefix
   tags                  = var.tags
 }
 
 module "lambda" {
   source = "./modules/lambda"
-  # TODO: the prefix should not be hardcoded here
-  ssm_parameter_name_prefix = "/api-gw-lambda-samples"
+  aws_region                = var.aws_region
+  aws_account_id            = data.aws_caller_identity.current.account_id
+  ssm_parameter_name_prefix = var.ssm_parameter_name_prefix
   resource_name_prefix      = var.resource_name_prefix
   tags                      = var.tags
 }
