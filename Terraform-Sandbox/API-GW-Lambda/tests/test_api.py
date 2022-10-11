@@ -93,3 +93,15 @@ class TestKmsEncryptionDecryption:
         decryption_response_body = decryption_response.json()
         assert ciphertext == decryption_response_body["ciphertext"]
         assert plaintext == decryption_response_body["plaintext"]
+
+    def test_that_encryption_with_non_existent_key_leads_to_error(self) -> None:
+        encryption_request_body = {
+            "plaintext": "Text not relevant",
+            "kmsKeyId": "00000000-0001-0001-0001-111111111111"
+        }
+        encryption_response = requests.post(
+            f"{API_GW_INVOCATION_URL}/kms/encrypt",
+            data=dumps(encryption_request_body)
+        )
+
+        assert encryption_response.status_code == 404
