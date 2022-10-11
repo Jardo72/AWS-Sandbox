@@ -1,0 +1,193 @@
+#
+# Copyright 2022 Jaroslav Chmurny
+#
+# This file is part of AWS Sandbox.
+#
+# AWS Sandbox is free software developed for educational purposes. It
+# is licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+openapi: 3.0.0
+
+info:
+  title: API Gateway + Lambda Demo
+  description: Educational/experimental API to be provided by AWS API Gateway
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+
+paths:
+  /ssm-parameter:
+    get:
+      summary: SSM paramater details
+      description: Returns the type and the value of the specified parameter stored in the SSM Parameter Store
+      tags:
+        - SSM Parameter Store
+      parameters:
+        - name: name
+          description: The name of the SSM parameter whose details are to be returned
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Parameter details returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SSMParameterDetailsResponse"
+        '404':
+          description: SSM parameter with the given name not found
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${read_ssm_parameter_function_arn}/invocations"
+        timeoutInMillis: 10000
+
+  /kms/encrypt:
+    post:
+      summary: KMS encryption
+      description: Encrypts the given plaintext with the KMS encryption key with the given ID
+      tags:
+        - KMS Encryption/Decryption
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EncryptionRequest"
+      responses:
+        '200':
+          description: Returns the outcome of the encryption, together with the original plaintext and the ID of the KMS encryption key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CryptographicOperationResponse"
+        '404':
+          description: KMS key with the given key ID not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetails"
+        '400':
+          description: If some of the mandatory attributes is missing in the request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetails"
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${kms_encryption_function_arn}/invocations"
+        timeoutInMillis: 10000
+
+  /kms/decrypt:
+    post:
+      summary: KMS decryption
+      description: Decrypts the given ciphertext with the KMS encryption key with the given ID
+      tags:
+        - KMS Encryption/Decryption
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DecryptionRequest"
+      responses:
+        '200':
+          description: Returns the outcome of the decryption, together with the original ciphertext and the ID of the KMS encryption key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CryptographicOperationResponse"
+        '404':
+          description: KMS key with the given key ID not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetails"
+        '400':
+          description: If some of the mandatory attributes is missing in the request body, or if the given ciphertext is not a valid ciphertext
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorDetails"
+      x-amazon-apigateway-integration:
+        type: "aws_proxy"
+        httpMethod: "POST"
+        passthroughBehavior: "when_no_match"
+        uri: "arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/${kms_decryption_function_arn}/invocations"
+        timeoutInMillis: 10000
+
+components:
+  schemas:
+    SSMParameterDetailsResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        value:
+          type: string
+        version:
+          type: string
+
+    EncryptionRequest:
+      type: object
+      required:
+        - plaintext
+        - kmsKeyId
+      properties:
+        plaintext:
+          type: string
+        kmsKeyId:
+          type: string
+
+    DecryptionRequest:
+      type: object
+      required:
+        - ciphertext
+        - kmsKeyId
+      properties:
+        ciphertext:
+          type: string
+        kmsKeyId:
+          type: string
+
+    CryptographicOperationResponse:
+      type: object
+      required:
+        - kmsKeyId
+        - plaintext
+        - ciphertext
+      properties:
+        kmsKeyId:
+          type: string
+        plaintext:
+          type: string
+        ciphertext:
+          type: string
+
+    ErrorDetails:
+      type: object
+      required:
+        - exception
+        - detail
+      properties:
+        exception:
+          type: string
+        detail:
+          type: string

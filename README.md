@@ -1,6 +1,9 @@
 # AWS-Sandbox
 Set of experimental applications/deployments for AWS. The following index categorizes the demos by the services demonstrated.
 
+#### API Gateway
+* [Terraform-Sandbox/API-GW-Lambda](./Terraform-Sandbox/API-GW-Lambda)
+
 #### AWS Organizations
 * [AWS-Organizations-Sandbox](./AWS-Organizations-Sandbox)
 
@@ -9,6 +12,7 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [CloudWatch-Metrics](./CloudWatch-Metrics)
 * [Lambda-Samples](./Lambda-Samples)
 * [S3-Notifications-Lambda](./S3-Notifications-Lambda)
+* [Terraform-Sandbox/API-GW-Lambda](./Terraform-Sandbox/API-GW-Lambda)
 
 #### CloudFormation
 * [CloudFormation-Sandbox](./CloudFormation-Sandbox)
@@ -52,10 +56,14 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [IAM-Policy-Sandbox](./IAM-Policy-Sandbox)
 * [Common-S3-Buckets](./Common-S3-Buckets)
 
+#### KMS
+* [Terraform-Sandbox/API-GW-Lambda](./Terraform-Sandbox/API-GW-Lambda)
+
 #### Lambda
 * [ALB-Lambda](./ALB-Lambda)
 * [Lambda-Samples](./Lambda-Samples)
 * [S3-Notifications-Lambda](./S3-Notifications-Lambda)
+* [Terraform-Sandbox/API-GW-Lambda](./Terraform-Sandbox/API-GW-Lambda)
 
 #### Route 53
 * [Route53-Failover](./Route53-Failover)
@@ -98,6 +106,7 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [Terraform-Sandbox/L7-Load-Balancing](./Terraform-Sandbox/L7-Load-Balancing)
 * [Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone](./Terraform-Sandbox/VPC-Peering-with-Private-R53-Zone)
 * [Terraform-Sandbox/S3-Cross-Region-Replication](./Terraform-Sandbox/S3-Cross-Region-Replication)
+* [Terraform-Sandbox/API-GW-Lambda](./Terraform-Sandbox/API-GW-Lambda)
 
 #### VPC
 * [VPC-Endpoint](./VPC-Endpoint)
