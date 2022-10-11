@@ -91,5 +91,5 @@ class TestKmsEncryptionDecryption:
 
         assert decryption_response.status_code == 200
         decryption_response_body = decryption_response.json()
-        ciphertext = decryption_response_body["ciphertext"]
+        assert ciphertext == decryption_response_body["ciphertext"]
         assert plaintext == decryption_response_body["plaintext"]
