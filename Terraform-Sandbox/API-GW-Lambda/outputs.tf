@@ -17,6 +17,18 @@
 # limitations under the License.
 #
 
+output "ssm_parameter_one_name" {
+  value = module.ssm.ssm_parameter_one_name
+}
+
+output "ssm_parameter_two_name" {
+  value = module.ssm.ssm_parameter_two_name
+}
+
+output "ssm_parameter_three_name" {
+  value = module.ssm.ssm_parameter_three_name
+}
+
 output "read_ssm_parameter_function_arn" {
   value = module.lambda.read_ssm_parameter_function_arn
 }

@@ -16,3 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+output "ssm_parameter_one_name" {
+  value = aws_ssm_parameter.ssm_parameter_one.name
+}
+
+output "ssm_parameter_two_name" {
+  value = aws_ssm_parameter.ssm_parameter_two.name
+}
+
+output "ssm_parameter_three_name" {
+  value = aws_ssm_parameter.ssm_parameter_three.name
+}
