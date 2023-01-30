@@ -1,7 +1,10 @@
 # S3 Event Notifications Demo
 
 ## Introduction
-S3 Event Notifications Demo is an experimantal/educational serverless AWS application meant as illustration of S3 event notifications. Lambda function is used as event handler for the S3 event notifications. Files uploaded to an S3 bucket are supposed to represent results of ice hockey games. Upload of such a file triggers the Lambda function which parses the game results, calculates standings based on the parsed game results, and sends the calculated standings to an SQS queue. The files with game results are expected in plain text with UTF-8 encoding. The following snippet illustrates the expected format of the game results (OT = overtime, SO = shootout).
+S3 Event Notifications Demo is an experimantal/educational serverless AWS application meant as illustration of S3 event notifications. The overall setup is depicted by the following diagram:
+![application-diagram](./diagram.png)
+
+Lambda function (implemented in Python) is used as event handler for the S3 event notifications. Files uploaded to an S3 bucket are supposed to represent results of ice hockey games. Upload of such a file triggers the Lambda function which parses the game results, calculates standings based on the parsed game results, and sends the calculated standings to an SQS queue. The files with game results are expected in plain text with UTF-8 encoding. The following snippet illustrates the expected format of the game results (OT = overtime, SO = shootout).
 
 ```
 RUS-CZE 4:3
@@ -87,4 +90,3 @@ aws cloudformation create-stack --stack-name Lambda-Ice-Hockey --template-body f
 As outlined above, the template involves several parameters. The [stack-params.json](./stack-params.json) file contains parameter values used during my experiments.
 
 The configuration of the S3 event notification is a bit tricky as the notification cannot be configured when the S3 bucket is being created. Therefore, the CloudFormation template involves a custom resource in form of a Lambda function that uses the AWS SDK to setup the notification (see the S3NotificationConfiguration and S3NotificationConfiguratorFunction resources in the template). The Lambda function is implemented in Python directly in the CloudFormation template. For more details, look at the [AWS Documentation](https://aws.amazon.com/premiumsupport/knowledge-center/cloudformation-s3-notification-lambda/).
-
