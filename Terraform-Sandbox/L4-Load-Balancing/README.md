@@ -1,5 +1,8 @@
 # L4 Load-Balancing Demo
-Terraform deployment of the [L4 Load-Balancing Demo](../../L4-Load-Balancing) application. The deployment relies on the deployment artifactory S3 bucket created by the [Common-S3-Buckets](../../Common-S3-Buckets) deployment.
+Terraform deployment of the [L4 Load-Balancing Demo](../../L4-Load-Balancing) application. The overall setup is depicted by the following diagram:
+![application-diagram](./diagram.png)
+
+The deployment relies on the deployment artifactory S3 bucket created by the [Common-S3-Buckets](../../Common-S3-Buckets) deployment.
 
 The configuration is divided to the following modules:
 * **vpc** module is responsible for provisioning of a VPC, its subnets, route tables, Internet Gateway and NAT Gateways.
