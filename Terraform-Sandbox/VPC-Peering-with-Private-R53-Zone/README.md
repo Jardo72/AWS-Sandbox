@@ -14,6 +14,9 @@ The configuration involves the following resources:
 * Private hosted zone configured in Route 53. A-records for both EC2 instances (one record for each of the two EC2 instances). The hosted zone is associated with both VPCs, so when testing the conncectivity, you can use both private IP addresses of the EC2 instances and they custom DNS names generated and assigned by the Terraform configuration (not by AWS).
 * VPC flow log for both VPCs (separate VPC flow log for each VPC). The flow logs are written to CloudWatch Logs - a separate log group is created for each of the two VPCs.
 
+The overall setup is depicted by the following diagram:
+![application-diagram](./diagram.png)
+
 The following snippet illustrates the values of Terraform variables used during my experiments:
 ```hcl
 aws_region = "eu-central-1"
