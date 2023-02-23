@@ -100,12 +100,6 @@ aws cloudformation create-stack --stack-name CFN-Helper-Scripts --template-body 
 In order to demonstrate the cfn-hup functionality, update the stack using the same template via the AWS Management Console, but use a different value for the message parameter.
 
 
-## Wait Condition & CFN Signal Demo
-TODO
-
-Source code:
-
-
 ## Stack Role Demo
 Demonstration of stack creation using an IAM role. The IAM user that triggers the stack creation does not have permissions to create the resources defined in the CloudFormation template, but the user is permitted to pass an IAM role to CloudFormation, and the passed role has permissions to create the resources.
 
