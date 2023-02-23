@@ -8,6 +8,9 @@ Simple demonstration of API Gateway and Lambda. The API exposes three endpoints:
 
 The Lambda functions are implemented in Python. The provisioning and configuration of the AWS resources is implemented in Terraform.
 
+The overall setup is depicted by the following diagram:
+![application-diagram](./diagram.png)
+
 ## Terraform Variables
 The following snippet illustrates the values of the Terraform variables used during my experiments.
 
