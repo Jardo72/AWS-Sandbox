@@ -6,6 +6,9 @@ Simple educational/experimental Lambda function implemented in Python meant as t
 * Three Lambda functions, all using the common codebase. Each of the functions is deployed with a different value of the `COLOR` environment variable.
 * Internet-facing Application Load Balancer with a single listener (port 80). The listener has three listener rules, each forwarding requests to one of the three Lambda functions. The default action returns a fixed response with HTTP status 404.
 
+The overall setup is depicted by the following diagram:
+![application-diagram](./diagram.png)
+
 ## Deployment to AWS
 The following AWS CLI command illustrates how to deploy the above mentioned stack using the CloudFormation template. The template expects that the Python file with the common source code for all three functions has been compressed to a ZIP file and uploaded to an S3 bucket.
 ```
