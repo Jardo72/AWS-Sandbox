@@ -46,6 +46,7 @@ data "aws_cloudformation_export" "deployment_artifactory_read_access_policy_arn"
 }
 
 data "aws_route53_zone" "alias_hosted_zone" {
+  count        = var.route53_alias_settings.enabled ? 1 : 0
   name         = var.route53_alias_settings.alias_hosted_zone_name
   private_zone = false
 }
@@ -99,7 +100,7 @@ module "route53" {
   enabled                = var.route53_alias_settings.enabled
   load_balancer_dns_name = module.nlb.load_balancer_details.dns_name
   load_balancer_zone_id  = module.nlb.load_balancer_details.zone_id
-  alias_zone_id          = data.aws_route53_zone.alias_hosted_zone.zone_id
+  alias_zone_id          = var.route53_alias_settings.enabled ? data.aws_route53_zone.alias_hosted_zone[0].zone_id : "N/A"
   alias_fqdn             = var.route53_alias_settings.alias_fqdn
   depends_on             = [module.nlb]
 }
