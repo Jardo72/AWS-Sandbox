@@ -21,5 +21,45 @@
 
 yum update -y
 yum install java-1.8.0-openjdk -y
-aws s3 cp s3://${deployment_artifactory_bucket}/${deployment_artifactory_prefix}/${application_jar_file} /tmp/${application_jar_file}
-java -Dserver.port=${ec2_port} -jar /tmp/${application_jar_file} &
+
+
+# create the user used to run the application
+useradd --no-create-home --shell /bin/false albdemo
+
+
+# create installation directory and download the application JAR file
+mkdir /opt/alb-demo
+aws s3 cp s3://${deployment_artifactory_bucket}/${deployment_artifactory_prefix}/${application_jar_file} /opt/alb-demo/${application_jar_file}
+chown -R albdemo:albdemo /opt/alb-demo
+
+
+# create configuration file (service unit) for the application service
+JAVA_EXECUTABLE=$(which java)
+cat > /etc/systemd/system/albdemo.service <<-EOF
+[Unit]
+Description=ALB-Demo
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+
+WorkingDirectory=/opt/alb-demo
+User=albdemo
+Group=albdemo
+
+ExecStart=$JAVA_EXECUTABLE -Dserver.port=${ec2_port} -jar ${application_jar_file}
+
+RestartSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+# start (and enable) the Tomcat service
+systemctl daemon-reload
+systemctl start albdemo
+systemctl status albdemo
+systemctl enable albdemo
