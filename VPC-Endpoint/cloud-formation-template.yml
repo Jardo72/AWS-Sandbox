@@ -60,6 +60,9 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      LoggingConfiguration:
+        DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
+        LogFilePrefix: !Sub "${AWS::StackName}/UnrestrictedBucket-"
 
   VPCRestrictedBucket:
     Type: AWS::S3::Bucket
@@ -71,6 +74,9 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      LoggingConfiguration:
+        DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
+        LogFilePrefix: !Sub "${AWS::StackName}/VPCRestrictedBucket-"
 
   VPCRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -80,9 +86,9 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Action:
-              - "s3:GetObject"
-              - "s3:PutObject"
-              - "s3:DeleteObject"
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
             Effect: Deny
             Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}/*"
             Principal: "*"
@@ -90,7 +96,7 @@ Resources:
               StringNotEquals:
                 aws:sourceVpc: !Ref GreenVPC
           - Action:
-              - "s3:ListBucket"
+              - s3:ListBucket
             Effect: Deny
             Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}"
             Principal: "*"
@@ -108,6 +114,9 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      LoggingConfiguration:
+        DestinationBucketName: !ImportValue CommonS3AccessLogBucketName
+        LogFilePrefix: !Sub "${AWS::StackName}/VPCEndpointRestrictedBucket-"
 
   VPCEndpointRestrictedBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -117,9 +126,9 @@ Resources:
         Version: 2012-10-17
         Statement:
           - Action:
-              - "s3:GetObject"
-              - "s3:PutObject"
-              - "s3:DeleteObject"
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
             Effect: Deny
             Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}/*"
             Principal: "*"
@@ -127,7 +136,7 @@ Resources:
               StringNotEquals:
                 aws:sourceVpce: !Ref GreenVPCEndpoint
           - Action:
-              - "s3:ListBucket"
+              - s3:ListBucket
             Effect: Deny
             Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}"
             Principal: "*"
@@ -147,7 +156,7 @@ Resources:
               Service:
                 - ec2.amazonaws.com
             Action:
-              - 'sts:AssumeRole'
+              - sts:AssumeRole
       Policies:
         - PolicyName: S3Access
           PolicyDocument:
@@ -155,33 +164,33 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - "s3:ListBucket"
+                  - s3:ListBucket
                 Resource: !Sub "arn:aws:s3:::${UnrestrictedBucketNameParam}"
               - Effect: Allow
                 Action:
-                  - "s3:GetObject"
-                  - "s3:PutObject"
-                  - "s3:DeleteObject"
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
                 Resource: !Sub "arn:aws:s3:::${UnrestrictedBucketNameParam}/*"
               - Effect: Allow
                 Action:
-                  - "s3:ListBucket"
+                  - s3:ListBucket
                 Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}"
               - Effect: Allow
                 Action:
-                  - "s3:GetObject"
-                  - "s3:PutObject"
-                  - "s3:DeleteObject"
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
                 Resource: !Sub "arn:aws:s3:::${VPCRestrictedBucketNameParam}/*"
               - Effect: Allow
                 Action:
-                  - "s3:ListBucket"
+                  - s3:ListBucket
                 Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}"
               - Effect: Allow
                 Action:
-                  - "s3:GetObject"
-                  - "s3:PutObject"
-                  - "s3:DeleteObject"
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
                 Resource: !Sub "arn:aws:s3:::${VPCEndpointRestrictedBucketNameParam}/*"
 
   EC2InstanceProfile:
@@ -213,11 +222,11 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref RedVPC
-      CidrBlock: !Select [0, !Cidr [!Ref RedVPCCIDRParam, 1, 8 ]]
+      CidrBlock: !Select [0, !Cidr [!Ref RedVPCCIDRParam, 1, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   RedRouteTable:
     Type: AWS::EC2::RouteTable
@@ -262,7 +271,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref RedSubnet
       IamInstanceProfile: !Ref EC2InstanceProfile
       ImageId: !Ref CurrentVersionAMIIdParam
@@ -296,11 +305,11 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref GreenVPC
-      CidrBlock: !Select [0, !Cidr [!Ref GreenVPCCIDRParam, 1, 8 ]]
+      CidrBlock: !Select [0, !Cidr [!Ref GreenVPCCIDRParam, 1, 8]]
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
 
   GreenRouteTable:
     Type: AWS::EC2::RouteTable
@@ -345,7 +354,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select
         - 0
-        - Fn::GetAZs: !Ref 'AWS::Region'
+        - Fn::GetAZs: !Ref "AWS::Region"
       SubnetId: !Ref GreenSubnet
       IamInstanceProfile: !Ref EC2InstanceProfile
       ImageId: !Ref CurrentVersionAMIIdParam
@@ -385,5 +394,3 @@ Resources:
         - Key: Name
           Value: Green
 
-# see
-# - https://www.1strategy.com/blog/2020/06/23/getting-crafty-with-iam-conditions/
