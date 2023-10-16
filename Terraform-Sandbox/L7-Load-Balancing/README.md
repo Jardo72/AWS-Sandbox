@@ -44,7 +44,7 @@ application_installation = {
 
 ec2_settings = {
   instance_type = "t2.nano"
-  port          = 80
+  port          = 8080
 }
 
 alb_access_log_settings = {
