@@ -21,6 +21,7 @@
 
 yum update -y
 yum install java-1.8.0-openjdk -y
+yum install amazon-cloudwatch-agent -y
 
 
 # create the user used to run the application
@@ -33,7 +34,7 @@ aws s3 cp s3://${deployment_artifactory_bucket}/${deployment_artifactory_prefix}
 chown -R albdemo:albdemo /opt/alb-demo
 
 
-# create configuration file (service unit) for the application service
+# create service unit file for the application
 JAVA_EXECUTABLE=$(which java)
 cat > /etc/systemd/system/albdemo.service <<-EOF
 [Unit]
