@@ -47,6 +47,12 @@ ec2_settings = {
   port          = 8080
 }
 
+alb_settings = {
+  port            = 443
+  protocol        = "HTTPS"
+  certificate_arn = "arn:aws:acm:eu-central-1:467504711004:certificate/fae97c88-06af-4113-8537-adf2c080be97"
+}
+
 alb_access_log_settings = {
   bucket_name_export = "CommonELBAccessLogBucketName"
   prefix             = "L7-LB-Demo-Terraform"
