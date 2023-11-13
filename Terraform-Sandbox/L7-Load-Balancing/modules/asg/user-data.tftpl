@@ -49,7 +49,7 @@ WorkingDirectory=/opt/alb-demo
 User=albdemo
 Group=albdemo
 
-ExecStart=$JAVA_EXECUTABLE -Dlogging.level.jch.education.aws=DEBUG -Dlogging.file=alb-demo.log -Dserver.port=${ec2_port} -jar ${application_jar_file}
+ExecStart=$JAVA_EXECUTABLE -Dlogging.level.jch.education.aws=DEBUG -Dserver.port=${ec2_port} -jar ${application_jar_file} > /var/log/alb-demo.log
 
 RestartSec=15
 Restart=always
@@ -65,11 +65,38 @@ systemctl start albdemo
 systemctl status albdemo
 systemctl enable albdemo
 
+# generate CloudWatch Agent configuration
+# see also https://github.com/awsdocs/amazon-cloudwatch-user-guide/blob/master/doc_source/CloudWatch-Agent-Configuration-File-Details.md
+CLOUDWATCH_AGENT_CONFIG_DIR=/opt/aws/amazon-cloudwatch-agent/etc
+CLOUDWATCH_AGENT_CONFIG_FILE=$CLOUDWATCH_AGENT_CONFIG_DIR/amazon-cloudwatch-agent.json
+mkdir -p $CLOUDWATCH_AGENT_CONFIG_DIR
+cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
+{
+    "agent": {
+        "debug": true,
+        "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+        "run_as_user": "cwagent",
+        "region": "${aws_region}"
+    },
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+                    {
+                        "file_path": "/var/log/alb-demo.log",
+                        "log_group_name": "ALB-Demo-App-Log",
+                        "retention_in_days": 7
+                    }
+                ]
+            }
+        }
+    }
+}
+JSON_EOF
 
 # start and enable CloudWatch Agent
 # TODO: do we need this even if CloudWatch Agent will only publish log files (no metrics)?
 # mkdir -p /usr/share/collectd
 # touch /usr/share/collectd/types.db
 
-# TODO: SSM parameter instead of config file might be a better choice
-# /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE

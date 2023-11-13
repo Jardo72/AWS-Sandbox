@@ -31,6 +31,7 @@ data "template_file" "ec2_user_data" {
     deployment_artifactory_bucket = var.application_installation.deployment_artifactory_bucket_name
     deployment_artifactory_prefix = var.application_installation.deployment_artifactory_prefix,
     application_jar_file          = var.application_installation.application_jar_file,
+    aws_region                    = var.aws_region
     ec2_port                      = var.ec2_instance.port
   })
 }

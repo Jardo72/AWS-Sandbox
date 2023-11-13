@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+variable "aws_region" {
+  description = "The name of the AWS region where the application is running"
+  type        = string
+}
+
 variable "application_installation" {
   description = "Settings for the installation of the application"
   type = object({

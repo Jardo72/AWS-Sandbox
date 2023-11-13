@@ -93,6 +93,7 @@ module "alb" {
 
 module "asg" {
   source                          = "./modules/asg"
+  aws_region                      = var.aws_region
   vpc_id                          = module.vpc.vpc_details.id
   subnet_ids                      = values(module.vpc.subnets)[*].subnet_id
   target_group_arn                = module.alb.target_group_details.arn
