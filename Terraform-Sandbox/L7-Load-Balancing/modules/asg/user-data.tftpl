@@ -35,6 +35,9 @@ chown -R albdemo:albdemo /opt/alb-demo
 
 
 # create service unit file for the application
+# see also 
+# - https://www.baeldung.com/linux/redirect-systemd-output-to-file
+# - https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#StandardOutput=
 JAVA_EXECUTABLE=$(which java)
 cat > /etc/systemd/system/albdemo.service <<-EOF
 [Unit]
@@ -49,9 +52,9 @@ WorkingDirectory=/opt/alb-demo
 User=albdemo
 Group=albdemo
 
-ExecStart=$JAVA_EXECUTABLE -Dlogging.level.jch.education.aws=DEBUG -Dserver.port=${ec2_port} -jar ${application_jar_file}
+ExecStart=$JAVA_EXECUTABLE -Dserver.port=${ec2_port} -jar ${application_jar_file}
 StandardOutput=file:/tmp/alb-demo.log
-StandardError=inherit
+StandardError=file:/tmp/alb-demo-error.log
 
 RestartSec=15
 Restart=always
@@ -101,4 +104,4 @@ JSON_EOF
 # mkdir -p /usr/share/collectd
 # touch /usr/share/collectd/types.db
 
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE
+# /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE
