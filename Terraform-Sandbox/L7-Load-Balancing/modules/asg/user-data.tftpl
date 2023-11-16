@@ -77,7 +77,11 @@ cat > /opt/alb-demo/logback-config.xml <<-EOF
     </encoder>
   </appender>
 
-  <root level="debug">
+  <logger name="jch.education.aws" level="DEBUG" additivity="false" > 
+    <appender-ref ref="FILE" /> 
+  </logger>
+
+  <root level="info">
     <appender-ref ref="FILE" />
   </root>
 </configuration>
@@ -119,9 +123,6 @@ cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
 }
 JSON_EOF
 
-# start and enable CloudWatch Agent
-# TODO: do we need this even if CloudWatch Agent will only publish log files (no metrics)?
-# mkdir -p /usr/share/collectd
-# touch /usr/share/collectd/types.db
 
-# /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE
+# start and enable CloudWatch Agent
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE
