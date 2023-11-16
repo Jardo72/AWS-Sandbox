@@ -52,7 +52,7 @@ WorkingDirectory=/opt/alb-demo
 User=albdemo
 Group=albdemo
 
-ExecStart=$JAVA_EXECUTABLE -Dserver.port=${ec2_port} -jar ${application_jar_file}
+ExecStart=$JAVA_EXECUTABLE -Dserver.port=${ec2_port} -Dlogging.config=logback-config.xml -jar ${application_jar_file}
 StandardOutput=file:/tmp/alb-demo.log
 StandardError=file:/tmp/alb-demo-error.log
 
@@ -61,6 +61,26 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
+EOF
+
+
+# create logging configuration for the application
+# see also https://www.baeldung.com/logback
+cat > /opt/alb-demo/logback-config.xml <<-EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="false">
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>/tmp/alb-demo.log</file>
+    <append>false</append>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="debug">
+    <appender-ref ref="FILE" />
+  </root>
+</configuration>
 EOF
 
 
