@@ -53,8 +53,6 @@ User=albdemo
 Group=albdemo
 
 ExecStart=$JAVA_EXECUTABLE -Dserver.port=${ec2_port} -Dlogging.config=logback-config.xml -jar ${application_jar_file}
-StandardOutput=file:/tmp/alb-demo.log
-StandardError=file:/tmp/alb-demo-error.log
 
 RestartSec=15
 Restart=always
@@ -65,7 +63,9 @@ EOF
 
 
 # create logging configuration for the application
-# see also https://www.baeldung.com/logback
+# see also
+# - https://www.baeldung.com/logback
+# - https://stackoverflow.com/questions/23605377/how-to-configure-logback-to-add-host-name-ip-to-each-log-event
 cat > /opt/alb-demo/logback-config.xml <<-EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="true" scan="false">
