@@ -4,6 +4,9 @@ Set of experimental applications/deployments for AWS. The following index catego
 #### API Gateway
 * [Terraform-Sandbox/API-GW-Lambda](./Terraform-Sandbox/API-GW-Lambda)
 
+#### AWS Certificate Manager
+* [Terraform-Sandbox/L7-Load-Balancing](./Terraform-Sandbox/L7-Load-Balancing)
+
 #### AWS Organizations
 * [AWS-Organizations-Sandbox](./AWS-Organizations-Sandbox)
 
