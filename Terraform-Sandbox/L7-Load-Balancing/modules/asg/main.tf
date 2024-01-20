@@ -31,6 +31,7 @@ data "template_file" "ec2_user_data" {
     deployment_artifactory_bucket = var.application_installation.deployment_artifactory_bucket_name
     deployment_artifactory_prefix = var.application_installation.deployment_artifactory_prefix,
     application_jar_file          = var.application_installation.application_jar_file,
+    aws_region                    = var.aws_region
     ec2_port                      = var.ec2_instance.port
   })
 }
@@ -125,7 +126,7 @@ resource "aws_autoscaling_group" "autoscaling_group" {
   max_size                  = var.autoscaling_group.max_size
   desired_capacity          = var.autoscaling_group.desired_capacity
   health_check_type         = "ELB"
-  health_check_grace_period = 150
+  health_check_grace_period = 180
   vpc_zone_identifier       = var.subnet_ids
   enabled_metrics = [
     "GroupDesiredCapacity",

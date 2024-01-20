@@ -35,6 +35,9 @@ chown -R albdemo:albdemo /opt/alb-demo
 
 
 # create service unit file for the application
+# see also 
+# - https://www.baeldung.com/linux/redirect-systemd-output-to-file
+# - https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html#StandardOutput=
 JAVA_EXECUTABLE=$(which java)
 cat > /etc/systemd/system/albdemo.service <<-EOF
 [Unit]
@@ -49,7 +52,7 @@ WorkingDirectory=/opt/alb-demo
 User=albdemo
 Group=albdemo
 
-ExecStart=$JAVA_EXECUTABLE -Dserver.port=${ec2_port} -jar ${application_jar_file}
+ExecStart=$JAVA_EXECUTABLE -Dserver.port=${ec2_port} -Dlogging.config=logback-config.xml -jar ${application_jar_file}
 
 RestartSec=15
 Restart=always
@@ -59,8 +62,67 @@ WantedBy=multi-user.target
 EOF
 
 
-# start (and enable) the Tomcat service
+# create logging configuration for the application
+# see also
+# - https://www.baeldung.com/logback
+# - https://stackoverflow.com/questions/23605377/how-to-configure-logback-to-add-host-name-ip-to-each-log-event
+cat > /opt/alb-demo/logback-config.xml <<-EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="false">
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>/tmp/alb-demo.log</file>
+    <append>false</append>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="jch.education.aws" level="DEBUG" additivity="false" > 
+    <appender-ref ref="FILE" /> 
+  </logger>
+
+  <root level="info">
+    <appender-ref ref="FILE" />
+  </root>
+</configuration>
+EOF
+
+
+# start (and enable) the application service
 systemctl daemon-reload
 systemctl start albdemo
 systemctl status albdemo
 systemctl enable albdemo
+
+# generate CloudWatch Agent configuration
+# see also https://github.com/awsdocs/amazon-cloudwatch-user-guide/blob/master/doc_source/CloudWatch-Agent-Configuration-File-Details.md
+CLOUDWATCH_AGENT_CONFIG_DIR=/opt/aws/amazon-cloudwatch-agent/etc
+CLOUDWATCH_AGENT_CONFIG_FILE=$CLOUDWATCH_AGENT_CONFIG_DIR/amazon-cloudwatch-agent.json
+mkdir -p $CLOUDWATCH_AGENT_CONFIG_DIR
+cat > $CLOUDWATCH_AGENT_CONFIG_FILE <<JSON_EOF
+{
+    "agent": {
+        "debug": true,
+        "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+        "run_as_user": "cwagent",
+        "region": "${aws_region}"
+    },
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+                    {
+                        "file_path": "/tmp/alb-demo.log",
+                        "log_group_name": "ALB-Demo-App-Log",
+                        "retention_in_days": 7
+                    }
+                ]
+            }
+        }
+    }
+}
+JSON_EOF
+
+
+# start and enable CloudWatch Agent
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c file:$CLOUDWATCH_AGENT_CONFIG_FILE

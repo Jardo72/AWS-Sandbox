@@ -54,10 +54,18 @@ variable "ec2_settings" {
   })
 }
 
-variable "alb_port" {
-  description = "TCP port the load balancer will use to accept incoming connections"
-  type        = number
-  default     = 80
+variable "alb_settings" {
+  description = "Settings for the ALB - protocol (HTTP/HTTPS), TCP port and certificate ARN"
+  type = object({
+    port            = number
+    protocol        = string
+    certificate_arn = string
+  })
+  default = {
+    port            = 80
+    protocol        = "HTTP"
+    certificate_arn = null
+  }
 }
 
 variable "alb_access_log_settings" {

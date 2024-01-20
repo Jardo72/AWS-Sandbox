@@ -67,8 +67,9 @@ module "alb" {
   vpc_cidr_block = module.vpc.vpc_details.cidr_block
   subnet_ids     = values(module.vpc.subnets)[*].subnet_id
   alb_listener_settings = {
-    port     = var.alb_port
-    protocol = "HTTP"
+    port            = var.alb_settings.port
+    protocol        = var.alb_settings.protocol
+    certificate_arn = var.alb_settings.certificate_arn
   }
   alb_access_log_settings = {
     bucket_name = data.aws_cloudformation_export.common_elb_access_log_bucket_name.value
@@ -92,6 +93,7 @@ module "alb" {
 
 module "asg" {
   source                          = "./modules/asg"
+  aws_region                      = var.aws_region
   vpc_id                          = module.vpc.vpc_details.id
   subnet_ids                      = values(module.vpc.subnets)[*].subnet_id
   target_group_arn                = module.alb.target_group_details.arn

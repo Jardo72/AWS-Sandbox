@@ -8,8 +8,8 @@ This deployment relies on several buckets created by the [Common-S3-Buckets](../
 
 The configuration is divided to the following modules:
 * **vpc** module is responsible for provisioning of a VPC, its subnets, route table and Internet Gateway.
-* **alb** module provisions an ALB, including ALB listener and target group. Security group restricting network access to the ALB is also provisioned by this module. Optionally, ALB access log can also be enabled/configured.
-* **asg** module is responsible for provisioning of an EC2 auto-scaling group with target-tracking policy which adapts the number of EC2 instances based on the aggregate CPU utilization for the entire auto-scaling group. IAM instance profile for the EC2 instances as well as security group restricting network access to the EC2 instances are provisioned as well.
+* **alb** module provisions an ALB, including ALB listener and target group. Security group restricting network access to the ALB is also provisioned by this module. Optionally, ALB access log can also be enabled/configured. The ALB listener can be configured to use HTTPS protocol and an ACM certificate.
+* **asg** module is responsible for provisioning of an EC2 auto-scaling group with target-tracking policy which adapts the number of EC2 instances based on the aggregate CPU utilization for the entire auto-scaling group. IAM instance profile for the EC2 instances as well as security group restricting network access to the EC2 instances are provisioned as well. The EC2 instances use CloudWatch Agent to push the application logs to CloudWatch Logs.
 * **route53** module optionally provisions a Route 53 alias for the ALB.
 * **cloudwatch** module creates a CloudWatch dashboard that visualizes some metrics like CPU utilization for the EC2 auto-scaling group.
 
@@ -43,8 +43,22 @@ application_installation = {
 }
 
 ec2_settings = {
-  instance_type = "t2.nano"
+  instance_type = "t2.micro"
   port          = 8080
+}
+
+/* enable this if you want plain HTTP - in such case, disable the settings below which are meant for HTTPS
+alb_settings = {
+  port            = 80
+  protocol        = "HTTP"
+  certificate_arn = null
+}
+*/
+
+alb_settings = {
+  port            = 443
+  protocol        = "HTTPS"
+  certificate_arn = "arn:aws:acm:eu-central-1:467504711004:certificate/fae97c88-06af-4113-8537-adf2c080be97"
 }
 
 alb_access_log_settings = {

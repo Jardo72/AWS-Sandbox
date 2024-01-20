@@ -60,6 +60,7 @@ resource "aws_lb_listener" "load_balancer_listener" {
   load_balancer_arn = aws_lb.load_balancer.arn
   port              = var.alb_listener_settings.port
   protocol          = var.alb_listener_settings.protocol
+  certificate_arn   = var.alb_listener_settings.certificate_arn
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.target_group.arn

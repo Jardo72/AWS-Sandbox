@@ -33,10 +33,11 @@ variable "subnet_ids" {
 }
 
 variable "alb_listener_settings" {
-  description = "Protocol and TCP port for the ALB listener"
+  description = "Protocol, TCP port and certificate for the ALB listener"
   type = object({
-    port     = number
-    protocol = string
+    port            = number
+    protocol        = string
+    certificate_arn = string
   })
 }
 
