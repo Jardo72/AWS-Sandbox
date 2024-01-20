@@ -19,7 +19,7 @@
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 from collections import Counter
-from http.client import HTTPConnection
+from http.client import HTTPConnection, HTTPSConnection
 from json import loads
 from typing import Tuple
 
@@ -44,6 +44,13 @@ def create_cmd_line_args_parser() -> ArgumentParser:
     parser.add_argument('request_count',
         help='minimum for the generated metric value',
         type=int)
+    parser.add_argument(
+        "-s", "--https",
+        dest="https",
+        default=False,
+        action="store_true",
+        help="if specified, HTTPS will be used (plain HTTP is used by default)"
+    )
 
     return parser
 
@@ -61,7 +68,10 @@ def dump_cmd_line_args(params) -> None:
 
 
 def generate_requests(params) -> Tuple[Counter, Counter]:
-    connection = HTTPConnection(params.host, params.port, timeout=15)
+    if params.https:
+        connection = HTTPSConnection(params.host, params.port, timeout=15)
+    else:
+        connection = HTTPConnection(params.host, params.port, timeout=15)
     http_status_stats: Counter = Counter()
     server_stats: Counter = Counter()
 

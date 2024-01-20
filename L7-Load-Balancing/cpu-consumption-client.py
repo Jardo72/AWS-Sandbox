@@ -21,7 +21,7 @@ from argparse import ArgumentParser, RawTextHelpFormatter
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
-from http.client import HTTPConnection
+from http.client import HTTPConnection, HTTPSConnection
 from threading import Lock, Thread
 from time import perf_counter
 
@@ -44,6 +44,7 @@ class RequestGeneratorThread(Thread):
         self._host = params.host
         self._port = params.port
         self._duration_sec = 60 * params.duration_min
+        self._https = params.https
         self._id = RequestGeneratorThread._next_id()
         self._http_status_stats = Counter()
 
@@ -54,7 +55,10 @@ class RequestGeneratorThread(Thread):
             return RequestGeneratorThread._sequence
 
     def run(self) -> None:
-        connection = HTTPConnection(self._host, self._port, timeout=15)
+        if self._https:
+            connection = HTTPSConnection(self._host, self._port, timeout=15)
+        else:
+            connection = HTTPConnection(self._host, self._port, timeout=15)
         start_time = perf_counter()
         request_count = 0
 
@@ -104,6 +108,13 @@ def create_cmd_line_args_parser() -> ArgumentParser:
     parser.add_argument('thread_count',
         help='number of threads to be used to generate the requests',
         type=int)
+    parser.add_argument(
+        "-s", "--https",
+        dest="https",
+        default=False,
+        action="store_true",
+        help="if specified, HTTPS will be used (plain HTTP is used by default)"
+    )
 
     return parser
 
