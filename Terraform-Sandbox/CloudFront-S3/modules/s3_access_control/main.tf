@@ -26,13 +26,13 @@ resource "aws_s3_bucket_policy" "webcontent_bucket_policy" {
         Action : ["s3:GetObject"],
         Effect : "Allow",
         Principal : {
-            "Service": "cloudfront.amazonaws.com"
+          "Service" : "cloudfront.amazonaws.com"
         },
         Resource : "${var.webcontent_bucket_arn}/*"
-        Condition: {
-            test = "StringEquals"
-            variable = "AWS:SourceArn"
-            values = [var.cloudfront_distribution_id]
+        Condition : {
+          test     = "StringEquals"
+          variable = "AWS:SourceArn"
+          values   = [var.cloudfront_distribution_id]
         }
       }
     ]

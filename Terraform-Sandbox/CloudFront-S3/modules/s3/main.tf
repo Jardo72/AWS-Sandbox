@@ -22,12 +22,13 @@ resource "aws_s3_bucket" "webcontent_bucket" {
   tags   = var.tags
 }
 
+/* TODO:
 resource "aws_s3_bucket_acl" "webcontent_bucket_acl" {
   bucket = aws_s3_bucket.webcontent_bucket.id
   acl    = "private"
-}
+} */
 
-resource "aws_s3_bucket_public_access_block" "website_public_access_config" {
+resource "aws_s3_bucket_public_access_block" "webcontent_public_access_config" {
   bucket                  = aws_s3_bucket.webcontent_bucket.id
   block_public_acls       = true
   block_public_policy     = true
@@ -36,8 +37,9 @@ resource "aws_s3_bucket_public_access_block" "website_public_access_config" {
 }
 
 resource "aws_s3_object" "start_page" {
-  bucket = var.webcontent_bucket_name
-  key    = "index.html"
-  source = "${path.module}/index.html"
-  etag   = filemd5("${path.module}/index.html")
+  bucket     = var.webcontent_bucket_name
+  key        = "index.html"
+  source     = "${path.module}/index.html"
+  etag       = filemd5("${path.module}/index.html")
+  depends_on = [aws_s3_bucket.webcontent_bucket]
 }

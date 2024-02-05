@@ -43,6 +43,7 @@ module "cloudfront" {
   web_bucket_domain_name = module.s3.webcontent_bucket_regional_domain_name
   resource_name_prefix   = var.resource_name_prefix
   tags                   = var.tags
+  depends_on             = [module.s3]
 }
 
 module "s3_access_control" {
@@ -50,4 +51,5 @@ module "s3_access_control" {
   cloudfront_distribution_id = module.cloudfront.cloudfront_distribution_id
   webcontent_bucket_id       = module.s3.webcontent_bucket_id
   webcontent_bucket_arn      = module.s3.webcontent_bucket_arn
+  depends_on                 = [module.s3, module.cloudfront]
 }
