@@ -17,10 +17,6 @@
 # limitations under the License.
 #
 
-locals {
-  s3_origin_id = "CloudFront-S3-Demo-Origin"
-}
-
 resource "aws_cloudfront_origin_access_control" "origin_access_control" {
   name                              = "CloudFront-S3-Demo-OAC"
   description                       = "Origin Access Control for CloudFront + S3 Demo Website"
@@ -32,8 +28,12 @@ resource "aws_cloudfront_origin_access_control" "origin_access_control" {
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name              = var.web_bucket_domain_name
-    origin_id                = local.s3_origin_id
+    origin_id                = "CloudFront-S3-Demo-Origin"
     origin_access_control_id = aws_cloudfront_origin_access_control.origin_access_control.id
+    /* TODO: remove???
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.default.cloudfront_access_identity_path
+    } */
   }
 
   enabled             = true
@@ -46,7 +46,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   logging_config {
     include_cookies = false
     bucket          = var.access_log_bucket_name
-    prefix          = "Contractor-Portal-FE-Access-Log"
+    prefix          = "CloudFront-S3-Demo-Log"
   } */
 
   default_cache_behavior {

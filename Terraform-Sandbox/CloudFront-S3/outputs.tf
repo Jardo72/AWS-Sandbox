@@ -16,12 +16,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-/* TODO: remove
-output "s3_hosted_zone_id" {
-  value = module.s3.hosted_zone_id
-}
-
-output "website_endpoint" {
-  value = module.s3.website_endpoint
-} */

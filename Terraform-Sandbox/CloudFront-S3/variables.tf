@@ -22,12 +22,6 @@ variable "aws_region" {
   type        = string
 }
 
-/* TODO: do we need this?
-variable "website_domain_name" {
-  description = "The FQDN of the static website"
-  type        = string
-} */
-
 variable "webcontent_bucket_name" {
   description = "Name of the bucket storing the web content (serving as origin for the CloudFront distribution)"
   type        = string

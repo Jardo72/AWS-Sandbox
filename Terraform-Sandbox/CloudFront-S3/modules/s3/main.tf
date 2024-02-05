@@ -22,12 +22,6 @@ resource "aws_s3_bucket" "webcontent_bucket" {
   tags   = var.tags
 }
 
-/* TODO:
-resource "aws_s3_bucket_acl" "webcontent_bucket_acl" {
-  bucket = aws_s3_bucket.webcontent_bucket.id
-  acl    = "private"
-} */
-
 resource "aws_s3_bucket_public_access_block" "webcontent_public_access_config" {
   bucket                  = aws_s3_bucket.webcontent_bucket.id
   block_public_acls       = true
