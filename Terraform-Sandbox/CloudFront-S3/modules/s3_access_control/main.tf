@@ -30,9 +30,9 @@ resource "aws_s3_bucket_policy" "webcontent_bucket_policy" {
         },
         Resource : "${var.webcontent_bucket_arn}/*"
         Condition : {
-          test     = "StringEquals"
-          variable = "AWS:SourceArn"
-          values   = [var.cloudfront_distribution_id]
+          test : "StringEquals"
+          variable : "AWS:SourceArn"
+          values : ["${var.cloudfront_distribution_id}"]
         }
       }
     ]
