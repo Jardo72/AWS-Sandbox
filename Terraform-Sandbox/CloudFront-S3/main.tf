@@ -47,9 +47,9 @@ module "cloudfront" {
 }
 
 module "s3_access_control" {
-  source                     = "./modules/s3_access_control"
-  cloudfront_distribution_id = module.cloudfront.cloudfront_distribution_id
-  webcontent_bucket_id       = module.s3.webcontent_bucket_id
-  webcontent_bucket_arn      = module.s3.webcontent_bucket_arn
-  depends_on                 = [module.s3, module.cloudfront]
+  source                      = "./modules/s3_access_control"
+  cloudfront_distribution_arn = module.cloudfront.cloudfront_distribution_arn
+  webcontent_bucket_id        = module.s3.webcontent_bucket_id
+  webcontent_bucket_arn       = module.s3.webcontent_bucket_arn
+  depends_on                  = [module.s3, module.cloudfront]
 }

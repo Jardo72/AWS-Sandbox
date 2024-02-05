@@ -27,7 +27,7 @@ variable "webcontent_bucket_arn" {
   type        = string
 }
 
-variable "cloudfront_distribution_id" {
-  description = "ID of the CloudFront distribution"
+variable "cloudfront_distribution_arn" {
+  description = "ARN of the CloudFront distribution"
   type        = string
 }

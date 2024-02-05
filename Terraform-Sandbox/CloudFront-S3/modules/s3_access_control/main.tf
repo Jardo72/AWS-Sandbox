@@ -28,11 +28,11 @@ resource "aws_s3_bucket_policy" "webcontent_bucket_policy" {
         Principal : {
           "Service" : "cloudfront.amazonaws.com"
         },
-        Resource : "${var.webcontent_bucket_arn}/*"
+        Resource : "${var.webcontent_bucket_arn}/*",
         Condition : {
-          test : "StringEquals"
-          variable : "AWS:SourceArn"
-          values : ["${var.cloudfront_distribution_id}"]
+          "StringEquals" : {
+            "AWS:SourceArn" : "${var.cloudfront_distribution_arn}"
+          }
         }
       }
     ]

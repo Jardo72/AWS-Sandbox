@@ -31,9 +31,10 @@ resource "aws_s3_bucket_public_access_block" "webcontent_public_access_config" {
 }
 
 resource "aws_s3_object" "start_page" {
-  bucket     = var.webcontent_bucket_name
-  key        = "index.html"
-  source     = "${path.module}/index.html"
-  etag       = filemd5("${path.module}/index.html")
-  depends_on = [aws_s3_bucket.webcontent_bucket]
+  bucket       = var.webcontent_bucket_name
+  key          = "index.html"
+  source       = "${path.module}/index.html"
+  content_type = "text/html"
+  etag         = filemd5("${path.module}/index.html")
+  depends_on   = [aws_s3_bucket.webcontent_bucket]
 }
