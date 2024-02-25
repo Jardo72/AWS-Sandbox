@@ -22,6 +22,11 @@ variable "web_bucket_domain_name" {
   type        = string
 }
 
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate to be used"
+  type        = string
+}
+
 /* TODO: remove?
 variable "access_log_bucket_name" {
   description = "The name of an existing S3 bucket where the HTTP access log for the website will be written to"

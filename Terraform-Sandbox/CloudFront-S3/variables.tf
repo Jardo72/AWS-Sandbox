@@ -27,6 +27,11 @@ variable "webcontent_bucket_name" {
   type        = string
 }
 
+variable "acm_certificate_arn" {
+  description = "ARN of the ACM certificate to be used"
+  type        = string
+}
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string

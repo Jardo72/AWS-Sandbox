@@ -36,6 +36,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     origin_access_control_id = aws_cloudfront_origin_access_control.origin_access_control.id
   }
 
+  aliases = ["cloudfront-s3-demo.jardo72.de"]
+
   enabled             = true
   is_ipv6_enabled     = false
   comment             = "CloudFront Demo Distribution"
@@ -69,7 +71,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn = var.acm_certificate_arn
+    ssl_support_method  = "vip"
   }
 
   restrictions {
