@@ -47,6 +47,7 @@ module "cloudfront" {
   source                 = "./modules/cloudfront"
   web_bucket_domain_name = module.s3.webcontent_bucket_regional_domain_name
   acm_certificate_arn    = var.acm_certificate_arn
+  dns_alias_fqdn         = var.dns_alias_fqdn
   resource_name_prefix   = var.resource_name_prefix
   tags                   = var.tags
   depends_on             = [module.s3]

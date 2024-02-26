@@ -27,6 +27,11 @@ variable "acm_certificate_arn" {
   type        = string
 }
 
+variable "dns_alias_fqdn" {
+  description = "FQDN for the Route 53 alias record"
+  type        = string
+}
+
 /* TODO: remove?
 variable "access_log_bucket_name" {
   description = "The name of an existing S3 bucket where the HTTP access log for the website will be written to"
