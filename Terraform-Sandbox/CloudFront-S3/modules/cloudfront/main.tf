@@ -36,6 +36,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     origin_access_control_id = aws_cloudfront_origin_access_control.origin_access_control.id
   }
 
+  // TODO: this value should originate from variable
   aliases = ["cloudfront-s3-demo.jardo72.de"]
 
   enabled             = true

@@ -17,18 +17,22 @@
 # limitations under the License.
 #
 
-output "cloudfront_distribution_arn" {
-  value = aws_cloudfront_distribution.s3_distribution.arn
+variable "alias_zone_id" {
+  description = "Zone ID of the hosted zone the alias record is to be added to"
+  type        = string
 }
 
-output "cloudfront_distribution_id" {
-  value = aws_cloudfront_distribution.s3_distribution.id
+variable "alias_fqdn" {
+  description = "FQDN for the alias record"
+  type        = string
 }
 
-output "cloudfront_distribution_domain_name" {
-  value = aws_cloudfront_distribution.s3_distribution.domain_name
+variable "cloudfront_dns_name" {
+  description = "AWS-assigned DNS name of the CloudFront distribution"
+  type        = string
 }
 
-output "cloudfront_distribution_hosted_zone_id" {
-  value = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
+variable "cloudfront_hosted_zone_id" {
+  description = "The zone ID of the AWS-managed hosted zone containing the record with the AWS-assigned DNS name of the CloudFront distribution"
+  type        = string
 }

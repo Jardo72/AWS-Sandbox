@@ -31,6 +31,11 @@ provider "aws" {
   region = var.aws_region
 }
 
+data "aws_route53_zone" "alias_hosted_zone" {
+  name         = var.alias_hosted_zone_name
+  private_zone = false
+}
+
 module "s3" {
   source                 = "./modules/s3"
   webcontent_bucket_name = var.webcontent_bucket_name
@@ -53,4 +58,13 @@ module "s3_access_control" {
   webcontent_bucket_id        = module.s3.webcontent_bucket_id
   webcontent_bucket_arn       = module.s3.webcontent_bucket_arn
   depends_on                  = [module.s3, module.cloudfront]
+}
+
+module "route53" {
+  source                    = "./modules/route53"
+  alias_zone_id             = data.aws_route53_zone.alias_hosted_zone.zone_id
+  alias_fqdn                = var.dns_alias_fqdn
+  cloudfront_dns_name       = module.cloudfront.cloudfront_distribution_domain_name
+  cloudfront_hosted_zone_id = module.cloudfront.cloudfront_distribution_hosted_zone_id
+  depends_on                = [module.cloudfront]
 }

@@ -17,18 +17,14 @@
 # limitations under the License.
 #
 
-output "cloudfront_distribution_arn" {
-  value = aws_cloudfront_distribution.s3_distribution.arn
-}
-
-output "cloudfront_distribution_id" {
-  value = aws_cloudfront_distribution.s3_distribution.id
-}
-
-output "cloudfront_distribution_domain_name" {
-  value = aws_cloudfront_distribution.s3_distribution.domain_name
-}
-
-output "cloudfront_distribution_hosted_zone_id" {
-  value = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
+// TODO: rename the resource
+resource "aws_route53_record" "load_balancer_alias" {
+  zone_id = var.alias_zone_id
+  name    = var.alias_fqdn
+  type    = "A"
+  alias {
+    name                   = var.cloudfront_dns_name
+    zone_id                = var.cloudfront_hosted_zone_id
+    evaluate_target_health = false
+  }
 }

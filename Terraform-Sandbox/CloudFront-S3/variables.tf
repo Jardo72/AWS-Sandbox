@@ -27,6 +27,16 @@ variable "webcontent_bucket_name" {
   type        = string
 }
 
+variable "alias_hosted_zone_name" {
+  description = "The name of the Route 53 hosted zone the Route 53 alias is to be added to"
+  type        = string
+}
+
+variable "dns_alias_fqdn" {
+  description = "FQDN for the Route 53 alias record"
+  type        = string
+}
+
 variable "acm_certificate_arn" {
   description = "ARN of the ACM certificate to be used"
   type        = string
