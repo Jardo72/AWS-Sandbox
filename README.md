@@ -30,7 +30,7 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [VPC-Peering](./VPC-Peering)
 
 #### CloudFront
-* [CloudFront-S3](./CloudFront-S3)
+* [Terraform-Sandbox/CloudFront-S3](./Terraform-Sandbox/CloudFront-S3)
 
 #### CloudWatch
 * [CloudWatch-Metrics](./CloudWatch-Metrics)
