@@ -17,6 +17,10 @@
 # limitations under the License.
 #
 
-output "cloudfront_distribution_domain_name" {
+output "cloudfront_distribution_dns_name" {
   value = module.cloudfront.cloudfront_distribution_domain_name
+}
+
+output "cloudfront_distribution_dns_alias" {
+  value = var.dns_alias_fqdn
 }

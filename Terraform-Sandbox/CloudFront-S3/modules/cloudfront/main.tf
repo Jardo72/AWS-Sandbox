@@ -44,13 +44,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_root_object = "index.html"
   tags                = var.tags
 
-  /* TODO
-  logging_config {
-    include_cookies = false
-    bucket          = var.access_log_bucket_name
-    prefix          = "CloudFront-S3-Demo-Log"
-  } */
-
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]

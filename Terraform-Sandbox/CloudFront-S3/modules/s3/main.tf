@@ -38,3 +38,12 @@ resource "aws_s3_object" "start_page" {
   etag         = filemd5("${path.module}/index.html")
   depends_on   = [aws_s3_bucket.webcontent_bucket]
 }
+
+resource "aws_s3_object" "diagram" {
+  bucket       = var.webcontent_bucket_name
+  key          = "diagram.png"
+  source       = "${path.root}/diagram.png"
+  content_type = "image/png"
+  etag         = filemd5("${path.root}/diagram.png")
+  depends_on   = [aws_s3_bucket.webcontent_bucket]
+}

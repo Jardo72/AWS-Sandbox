@@ -32,12 +32,6 @@ variable "dns_alias_fqdn" {
   type        = string
 }
 
-/* TODO: remove?
-variable "access_log_bucket_name" {
-  description = "The name of an existing S3 bucket where the HTTP access log for the website will be written to"
-  type        = string
-} */
-
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string
