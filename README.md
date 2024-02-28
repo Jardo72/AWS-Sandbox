@@ -87,7 +87,8 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [S3-Replication-Demo](./S3-Replication-Demo)
 * [Terraform-Sandbox/S3-Cross-Region-Replication](./Terraform-Sandbox/S3-Cross-Region-Replication)
 * [VPC-Endpoint](./VPC-Endpoint)
-* [CloudFront-S3](./CloudFront-S3)
+* [Terraform-Sandbox/CloudFront-S3](./Terraform-Sandbox/CloudFront-S3)
+
 
 #### Secrets Manager
 * [Lambda-Samples](./Lambda-Samples)
