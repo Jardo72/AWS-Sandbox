@@ -29,6 +29,9 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [VPC-Endpoint](./VPC-Endpoint)
 * [VPC-Peering](./VPC-Peering)
 
+#### CloudFront
+* [CloudFront-S3](./CloudFront-S3)
+
 #### CloudWatch
 * [CloudWatch-Metrics](./CloudWatch-Metrics)
 * [CloudWatch-Events-Lambda](./CloudWatch-Events-Lambda)
@@ -84,6 +87,7 @@ Set of experimental applications/deployments for AWS. The following index catego
 * [S3-Replication-Demo](./S3-Replication-Demo)
 * [Terraform-Sandbox/S3-Cross-Region-Replication](./Terraform-Sandbox/S3-Cross-Region-Replication)
 * [VPC-Endpoint](./VPC-Endpoint)
+* [CloudFront-S3](./CloudFront-S3)
 
 #### Secrets Manager
 * [Lambda-Samples](./Lambda-Samples)
