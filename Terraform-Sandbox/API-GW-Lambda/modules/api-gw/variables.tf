@@ -37,6 +37,11 @@ variable "kms_decryption_function_arn" {
   type        = string
 }
 
+variable "api_gw_authorizer_function_arn" {
+  description = "ARN of the Lambda function to be used as Lambda authorizer for the API gateway"
+  type        = string
+}
+
 variable "resource_name_prefix" {
   description = "Prefix for the names to be applied to the provisioned resources"
   type        = string

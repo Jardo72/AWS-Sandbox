@@ -17,18 +17,18 @@
 # limitations under the License.
 #
 
-output "read_ssm_parameter_function_arn" {
-  value = aws_lambda_function.read_ssm_parameter_function.arn
-}
-
-output "kms_encryption_function_arn" {
-  value = aws_lambda_function.kms_encryption_function.arn
-}
-
-output "kms_decryption_function_arn" {
-  value = aws_lambda_function.kms_decryption_function.arn
-}
-
-output "api_gw_authorizer_function_arn" {
-  value = aws_lambda_function.api_gw_authorizer_function.arn
-}
+def main(event, context):
+    print(f"Request to authorize request, event = {event}")
+    return {
+        "principalId": "abc123",
+        "policyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": "execute-api:Invoke",
+                    "Resource": ["arn:aws:execute-api:us-east-1:YOURACCOUNTNUMBER:2ogoj2ul12/test/GET/customers"],
+                    "Effect": "Deny"
+                }
+            ]
+        }
+    }
