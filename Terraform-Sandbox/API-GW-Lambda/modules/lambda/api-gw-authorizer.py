@@ -17,8 +17,12 @@
 # limitations under the License.
 #
 
+from os import environ
+
+
 def main(event, context):
     print(f"Request to authorize request, event = {event}")
+    
     return {
         "principalId": "abc123",
         "policyDocument": {
@@ -26,7 +30,9 @@ def main(event, context):
             "Statement": [
                 {
                     "Action": "execute-api:Invoke",
-                    "Resource": ["arn:aws:execute-api:us-east-1:YOURACCOUNTNUMBER:2ogoj2ul12/test/GET/customers"],
+                    "Resource": [
+                        "arn:aws:execute-api:us-east-1:YOURACCOUNTNUMBER:2ogoj2ul12/test/GET/customers"
+                    ],
                     "Effect": "Deny"
                 }
             ]

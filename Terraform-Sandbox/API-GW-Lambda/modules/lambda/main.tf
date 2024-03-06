@@ -180,6 +180,11 @@ resource "aws_lambda_function" "api_gw_authorizer_function" {
   runtime          = local.runtime
   timeout          = local.timeout
   role             = aws_iam_role.kms_encryption_role.arn
+  environment {
+    variables = {
+      DUMMY_ARN = "arn:aws:lambda:eu-central-1:467504711004:function:API-GW-Lambda-Demo-APIGWAuthorizer-Function"
+    }
+  }
 }
 
 resource "aws_lambda_permission" "read_ssm_parameter_function_permission" {
@@ -200,5 +205,12 @@ resource "aws_lambda_permission" "kms_decryption_function_permission" {
   statement_id  = "AllowInvocationToAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.kms_decryption_function.function_name
+  principal     = "apigateway.amazonaws.com"
+}
+
+resource "aws_lambda_permission" "api_gw_authorizer_function_permission" {
+  statement_id  = "AllowInvocationToAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.api_gw_authorizer_function.function_name
   principal     = "apigateway.amazonaws.com"
 }
