@@ -17,6 +17,17 @@
 # limitations under the License.
 #
 
+locals {
+  runtime = "python3.8"
+  timeout = 10
+}
+
+data "archive_file" "api_gw_authorizer_function_archive" {
+  type        = "zip"
+  source_file = "${path.module}/api-gw-authorizer.py"
+  output_path = "${path.module}/api-gw-authorizer.zip"
+}
+
 resource "aws_api_gateway_rest_api" "rest_api" {
   name = "${var.resource_name_prefix}-REST-API"
   endpoint_configuration {
@@ -38,4 +49,57 @@ resource "aws_api_gateway_stage" "stage" {
   deployment_id = aws_api_gateway_deployment.deployment.id
   rest_api_id   = aws_api_gateway_rest_api.rest_api.id
   stage_name    = "sandbox"
+}
+
+resource "aws_iam_role" "api_gw_authorizer_role" {
+  name = "${var.resource_name_prefix}-APUGW-Authorizer-Role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowLambdaToAssumeRole"
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AWSLambdaExecute"
+  ]
+  tags = merge(var.tags, {
+    Name = "${var.resource_name_prefix}-APIGW-Autoririzer-Role"
+  })
+}
+
+
+resource "aws_lambda_function" "api_gw_authorizer_function" {
+  function_name    = "${var.resource_name_prefix}-APIGWAuthorizer-Function"
+  filename         = data.archive_file.api_gw_authorizer_function_archive.output_path
+  source_code_hash = data.archive_file.api_gw_authorizer_function_archive.output_base64sha256
+  handler          = "api-gw-authorizer.main"
+  runtime          = local.runtime
+  timeout          = local.timeout
+  role             = aws_iam_role.api_gw_authorizer_role.arn
+  environment {
+    variables = {
+      API_GW_ARN = aws_api_gateway_rest_api.rest_api.arn
+    }
+  }
+}
+
+resource "aws_lambda_permission" "api_gw_authorizer_function_permission" {
+  statement_id  = "AllowInvocationToAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.api_gw_authorizer_function.function_name
+  principal     = "apigateway.amazonaws.com"
+}
+
+resource "aws_api_gateway_authorizer" "api_gw_authorizer" {
+  name                   = "demo"
+  rest_api_id            = aws_api_gateway_rest_api.rest_api.id
+  authorizer_uri         = aws_lambda_function.api_gw_authorizer_function.invoke_arn
+  authorizer_credentials = aws_iam_role.api_gw_authorizer_role.arn
 }

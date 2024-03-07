@@ -28,7 +28,3 @@ output "kms_encryption_function_arn" {
 output "kms_decryption_function_arn" {
   value = aws_lambda_function.kms_decryption_function.arn
 }
-
-output "api_gw_authorizer_function_arn" {
-  value = aws_lambda_function.api_gw_authorizer_function.arn
-}

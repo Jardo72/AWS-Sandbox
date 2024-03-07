@@ -34,12 +34,6 @@ data "archive_file" "ssm_parameter_function_archive" {
   output_path = "${path.module}/read-ssm-parameter.zip"
 }
 
-data "archive_file" "api_gw_authorizer_function_archive" {
-  type        = "zip"
-  source_file = "${path.module}/api-gw-authorizer.py"
-  output_path = "${path.module}/api-gw-authorizer.zip"
-}
-
 resource "aws_iam_policy" "cloudwatch_logs_access_policy" {
   name = "${var.resource_name_prefix}-CloudWatchLogs-AccessPolicy"
   policy = jsonencode({
@@ -172,21 +166,6 @@ resource "aws_lambda_function" "kms_decryption_function" {
   role             = aws_iam_role.kms_encryption_role.arn
 }
 
-resource "aws_lambda_function" "api_gw_authorizer_function" {
-  function_name    = "${var.resource_name_prefix}-APIGWAuthorizer-Function"
-  filename         = data.archive_file.api_gw_authorizer_function_archive.output_path
-  source_code_hash = data.archive_file.api_gw_authorizer_function_archive.output_base64sha256
-  handler          = "api-gw-authorizer.main"
-  runtime          = local.runtime
-  timeout          = local.timeout
-  role             = aws_iam_role.kms_encryption_role.arn
-  environment {
-    variables = {
-      DUMMY_ARN = "arn:aws:lambda:eu-central-1:467504711004:function:API-GW-Lambda-Demo-APIGWAuthorizer-Function"
-    }
-  }
-}
-
 resource "aws_lambda_permission" "read_ssm_parameter_function_permission" {
   statement_id  = "AllowInvocationToAPIGateway"
   action        = "lambda:InvokeFunction"
@@ -205,12 +184,5 @@ resource "aws_lambda_permission" "kms_decryption_function_permission" {
   statement_id  = "AllowInvocationToAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.kms_decryption_function.function_name
-  principal     = "apigateway.amazonaws.com"
-}
-
-resource "aws_lambda_permission" "api_gw_authorizer_function_permission" {
-  statement_id  = "AllowInvocationToAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.api_gw_authorizer_function.function_name
   principal     = "apigateway.amazonaws.com"
 }

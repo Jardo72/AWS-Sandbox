@@ -23,8 +23,8 @@ from os import environ
 def main(event, context):
     print(f"Request to authorize request, event = {event}")
 
-    api_gw_stage_arn = environ["API_GW_STAGE_ARN"]
-    print(f"API GW stage ARN = {api_gw_stage_arn}")
+    api_gw_arn = environ["API_GW_ARN"]
+    print(f"API GW stage ARN = {api_gw_arn}")
     
     return {
         "principalId": "abc123",
@@ -34,14 +34,11 @@ def main(event, context):
                 {
                     "Action": "execute-api:Invoke",
                     "Resource": [
-                        # TODO:
-                        # - this will have to come from an environment variable
-                        # - it seems that the ARN of the API GW stage will be needed here
-                        f"{api_gw_stage_arn}/GET/ssm-parameter",
-                        f"{api_gw_stage_arn}/POST/kms/encrypt",
-                        f"{api_gw_stage_arn}/POST/kms/decrypt",
+                        f"{api_gw_arn}/GET/ssm/parameter",
+                        f"{api_gw_arn}/POST/kms/encrypt",
+                        f"{api_gw_arn}/POST/kms/decrypt",
                     ],
-                    "Effect": "Deny"
+                    "Effect": "Allow"
                 }
             ]
         }

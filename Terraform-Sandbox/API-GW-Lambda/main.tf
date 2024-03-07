@@ -65,7 +65,6 @@ module "api-gw" {
   read_ssm_parameter_function_arn = module.lambda.read_ssm_parameter_function_arn
   kms_encryption_function_arn     = module.lambda.kms_encryption_function_arn
   kms_decryption_function_arn     = module.lambda.kms_decryption_function_arn
-  api_gw_authorizer_function_arn  = module.lambda.api_gw_authorizer_function_arn
   resource_name_prefix            = var.resource_name_prefix
   tags                            = var.tags
 }
