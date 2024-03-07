@@ -28,7 +28,7 @@ info:
   version: 1.0.0
 
 paths:
-  /ssm-parameter:
+  /ssm/parameter:
     get:
       summary: SSM paramater details
       description: Returns the type and the value of the specified parameter stored in the SSM Parameter Store

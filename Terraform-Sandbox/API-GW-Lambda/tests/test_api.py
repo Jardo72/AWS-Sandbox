@@ -44,7 +44,7 @@ class TestSsmParamaterReading:
     ])
     def test_that_proper_param_value_is_read(self, test_case_data: Params) -> None:
         response = requests.get(
-            f"{API_GW_INVOCATION_URL}/ssm-parameter",
+            f"{API_GW_INVOCATION_URL}/ssm/parameter",
             params={"name": test_case_data.param_name}
         )
 
