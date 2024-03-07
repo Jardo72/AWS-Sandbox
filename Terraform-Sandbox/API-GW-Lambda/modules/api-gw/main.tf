@@ -52,7 +52,7 @@ resource "aws_api_gateway_stage" "stage" {
 }
 
 resource "aws_iam_role" "api_gw_authorizer_role" {
-  name = "${var.resource_name_prefix}-APUGW-Authorizer-Role"
+  name = "${var.resource_name_prefix}-APIGW-Authorizer-Role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -102,4 +102,6 @@ resource "aws_api_gateway_authorizer" "api_gw_authorizer" {
   rest_api_id            = aws_api_gateway_rest_api.rest_api.id
   authorizer_uri         = aws_lambda_function.api_gw_authorizer_function.invoke_arn
   authorizer_credentials = aws_iam_role.api_gw_authorizer_role.arn
+  identity_source        = "method.request.header.Authorization"
+  type                   = "REQUEST"
 }
