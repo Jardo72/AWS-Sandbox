@@ -17,7 +17,26 @@
 # limitations under the License.
 #
 
+from base64 import standard_b64decode
 from os import environ
+from re import fullmatch
+
+
+class MalformedCredendtials(Exception):
+
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+
+def extract_username_password(authorization):
+    m = fullmatch(r"Basic\s+([a-zA-Z0-9]+)", authorization)
+    try:
+        credentials = standard_b64decode(m.group(1))
+        credentials = credentials.decode("utf-8")
+        tokens = credentials.split(":")
+        return (tokens[0], tokens[1])
+    except:
+        raise MalformedCredendtials("Unable to extract username/password from Authorization header.")
 
 
 def main(event, context):
@@ -26,8 +45,21 @@ def main(event, context):
     api_gw_arn = environ["API_GW_ARN"]
     print(f"API GW stage ARN = {api_gw_arn}")
     
+    authorization = event["headers"]["Authorization"]
+    principal = "Unknown"
+    effect = "Deny"
+
+    try:
+        if authorization:
+            username, password = extract_username_password(authorization)
+            principal = username
+            if len(password) > len(username) and password > username:
+                effect = "Allow"
+    except MalformedCredendtials:
+        ...
+
     return {
-        "principalId": "abc123",
+        "principalId": principal,
         "policyDocument": {
             "Version": "2012-10-17",
             "Statement": [
@@ -38,7 +70,7 @@ def main(event, context):
                         f"{api_gw_arn}/POST/kms/encrypt",
                         f"{api_gw_arn}/POST/kms/decrypt",
                     ],
-                    "Effect": "Allow"
+                    "Effect": effect
                 }
             ]
         }
