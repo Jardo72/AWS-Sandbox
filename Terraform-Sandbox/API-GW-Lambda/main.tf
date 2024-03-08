@@ -38,7 +38,7 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 
 module "ssm" {
-  source = "./modules/ssm"
+  source                = "./modules/ssm"
   parameter_name_prefix = var.ssm_parameter_name_prefix
   parameter_one_name    = var.ssm_parameter_one_name
   parameter_one_value   = var.ssm_parameter_one_value
@@ -51,7 +51,7 @@ module "ssm" {
 }
 
 module "lambda" {
-  source = "./modules/lambda"
+  source                    = "./modules/lambda"
   aws_region                = var.aws_region
   aws_account_id            = data.aws_caller_identity.current.account_id
   ssm_parameter_name_prefix = var.ssm_parameter_name_prefix

@@ -43,7 +43,7 @@ variable "ssm_parameter_one_value" {
 variable "ssm_parameter_two_name" {
   description = "Short name (without prefix) for the 2nd SSM parameter"
   type        = string
-  default    = "sample-param-two"
+  default     = "sample-param-two"
 }
 
 variable "ssm_parameter_two_value" {
@@ -55,7 +55,7 @@ variable "ssm_parameter_two_value" {
 variable "ssm_parameter_three_name" {
   description = "Short name (without prefix) for the 3rd SSM parameter"
   type        = string
-  default    = "sample-param-three"
+  default     = "sample-param-three"
 }
 
 variable "ssm_parameter_three_value" {
