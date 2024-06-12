@@ -36,8 +36,8 @@ tags = {
 Configuration during testing:
 | Instance | VPC                  | Private IP  | DNS Name            | Listening on TCP Port |
 | -------- | -------------------- | ----------- | ------------------- | --------------------- |
-| EC2-#1   | VPC-#1 (10.0.0.0/16) | 10.0.1.77   | ec2-one.example.jch | 80                    |
-| EC2-#2   | VPC-#2 (10.1.0.0/16) | 10.1.13.126 | ec2-two.example.jch | 80                    |
+| EC2-#1   | VPC-#1 (10.0.0.0/16) | 10.0.1.77   | ec2-one.example.jch | 8080                  |
+| EC2-#2   | VPC-#2 (10.1.0.0/16) | 10.1.13.126 | ec2-two.example.jch | 8080                  |
 
 
 Test results:
@@ -47,12 +47,12 @@ Test results:
 | EC2-#1   | ping ec2-two.example.jch          | Success                  |
 | EC2-#2   | ping 10.0.1.77                    | Success                  |
 | EC2-#2   | ping ec2-one.example.jch          | Success                  |
-| EC2-#1   | nc -v ec2-two.example.jch 70      | Connection timed out     |
-| EC2-#1   | nc -v ec2-two.example.jch 80      | Connected to 10.1.13.126 |
-| EC2-#1   | nc -v ec2-two.example.jch 90      | Connection refused       |
-| EC2-#1   | nc -v ec2-two.example.jch 110     | Connection timed out     |
-| EC2-#2   | nc -v ec2-one.example.jch 80      | Connection timed out     |
-| EC2-#2   | nc -v ec2-one.example.jch 100     | Connection timed out     |
+| EC2-#1   | nc -v ec2-two.example.jch 8070    | Connection timed out     |
+| EC2-#1   | nc -v ec2-two.example.jch 8080    | Connected to 10.1.13.126 |
+| EC2-#1   | nc -v ec2-two.example.jch 8090    | Connection refused       |
+| EC2-#1   | nc -v ec2-two.example.jch 8110    | Connection timed out     |
+| EC2-#2   | nc -v ec2-one.example.jch 8080    | Connection timed out     |
+| EC2-#2   | nc -v ec2-one.example.jch 8100    | Connection timed out     |
 
 
 CloudWatch Insights queries - ICMP traffic:
@@ -107,7 +107,7 @@ CloudWatch Insights queries - TCP traffic:
 # - REJECT records found in flow log for VPC #2
 ####################################################################################
 fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
-| filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 70
+| filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 8070
 | sort @timestamp desc
 
 
@@ -118,7 +118,7 @@ fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
 # - ACCEPT records found in flow log for VPC #2
 ####################################################################################
 fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
-| filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 80
+| filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 8080
 | sort @timestamp desc
 
 
@@ -129,7 +129,7 @@ fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
 # - ACCEPT records found in flow log for VPC #2
 ####################################################################################
 fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
-| filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 90
+| filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 8090
 | sort @timestamp desc
 
 
@@ -140,7 +140,7 @@ fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
 # - REJECT records found in flow log for VPC #2
 ####################################################################################
 fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
-| filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 110
+| filter protocol = 6 and srcAddr = '10.0.1.77' and dstAddr = '10.1.13.126' and dstPort = 8110
 | sort @timestamp desc
 
 
@@ -151,7 +151,7 @@ fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
 # - REJECT records found in flow log for VPC #2
 ####################################################################################
 fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
-| filter protocol = 6 and srcAddr = '10.1.13.126' and dstAddr = '10.0.1.77' and dstPort = 80
+| filter protocol = 6 and srcAddr = '10.1.13.126' and dstAddr = '10.0.1.77' and dstPort = 8080
 | sort @timestamp desc
 
 
@@ -162,6 +162,6 @@ fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
 # - REJECT records found in flow log for VPC #2
 ####################################################################################
 fields @timestamp, protocol, srcAddr, srcPort, dstAddr, dstPort, action
-| filter protocol = 6 and srcAddr = '10.1.13.126' and dstAddr = '10.0.1.77' and dstPort = 100
+| filter protocol = 6 and srcAddr = '10.1.13.126' and dstAddr = '10.0.1.77' and dstPort = 8100
 | sort @timestamp desc
 ```

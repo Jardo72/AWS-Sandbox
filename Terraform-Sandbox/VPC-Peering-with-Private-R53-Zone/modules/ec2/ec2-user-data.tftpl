@@ -21,6 +21,36 @@
 
 yum update -y
 yum install nc -y
+yum install net-tools -y
+yum install tcpdump -y
 
-# open TCP port 80 in listening mode, keep it open & accept many connections
-nc -l -k 80 &
+# create the user used to run the nc process
+useradd --no-create-home --shell /bin/false nc
+
+# generate the unit file for the nc service
+NC_EXECUTABLE=$(which nc)
+cat > /etc/systemd/system/nc.service <<-EOF
+[Unit]
+Description=netcat service
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+
+User=nc
+Group=nc
+
+ExecStart=$NC_EXECUTABLE -l -k 8080
+
+RestartSec=15
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# start (and enable) the nc service
+systemctl daemon-reload
+systemctl start nc
+systemctl enable nc

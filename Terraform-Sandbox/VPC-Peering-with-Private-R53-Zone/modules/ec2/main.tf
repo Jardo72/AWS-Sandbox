@@ -122,10 +122,10 @@ resource "aws_security_group" "ec2_two_security_group" {
   }
   ingress {
     protocol    = "tcp"
-    from_port   = 80
-    to_port     = 100
+    from_port   = 8080
+    to_port     = 8100
     cidr_blocks = [var.vpc_one_cidr_block]
-    description = "Allow inbound TCP traffic from the peered VPC for ports between 80 and 100"
+    description = "Allow inbound TCP traffic from the peered VPC for ports between 8080 and 8100"
   }
   tags = merge(var.tags, {
     Name = "${var.resource_name_prefix}-EC2-#2-SG"
