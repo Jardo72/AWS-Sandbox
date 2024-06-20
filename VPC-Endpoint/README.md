@@ -21,7 +21,7 @@ The overall setup is depicted by the following diagram:
 ![application-diagram](./diagram.png)
 
 ## Deployment
-The following command can be used to deploy the setup using the AWS CLI.
+The deployment of the above described setup depends on resource(s) created by [Common-S3-Buckets](../Common-S3-Buckets) (e.g. S3 bucket for S3 access logs). Therefore, create that stack before you start the deployment of this demo. The following command can be used to deploy the VPC endpoint demo using the AWS CLI.
 ```
 aws cloudformation create-stack --stack-name VPC-Endpoint-Demo --template-body file://cloud-formation-template.yml --parameters file://stack-params.json --capabilities CAPABILITY_NAMED_IAM --on-failure ROLLBACK
 ```
